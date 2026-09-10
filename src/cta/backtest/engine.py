@@ -30,6 +30,9 @@ class BacktestResult:
     costs: pd.Series[Any]  # 每日 手续费+滑点(元)
     trades: pd.DataFrame  # date, symbol, contract, lots, price, reason
     unfilled: pd.Series[Any] = field(default_factory=lambda: pd.Series(dtype=int))
+    slippage: pd.Series[Any] = field(
+        default_factory=lambda: pd.Series(dtype=float)
+    )  # 每日滑点(元),已体现在成交价与权益里,此处单独记账
 
 
 def _fill_price(open_px: float, lots_delta: float, tick: float, slippage_ticks: float) -> float:
@@ -43,11 +46,14 @@ def run_backtest(
     initial_capital: float,
     max_margin_usage: float = 0.4,
     slippage_ticks: float = 1.0,
+    lot_band: float = 0.2,
 ) -> BacktestResult:
     """target_exposure: index=信号日(收盘), columns=symbol, 值=目标名义暴露/权益(正多负空)。在下一交易日开盘成交。
 
     每日四步:① 换月(旧平新开,不受保证金预检影响);② 由目标暴露与今日开盘价算目标手数,合并涨跌停顺延的挂单;
-    ③ 保证金预检:预计占用 > 上限 × 权益 时按比例缩减全部目标手数;④ 成交(涨跌停锁死则顺延)并按结算价盯市。"""
+    ③ 保证金预检:预计占用 > 上限 × 权益 时按比例缩减全部目标手数;④ 成交(涨跌停锁死则顺延)并按结算价盯市。
+    lot_band:手数层面的不交易带——|目标手数 − 当前手数| < lot_band × max(1, |当前手数|) 时不交易,
+             消除权益与价格日间波动造成的整手抖动(目标手数为 0 即平仓时不受此限)。"""
     symbols = [s for s in target_exposure.columns if s in panels]
     frames = {s: panels[s].frame for s in symbols}
     all_dates = sorted(set().union(*[set(f.index) for f in frames.values()]))
@@ -65,9 +71,10 @@ def run_backtest(
     cost_hist: dict[pd.Timestamp, float] = {}
     unf_hist: dict[pd.Timestamp, int] = {}
     trades: list[tuple[pd.Timestamp, str, str, float, float, str]] = []
+    slip_hist: dict[pd.Timestamp, float] = {}
 
     for d in dates:
-        day_cost, pnl, unfilled = 0.0, 0.0, 0
+        day_cost, pnl, unfilled, day_slip = 0.0, 0.0, 0, 0.0
         rows = {s: frames[s].loc[d] for s in symbols if d in frames[s].index}
         settled: set[str] = set()  # 今日已盯市到结算价的品种
         # ① 换月
@@ -87,10 +94,12 @@ def run_backtest(
             px_old = _fill_price(old_open, -cur, spec.tick, slippage_ticks)
             pnl += (px_old - float(row["prev_settle"])) * mult * cur
             day_cost += spec.fee(px_old, cur)
+            day_slip += spec.slippage(cur, slippage_ticks)
             trades.append((d, s, str(row["roll_from"]), -cur, px_old, "roll_close"))
             px_new = _fill_price(float(row["open"]), cur, spec.tick, slippage_ticks)
             pnl += (float(row["settle"]) - px_new) * mult * cur
             day_cost += spec.fee(px_new, cur)
+            day_slip += spec.slippage(cur, slippage_ticks)
             trades.append((d, s, str(row["contract"]), cur, px_new, "roll_open"))
             held_contract[s] = str(row["contract"])
             settled.add(s)
@@ -119,6 +128,9 @@ def run_backtest(
             want = desired.get(s, lots[s])
             delta = want - lots[s]
             px_open = float(row["open"])
+            # 手数不交易带:小于带宽的整手抖动不交易(平仓不受限)
+            if want != 0 and abs(delta) < lot_band * max(1.0, abs(lots[s])):
+                delta = 0.0
             if delta != 0:
                 locked = (px_open >= float(row["limit_up"]) - 1e-9 and delta > 0) or (
                     px_open <= float(row["limit_down"]) + 1e-9 and delta < 0
@@ -132,8 +144,9 @@ def run_backtest(
                         pnl += (float(row["settle"]) - float(row["prev_settle"])) * mult * lots[s]
                     pnl += (float(row["settle"]) - px) * mult * delta
                     day_cost += spec.fee(px, delta)
+                    day_slip += spec.slippage(delta, slippage_ticks)
                     trades.append((d, s, str(row["contract"]), delta, px, "rebalance"))
-                    lots[s] = want
+                    lots[s] = lots[s] + delta
                     held_contract[s] = str(row["contract"])
                     settled.add(s)
             if lots[s] != 0 and s not in settled:
@@ -167,4 +180,5 @@ def run_backtest(
         costs=pd.Series(cost_hist, name="costs"),
         trades=pd.DataFrame(trades, columns=["date", "symbol", "contract", "lots", "price", "reason"]),
         unfilled=pd.Series(unf_hist, name="unfilled", dtype=int),
+        slippage=pd.Series(slip_hist, name="slippage"),
     )

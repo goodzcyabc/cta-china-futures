@@ -120,6 +120,7 @@ def run_research(
         cfg.backtest.initial_capital_cny,
         max_margin_usage=cfg.portfolio.max_margin_usage,
         slippage_ticks=cfg.execution.slippage_ticks,
+        lot_band=cfg.portfolio.trade_buffer,
     )
     stats = perf_stats(res.equity)
     yrs = (res.equity.index[-1] - res.equity.index[0]).days / 365.25
@@ -129,7 +130,8 @@ def run_research(
         * res.trades["symbol"].map(lambda s: specs[s].multiplier)
     ).sum()
     stats["年化名义换手(倍)"] = float(gross_traded / res.equity.mean() / yrs)
-    stats["年化成本占权益"] = float(res.costs.sum() / res.equity.mean() / yrs)
+    stats["年化手续费占权益"] = float(res.costs.sum() / res.equity.mean() / yrs)
+    stats["年化滑点占权益"] = float(res.slippage.sum() / res.equity.mean() / yrs)
     stats["平均保证金占用"] = float(res.margin_usage.mean())
     stats["未成交顺延次数"] = float(res.unfilled.sum())
     out_dir.mkdir(parents=True, exist_ok=True)

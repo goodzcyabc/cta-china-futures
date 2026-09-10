@@ -85,3 +85,18 @@ def test_margin_cap_scales_next_target() -> None:
     tgt = pd.DataFrame({"CU": [10.0] * 4}, index=dates)  # 1000% 名义 -> 保证金 100% > 40% 上限
     r = run_backtest({"CU": p}, tgt, specs, initial_capital=1_000_000, max_margin_usage=0.4)
     assert r.margin_usage.iloc[-1] < 0.5  # 被压回上限附近
+
+
+def test_lot_band_suppresses_jitter_but_not_close() -> None:
+    specs = load_instruments()
+    dates = pd.bdate_range("2021-03-01", periods=6)
+    settles = [70000.0, 70000.0, 70000.0, 70000.0, 70000.0, 70000.0]
+    p = _panel(dates, opens=settles, settles=settles)
+    # 目标暴露 3.5 -> 10 手;之后微调到 10.5 手(11 手,差 1 手 < 20%×10)不交易;最后目标 0 必须平仓
+    tgt = pd.DataFrame({"CU": [3.5, 3.5, 3.85, 3.85, 0.0, 0.0]}, index=dates)
+    r = run_backtest({"CU": p}, tgt, specs, initial_capital=1_000_000, lot_band=0.2)
+    lots = r.positions["CU"].tolist()
+    assert lots[1] == 10 and lots[3] == 10 and lots[5] == 0
+    assert r.slippage.loc[dates[1]] == 10 * 10 * 5  # 10 手 × 1 跳 × 10 元 × 5 吨
+    r0 = run_backtest({"CU": p}, tgt, specs, initial_capital=1_000_000, lot_band=0.0)
+    assert r0.positions["CU"].tolist()[3] == 11  # 无缓冲带时会追到 11 手
