@@ -1,0 +1,30 @@
+# 合约参数表。数值为交易所公开规则的近似值(截至 2024 年常见水平),margin_rate 取交易所最低保证金的常见值。
+# 上线前必须逐项对照交易所当前公告核实,并把 verified 改为 true。fee 有两种口径:per_lot(元/手)或 notional_bp(按成交金额的万分比)。
+meta:
+  verified: false
+  note: "所有数值需在上线前对照交易所最新公告核实;回测中用作成本与保证金的保守近似。"
+  slippage_ticks_per_side: 1
+symbols:
+  C:  {exchange: DCE,  name: 玉米,     multiplier: 10,    tick: 1,     margin_rate: 0.07, fee_per_lot: 1.2,  fee_notional_bp: 0,    limit_pct: 0.04, asset_class: agri}
+  M:  {exchange: DCE,  name: 豆粕,     multiplier: 10,    tick: 1,     margin_rate: 0.07, fee_per_lot: 1.5,  fee_notional_bp: 0,    limit_pct: 0.04, asset_class: agri}
+  Y:  {exchange: DCE,  name: 豆油,     multiplier: 10,    tick: 2,     margin_rate: 0.07, fee_per_lot: 2.5,  fee_notional_bp: 0,    limit_pct: 0.05, asset_class: agri}
+  P:  {exchange: DCE,  name: 棕榈油,   multiplier: 10,    tick: 2,     margin_rate: 0.08, fee_per_lot: 2.5,  fee_notional_bp: 0,    limit_pct: 0.06, asset_class: agri}
+  JD: {exchange: DCE,  name: 鸡蛋,     multiplier: 10,    tick: 1,     margin_rate: 0.08, fee_per_lot: 0,    fee_notional_bp: 1.5,  limit_pct: 0.04, asset_class: agri}
+  CF: {exchange: CZCE, name: 棉花,     multiplier: 5,     tick: 5,     margin_rate: 0.07, fee_per_lot: 4.3,  fee_notional_bp: 0,    limit_pct: 0.05, asset_class: agri}
+  SR: {exchange: CZCE, name: 白糖,     multiplier: 10,    tick: 1,     margin_rate: 0.07, fee_per_lot: 3.0,  fee_notional_bp: 0,    limit_pct: 0.05, asset_class: agri}
+  V:  {exchange: DCE,  name: PVC,      multiplier: 5,     tick: 5,     margin_rate: 0.07, fee_per_lot: 1.0,  fee_notional_bp: 0,    limit_pct: 0.04, asset_class: chem}
+  TA: {exchange: CZCE, name: PTA,      multiplier: 5,     tick: 2,     margin_rate: 0.07, fee_per_lot: 3.0,  fee_notional_bp: 0,    limit_pct: 0.05, asset_class: chem}
+  MA: {exchange: CZCE, name: 甲醇,     multiplier: 10,    tick: 1,     margin_rate: 0.08, fee_per_lot: 2.0,  fee_notional_bp: 0,    limit_pct: 0.05, asset_class: chem}
+  SA: {exchange: CZCE, name: 纯碱,     multiplier: 20,    tick: 1,     margin_rate: 0.09, fee_per_lot: 3.5,  fee_notional_bp: 0,    limit_pct: 0.05, asset_class: chem}
+  RU: {exchange: SHFE, name: 天然橡胶, multiplier: 10,    tick: 5,     margin_rate: 0.10, fee_per_lot: 3.0,  fee_notional_bp: 0,    limit_pct: 0.06, asset_class: chem}
+  SC: {exchange: INE,  name: 原油,     multiplier: 1000,  tick: 0.1,   margin_rate: 0.15, fee_per_lot: 20.0, fee_notional_bp: 0,    limit_pct: 0.08, asset_class: energy}
+  J:  {exchange: DCE,  name: 焦炭,     multiplier: 100,   tick: 0.5,   margin_rate: 0.20, fee_per_lot: 0,    fee_notional_bp: 1.0,  limit_pct: 0.08, asset_class: ferrous}
+  I:  {exchange: DCE,  name: 铁矿石,   multiplier: 100,   tick: 0.5,   margin_rate: 0.12, fee_per_lot: 0,    fee_notional_bp: 1.0,  limit_pct: 0.06, asset_class: ferrous}
+  RB: {exchange: SHFE, name: 螺纹钢,   multiplier: 10,    tick: 1,     margin_rate: 0.08, fee_per_lot: 0,    fee_notional_bp: 1.0,  limit_pct: 0.06, asset_class: ferrous}
+  CU: {exchange: SHFE, name: 铜,       multiplier: 5,     tick: 10,    margin_rate: 0.10, fee_per_lot: 0,    fee_notional_bp: 0.5,  limit_pct: 0.06, asset_class: metal}
+  AL: {exchange: SHFE, name: 铝,       multiplier: 5,     tick: 5,     margin_rate: 0.10, fee_per_lot: 3.0,  fee_notional_bp: 0,    limit_pct: 0.06, asset_class: metal}
+  NI: {exchange: SHFE, name: 镍,       multiplier: 1,     tick: 10,    margin_rate: 0.12, fee_per_lot: 3.0,  fee_notional_bp: 0,    limit_pct: 0.08, asset_class: metal}
+  SN: {exchange: SHFE, name: 锡,       multiplier: 1,     tick: 10,    margin_rate: 0.12, fee_per_lot: 3.0,  fee_notional_bp: 0,    limit_pct: 0.08, asset_class: metal}
+  AU: {exchange: SHFE, name: 黄金,     multiplier: 1000,  tick: 0.02,  margin_rate: 0.10, fee_per_lot: 10.0, fee_notional_bp: 0,    limit_pct: 0.06, asset_class: precious}
+  AG: {exchange: SHFE, name: 白银,     multiplier: 15,    tick: 1,     margin_rate: 0.12, fee_per_lot: 0,    fee_notional_bp: 0.5,  limit_pct: 0.06, asset_class: precious}
+  TF: {exchange: CFFEX, name: 5年期国债, multiplier: 10000, tick: 0.005, margin_rate: 0.012, fee_per_lot: 3.0, fee_notional_bp: 0,   limit_pct: 0.012, asset_class: rates}
