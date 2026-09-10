@@ -57,5 +57,13 @@ def live(
     typer.echo(json.dumps(report["summary"], ensure_ascii=False, indent=2))
 
 
+@app.command()
+def report(run: Path = typer.Argument(..., help="results/<digest> 目录")) -> None:
+    """从已完成的回测结果生成 report.md 与图。"""
+    from cta.report.build import build_report
+
+    typer.echo(f"-> {build_report(run)}")
+
+
 if __name__ == "__main__":
     app()

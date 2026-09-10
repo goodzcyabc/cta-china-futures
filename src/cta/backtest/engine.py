@@ -171,6 +171,7 @@ def run_backtest(
         mu_hist[d] = margin / equity if equity > 0 else np.nan
         cost_hist[d] = day_cost
         unf_hist[d] = unfilled
+        slip_hist[d] = day_slip
 
     return BacktestResult(
         equity=pd.Series(eq_hist, name="equity"),
