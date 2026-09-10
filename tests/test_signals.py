@@ -50,12 +50,22 @@ def test_combine_and_vol_target() -> None:
     b = pd.DataFrame({"X": [-1, -1, -1, -1, -1.0], "Y": [0.5] * 5}, index=idx)
     c = combine({"a": a, "b": b})
     assert (c["X"] == 0).all() and (c["Y"] == 0.5).all()  # Y 只有 b 有值 -> 不被 NaN 拉低
-    vol = pd.DataFrame({"X": [0.2] * 5, "Y": [0.1] * 5}, index=idx)
-    sig = pd.DataFrame({"X": [1.0] * 5, "Y": [1.0] * 5}, index=idx)
-    w = vol_target_positions(sig, vol, target_vol=0.10)
-    assert abs(w.iloc[0]["X"] - 0.25) < 1e-12 and abs(w.iloc[0]["Y"] - 0.5) < 1e-12  # 各占 σ_t/σ_i/N
-    w2 = vol_target_positions(sig, vol * 0.01, target_vol=0.10, max_leverage_per_symbol=1.0)
-    assert (w2.abs() <= 1.0).all().all()
+    # 事前波动缩放:两只不相关、日波动 1% 的品种,等权做多,目标年化 10% -> 组合年化波动应≈10%
+    rng = np.random.default_rng(1)
+    n = 300
+    px = pd.DataFrame(
+        100 * np.exp(np.cumsum(0.01 * rng.normal(size=(n, 2)), axis=0)),
+        index=pd.bdate_range("2020-01-01", periods=n),
+        columns=["X", "Y"],
+    )
+    vol = realized_vol(px, 40)
+    sig = pd.DataFrame(1.0, index=px.index, columns=px.columns)
+    w = vol_target_positions(sig, vol, px, target_vol=0.10, window=60, max_leverage_per_symbol=5.0)
+    last = w.iloc[-1]
+    r = np.log(px).diff().iloc[-60:]
+    port_vol = float(np.sqrt(last.to_numpy() @ r.cov().to_numpy() @ last.to_numpy() * 243))
+    assert abs(port_vol - 0.10) < 1e-6
+    assert ((w.abs() <= 5.0) | w.isna()).all().all() and w.iloc[:60].isna().all().all()
 
 
 def test_trade_buffer() -> None:

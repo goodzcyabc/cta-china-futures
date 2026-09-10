@@ -43,19 +43,22 @@ def build_panels(
         if s not in src.symbols():
             continue
         c = src.contracts(s)
-        dd = src.dominant_daily(s)
         if end is not None:
             c = c[c.index.get_level_values("date") <= end]
-            dd = dd[dd.index <= end]
             dm_s = dm[dm["date"] <= end]
         else:
             dm_s = dm
         if len(c) == 0:
             continue
-        panel = build_symbol_panel(s, c, dm_s, meta, dd, confirm_days=cfg.execution.roll_confirm_days)
-        # 元数据里的合约保证金率是临近交割时抬高后的值(如 CU 0.20),不代表主力合约的日常水平;统一用交易所标准值
-        panel.frame["margin_rate"] = specs[s].margin_rate
-        out[s] = panel
+        out[s] = build_symbol_panel(
+            s,
+            c,
+            dm_s,
+            meta,
+            limit_pct=specs[s].limit_pct,
+            confirm_days=cfg.execution.roll_confirm_days,
+            margin_rate=specs[s].margin_rate,
+        )
     return out
 
 
@@ -79,7 +82,9 @@ def compute_signals(panels: dict[str, SymbolPanel], cfg: StrategyConfig) -> Sign
     raw_target = sig.vol_target_positions(
         comb.where(eligible),
         vol,
+        adj,
         cfg.portfolio.target_vol,
+        window=cfg.signals.vol_window,
         max_leverage_per_symbol=cfg.portfolio.max_leverage_per_symbol,
     )
     # 交易缓冲:逐日相对上一日实际目标

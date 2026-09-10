@@ -72,16 +72,36 @@ def combine(signals: dict[str, Frame], weights: dict[str, float] | None = None) 
 def vol_target_positions(
     signal: Frame,
     vol: Frame,
+    px: Frame,
     target_vol: float = 0.10,
-    n_active: pd.Series[float] | None = None,
+    window: int = 60,
     max_leverage_per_symbol: float = 1.0,
 ) -> Frame:
-    """把信号强度转成"占组合资本的名义暴露比例":w_i = s_i × (σ_target / σ_i) / N_active。
-    每个品种贡献约 σ_target/N 的风险(风险平价的简化版);上限防止低波品种杠杆爆炸。"""
-    n = signal.notna().sum(axis=1).astype(float) if n_active is None else n_active
-    raw = signal * (target_vol / vol.replace(0, np.nan))
-    w: Frame = raw.div(n.replace(0, np.nan), axis=0)
-    return w.clip(-max_leverage_per_symbol, max_leverage_per_symbol)
+    """信号 -> 占组合资本的名义暴露比例。
+    第一步 风险平价雏形:w_i ∝ s_i / σ_i(每单位信号承担相同风险);
+    第二步 事前组合波动缩放:用最近 window 日收益的协方差算 σ_p = sqrt(wᵀΣw),整体乘 target_vol/σ_p;
+    最后 单品种名义上限。相比"除以品种数"的写法,这里正确处理了分散化(N 个不相关头寸的组合波动是 σ/√N)。"""
+    raw: Frame = (signal / vol.replace(0, np.nan)).fillna(0.0)
+    rets = log_returns(px)
+    k = pd.Series(np.nan, index=raw.index, dtype=float)
+    cols = list(raw.columns)
+    r_np = rets[cols].to_numpy(dtype=float)
+    w_np = raw[cols].to_numpy(dtype=float)
+    for i in range(len(raw)):
+        if i < window:
+            continue
+        w = w_np[i]
+        if not np.any(w):
+            continue
+        block = r_np[i - window + 1 : i + 1]
+        ok = ~np.isnan(block).any(axis=0)
+        wv = np.where(ok, w, 0.0)
+        cov = np.cov(np.nan_to_num(block[:, ok]).T) if ok.sum() > 1 else np.array([[np.nanvar(block[:, ok])]])
+        var = float(wv[ok] @ np.atleast_2d(cov) @ wv[ok]) * TRADING_DAYS
+        if var > 0:
+            k.iloc[i] = target_vol / np.sqrt(var)
+    scaled: Frame = raw.mul(k, axis=0)
+    return scaled.clip(-max_leverage_per_symbol, max_leverage_per_symbol)
 
 
 def trade_buffer(target: pd.Series[float], current: pd.Series[float], band: float = 0.2) -> pd.Series[float]:

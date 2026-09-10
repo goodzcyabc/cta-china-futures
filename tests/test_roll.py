@@ -57,7 +57,7 @@ def test_confirmed_dominant_requires_persistence_and_monotone_maturity() -> None
 
 def test_build_panel_roll_and_adjustment() -> None:
     dates, c, dm, meta, dd = _fixture()
-    p = build_symbol_panel("X", c, dm, meta, dd, confirm_days=3).frame
+    p = build_symbol_panel("X", c, dm, meta, limit_pct=0.08, confirm_days=3).frame
     roll_days = p.index[p["roll"]]
     assert len(roll_days) == 1 and roll_days[0] == dates[8]  # 第 7 天开始候选为 B,第 9 天(连续 3 天)切换
     assert p.at[roll_days[0], "roll_from"] == "X2103" and p.at[roll_days[0], "roll_from_open"] == 100.0
@@ -67,5 +67,9 @@ def test_build_panel_roll_and_adjustment() -> None:
     assert p["next_contract"].iloc[0] == "X2105" and p["days_to_next"].iloc[0] == 60
     assert p["next_contract"].iloc[-1] == "X2107"
     assert p["multiplier"].iloc[0] == 10.0 and p["margin_rate"].iloc[0] == 0.1
-    # 结算价:与数据商主力一致时取结算价;切换滞后的两天(第 7、8 天)持有 A 而数据商主力为 B -> 回退为收盘
-    assert p["settle"].iloc[0] == 100.0 and p["settle"].iloc[6] == 100.0 and p["settle"].iloc[-1] == 90.0
+    # 结算价 ≈ 收盘;涨跌停 = 前收盘 × (1 ± 8%)
+    assert (
+        p["settle"].iloc[0] == 100.0
+        and abs(p["limit_up"].iloc[1] - 108.0) < 1e-9
+        and abs(p["limit_down"].iloc[1] - 92.0) < 1e-9
+    )

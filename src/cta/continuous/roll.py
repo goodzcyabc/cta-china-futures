@@ -3,8 +3,9 @@
 规则(预注册):
 1. 候选主力 = 数据商每日主力;实际持有合约在候选**连续 confirm_days 天**不变后才切换,且只向更晚到期切换(不回滚)。
 2. 切换日同时平旧开新,两笔都记成本(引擎负责);本模块只标记 roll 日与新旧合约。
-3. 回溯复权连续价(adj_close)只用于信号:在 roll 日用 新合约收盘/旧合约收盘 的比率把历史整体缩放。
-4. 次主力 = 到期晚于持有合约、当日持仓量最大的合约;展期收益需要 (持有 − 次主力)/次主力 与两者到期间隔天数。
+3. 结算价用收盘价近似、涨跌停按前收盘自算(数据商的 dominant_daily 是复权后的连续价,不能与原始合约价混用)。
+4. 回溯复权连续价(adj_close)只用于信号:在 roll 日用 新合约收盘/旧合约收盘 的比率把历史整体缩放。
+5. 次主力 = 到期晚于持有合约、当日持仓量最大的合约;展期收益需要 (持有 − 次主力)/次主力 与两者到期间隔天数。
 """
 
 from __future__ import annotations
@@ -72,9 +73,9 @@ def build_symbol_panel(
     contracts: pd.DataFrame,
     dominant_map: pd.DataFrame,
     meta: pd.DataFrame,
-    dominant_daily: pd.DataFrame,
+    limit_pct: float = 0.06,
     confirm_days: int = 3,
-    limit_pct_fallback: float = 0.06,
+    margin_rate: float | None = None,
 ) -> SymbolPanel:
     dm = dominant_map[dominant_map["symbol"] == symbol].set_index("date")["contract"]
     maturity = meta.loc[meta["symbol"] == symbol, "maturity_date"]
@@ -99,20 +100,14 @@ def build_symbol_panel(
     f["contract"] = held.values
     for col in ["open", "high", "low", "close", "volume", "open_interest"]:
         f[col] = pick(contracts[col].unstack("contract").reindex(dates), held)
-    # 结算价与官方涨跌停:持有合约等于数据商主力时直接用;否则结算≈收盘,涨跌停按比例回退
-    dd = dominant_daily.reindex(dates)
-    same = np.asarray(dd["contract"].astype(str).to_numpy() == held.to_numpy(), dtype=bool)
-    f["settle"] = np.where(same, dd["settlement"].to_numpy(dtype=float), f["close"].to_numpy(dtype=float))
+    # 结算价 ≈ 收盘价;涨跌停按前收盘与交易所幅度自算(合约级数据不含结算价与官方涨跌停)
+    f["settle"] = f["close"].to_numpy(dtype=float)
     f["prev_settle"] = f["settle"].shift(1).to_numpy(dtype=float)
     prev_settle = f["prev_settle"].to_numpy(dtype=float)
-    f["limit_up"] = np.where(
-        same, dd["limit_up"].to_numpy(dtype=float), prev_settle * (1 + limit_pct_fallback)
-    )
-    f["limit_down"] = np.where(
-        same, dd["limit_down"].to_numpy(dtype=float), prev_settle * (1 - limit_pct_fallback)
-    )
+    f["limit_up"] = prev_settle * (1 + limit_pct)
+    f["limit_down"] = prev_settle * (1 - limit_pct)
     f["multiplier"] = held.map(meta["multiplier"]).values
-    f["margin_rate"] = held.map(meta["margin_rate"]).values
+    f["margin_rate"] = margin_rate if margin_rate is not None else held.map(meta["margin_rate"]).values
     f["maturity"] = held.map(maturity).values
     # roll 标记与旧合约当日开盘价(引擎在 roll 日按旧合约开盘平仓)
     prev = held.shift(1)
