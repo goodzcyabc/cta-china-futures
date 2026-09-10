@@ -117,15 +117,4 @@ K = ["年化收益", "年化波动", "夏普(月频)", "月频NW t", "最大回�
 pd.set_option("display.width", 200)
 t = pd.DataFrame(rows).T[K]
 print(t.round(3).to_string())
-# 分品种 PnL(按暴露×结算收益近似)
-out = Path("results") / cfg.digest()
-t.to_csv(out / "diagnostics.csv")
-sym_pnl = {}
-for s, p in panels.items():
-    f = p.frame.reindex(main.exposure.index)
-    r = f["settle"].pct_change()
-    sym_pnl[s] = float((main.exposure[s].shift(1) * r).sum())
-sp = pd.Series(sym_pnl).sort_values(ascending=False)
-sp.to_csv(out / "symbol_pnl_approx.csv")
-print("\n分品种累计贡献(近似,占初始权益):")
-print(sp.round(3).to_string())
+# 分品种盈亏请用引擎记账的 results/<digest>/pnl_by_symbol.csv(与权益逐日对账),不要用暴露×结算价环比近似(换月日会把合约价差算成收益)
