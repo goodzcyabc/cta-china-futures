@@ -76,6 +76,7 @@ def vol_target_positions(
     target_vol: float = 0.10,
     window: int = 60,
     max_leverage_per_symbol: float = 1.0,
+    update: str = "daily",
 ) -> Frame:
     """信号 -> 占组合资本的名义暴露比例。
     第一步 风险平价雏形:w_i ∝ s_i / σ_i(每单位信号承担相同风险);
