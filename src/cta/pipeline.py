@@ -52,7 +52,10 @@ def build_panels(
             dm_s = dm
         if len(c) == 0:
             continue
-        out[s] = build_symbol_panel(s, c, dm_s, meta, dd, confirm_days=cfg.execution.roll_confirm_days)
+        panel = build_symbol_panel(s, c, dm_s, meta, dd, confirm_days=cfg.execution.roll_confirm_days)
+        # 元数据里的合约保证金率是临近交割时抬高后的值(如 CU 0.20),不代表主力合约的日常水平;统一用交易所标准值
+        panel.frame["margin_rate"] = specs[s].margin_rate
+        out[s] = panel
     return out
 
 
