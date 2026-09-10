@@ -147,6 +147,8 @@ def run_research(
     res.trades.to_csv(out_dir / "trades.csv", index=False)
     res.margin_usage.to_csv(out_dir / "margin_usage.csv")
     res.costs.to_csv(out_dir / "costs.csv")
+    res.slippage.to_csv(out_dir / "slippage.csv")
+    res.pnl_by_symbol.to_csv(out_dir / "pnl_by_symbol.csv")
     signals.combined.to_csv(out_dir / "signal_combined.csv")
     signals.tsmom.to_csv(out_dir / "signal_tsmom.csv")
     signals.carry.to_csv(out_dir / "signal_carry.csv")
