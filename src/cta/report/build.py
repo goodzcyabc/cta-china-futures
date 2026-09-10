@@ -10,6 +10,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 from matplotlib import font_manager  # noqa: E402
 
@@ -77,11 +78,26 @@ def build_report(run_dir: Path) -> Path:
             segs[lab] = perf_stats(sub)
     seg = pd.DataFrame(segs).T[["年化收益", "年化波动", "夏普(月频)", "最大回撤"]]
     # 分品种贡献:用暴露 × 次日收益近似(引擎按结算盯市,这里用权益口径的近似归因)
+    pnl_path = run_dir / "pnl_by_symbol.csv"
+    pnl_sym = (
+        pd.read_csv(pnl_path, index_col=0, parse_dates=True)
+        if pnl_path.exists()
+        else pd.DataFrame(columns=exp.columns)
+    )
+    init_cap = float(meta["config"]["backtest"]["initial_capital_cny"])
     contrib = {}
     for s in exp.columns:
         n_tr = int((trades["symbol"] == s).sum())
-        contrib[s] = {"平均|暴露|": float(exp[s].abs().mean()), "成交笔数": n_tr}
-    ct = pd.DataFrame(contrib).T.sort_values("平均|暴露|", ascending=False)
+        contrib[s] = {
+            "累计盈亏/初始资金": float(pnl_sym[s].sum() / init_cap) if s in pnl_sym else np.nan,
+            "平均|暴露|": float(exp[s].abs().mean()),
+            "成交笔数": n_tr,
+        }
+    ct = pd.DataFrame(contrib).T.sort_values("累计盈亏/初始资金", ascending=False)
+    trials_path = run_dir.parent / "trials" / "cost_trials.csv"
+    trials_md = (
+        pd.read_csv(trials_path, index_col=0).round(4).to_markdown() if trials_path.exists() else "(无)"
+    )
     md = [
         f"# CTA 回测报告 — 配置 {meta['config_digest']} / 代码 {meta['git_sha']}\n",
         f"区间 {meta['period'][0]} 至 {meta['period'][1]},{meta['n_symbols']} 个品种,初始资金 {meta['config']['backtest']['initial_capital_cny']:,.0f} 元。\n",
@@ -92,8 +108,10 @@ def build_report(run_dir: Path) -> Path:
         (yt * 100).round(2).to_frame("收益 %").to_markdown(),
         "\n## 分段\n",
         seg.round(3).to_markdown(),
-        "\n## 分品种\n",
+        "\n## 分品种(盯市盈亏,不含手续费)\n",
         ct.round(3).to_markdown(),
+        "\n## 成本导向试验(design_log 二b)\n",
+        trials_md,
         "\n## 出处\n",
         f"数据指纹:`{meta['data_manifest']['sha256']}`({meta['data_manifest']['n_files']} 个文件);配置:\n```json\n{json.dumps(meta['config'], ensure_ascii=False, indent=1)}\n```",
     ]

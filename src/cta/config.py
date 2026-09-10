@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 import yaml
 from pydantic import BaseModel, Field
@@ -63,6 +63,6 @@ class StrategyConfig(BaseModel):
 DEFAULT_PATH = Path(__file__).resolve().parents[2] / "configs" / "strategy.yaml"
 
 
-def load_config(path: Optional[Path] = None) -> StrategyConfig:
+def load_config(path: Path | None = None) -> StrategyConfig:
     p = path or DEFAULT_PATH
     return StrategyConfig(**yaml.safe_load(p.read_text(encoding="utf-8")))

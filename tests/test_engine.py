@@ -100,3 +100,15 @@ def test_lot_band_suppresses_jitter_but_not_close() -> None:
     assert r.slippage.loc[dates[1]] == 10 * 10 * 5  # 10 手 × 1 跳 × 10 元 × 5 吨
     r0 = run_backtest({"CU": p}, tgt, specs, initial_capital=1_000_000, lot_band=0.0)
     assert r0.positions["CU"].tolist()[3] == 11  # 无缓冲带时会追到 11 手
+
+
+def test_pnl_by_symbol_reconciles_with_equity() -> None:
+    specs = load_instruments()
+    dates = pd.bdate_range("2021-03-01", periods=8)
+    settles = [70000.0, 70100.0, 69900.0, 70300.0, 70300.0, 70000.0, 70200.0, 70100.0]
+    p = _panel(dates, opens=settles, settles=settles, roll_day=dates[4])
+    tgt = pd.DataFrame({"CU": [0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.0, 0.0]}, index=dates)
+    r = run_backtest({"CU": p}, tgt, specs, initial_capital=1_000_000)
+    total_pnl = r.pnl_by_symbol.sum(axis=1)
+    d_eq = r.equity.diff().fillna(r.equity.iloc[0] - 1_000_000)
+    assert np.allclose((total_pnl - r.costs).to_numpy(), d_eq.to_numpy(), atol=1e-6)

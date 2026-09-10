@@ -28,7 +28,7 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "W", "SIM", "PL"]
-ignore = ["PLR0913", "PLR2004", "PLR0912", "PLR0915", "E501"]
+ignore = ["PLR0913", "PLR2004", "PLR0912", "PLR0915", "E501", "PLR0917", "B008", "PLC0415"]  # 数值函数多参数 / typer 默认值惯用法 / CLI 延迟导入
 
 [tool.mypy]
 python_version = "3.9"
