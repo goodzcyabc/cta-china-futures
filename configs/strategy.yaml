@@ -1,5 +1,5 @@
 # 策略参数(预注册于 docs/design_log.md;任何改动需记入设计日志并递增 version)
-version: "0.1.0"
+version: "0.1.1"
 universe:
   asset_classes: [agri, chem, energy, ferrous, metal, precious]   # 不含 rates(TF)
   min_history_days: 250
@@ -14,7 +14,7 @@ portfolio:
   max_leverage_per_symbol: 1.0
   max_gross_exposure: 3.0      # Σ|名义暴露| 上限(倍权益);超出时整体等比缩减
   max_margin_usage: 0.40
-  trade_buffer: 0.20
+  trade_buffer: 0.30
   vol_scale_update: daily      # daily | weekly:事前组合波动缩放系数的更新频率
 execution:
   fill: next_open
