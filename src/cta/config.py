@@ -27,6 +27,7 @@ class SignalCfg(BaseModel):
 class PortfolioCfg(BaseModel):
     target_vol: float = Field(gt=0, le=1)
     max_leverage_per_symbol: float = Field(gt=0)
+    max_gross_exposure: float = Field(gt=0)
     max_margin_usage: float = Field(gt=0, le=1)
     trade_buffer: float = Field(ge=0, le=1)
 

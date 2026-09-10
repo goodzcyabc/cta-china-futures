@@ -87,6 +87,7 @@ def compute_signals(panels: dict[str, SymbolPanel], cfg: StrategyConfig) -> Sign
         window=cfg.signals.vol_window,
         max_leverage_per_symbol=cfg.portfolio.max_leverage_per_symbol,
     )
+    raw_target = sig.cap_gross_exposure(raw_target, cfg.portfolio.max_gross_exposure)
     # 交易缓冲:逐日相对上一日实际目标
     tgt = raw_target.copy()
     prev = pd.Series(0.0, index=tgt.columns)
@@ -122,16 +123,20 @@ def run_research(
         slippage_ticks=cfg.execution.slippage_ticks,
         lot_band=cfg.portfolio.trade_buffer,
     )
-    stats = perf_stats(res.equity)
-    yrs = (res.equity.index[-1] - res.equity.index[0]).days / 365.25
+    active = res.positions.abs().sum(axis=1) > 0
+    first_active = active[active].index.min() if active.any() else res.equity.index[0]
+    eq_active = res.equity.loc[first_active:]
+    stats = perf_stats(eq_active)
+    yrs = (eq_active.index[-1] - eq_active.index[0]).days / 365.25
     gross_traded = (
         res.trades["lots"].abs()
         * res.trades["price"]
         * res.trades["symbol"].map(lambda s: specs[s].multiplier)
     ).sum()
-    stats["年化名义换手(倍)"] = float(gross_traded / res.equity.mean() / yrs)
-    stats["年化手续费占权益"] = float(res.costs.sum() / res.equity.mean() / yrs)
-    stats["年化滑点占权益"] = float(res.slippage.sum() / res.equity.mean() / yrs)
+    stats["年化名义换手(倍)"] = float(gross_traded / eq_active.mean() / yrs)
+    stats["年化手续费占权益"] = float(res.costs.sum() / eq_active.mean() / yrs)
+    stats["年化滑点占权益"] = float(res.slippage.sum() / eq_active.mean() / yrs)
+    stats["平均总名义暴露"] = float(res.exposure.loc[first_active:].abs().sum(axis=1).mean())
     stats["平均保证金占用"] = float(res.margin_usage.mean())
     stats["未成交顺延次数"] = float(res.unfilled.sum())
     out_dir.mkdir(parents=True, exist_ok=True)

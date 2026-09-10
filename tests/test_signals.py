@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from cta.signals.core import (
+    cap_gross_exposure,
     carry,
     carry_signal,
     combine,
@@ -75,3 +76,12 @@ def test_trade_buffer() -> None:
     assert out["X"] == 0.9  # 差 0.1 < 0.2 -> 不动
     assert out["Y"] == 0.0  # 目标 0,阈值 0 -> 平掉
     assert out["Z"] == -1.0  # 差 1 > 0.2 -> 交易
+
+
+def test_cap_gross_exposure() -> None:
+    idx = pd.bdate_range("2021-01-01", periods=2)
+    w = pd.DataFrame({"X": [2.0, 0.5], "Y": [-2.0, 0.5]}, index=idx)
+    out = cap_gross_exposure(w, 3.0)
+    assert (
+        abs(out.iloc[0].abs().sum() - 3.0) < 1e-12 and (out.iloc[1] == w.iloc[1]).all()
+    )  # 超限缩到 3,未超限不动

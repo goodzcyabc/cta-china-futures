@@ -104,6 +104,14 @@ def vol_target_positions(
     return scaled.clip(-max_leverage_per_symbol, max_leverage_per_symbol)
 
 
+def cap_gross_exposure(w: Frame, max_gross: float) -> Frame:
+    """组合总名义暴露 Σ|w_i| 超过 max_gross 时,整行等比缩减到上限(只缩不放)。"""
+    gross = w.abs().sum(axis=1)
+    k = (max_gross / gross).clip(upper=1.0).where(gross > 0, 1.0)
+    out: Frame = w.mul(k, axis=0)
+    return out
+
+
 def trade_buffer(target: pd.Series[float], current: pd.Series[float], band: float = 0.2) -> pd.Series[float]:
     """交易缓冲:目标与当前的差小于 band × |目标| 时不交易。降低换手,对信号价值几乎无损。"""
     cur = current.reindex(target.index).fillna(0.0)

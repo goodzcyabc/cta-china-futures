@@ -12,6 +12,7 @@ signals:
 portfolio:
   target_vol: 0.10
   max_leverage_per_symbol: 1.0
+  max_gross_exposure: 3.0      # Σ|名义暴露| 上限(倍权益);超出时整体等比缩减
   max_margin_usage: 0.40
   trade_buffer: 0.20
 execution:
