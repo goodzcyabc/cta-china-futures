@@ -72,7 +72,7 @@ def build_report(run_dir: Path) -> Path:
         "2020-2022": ("2020-01-01", "2022-12-31"),
         "2023-2026": ("2023-01-01", "2026-12-31"),
     }.items():
-        sub = eq.loc[s:e]
+        sub = eq[(eq.index >= pd.Timestamp(s)) & (eq.index <= pd.Timestamp(e))]
         if len(sub) > 60:
             segs[lab] = perf_stats(sub)
     seg = pd.DataFrame(segs).T[["年化收益", "年化波动", "夏普(月频)", "最大回撤"]]
