@@ -7,5 +7,5 @@ def test_load_and_digest_stable() -> None:
     d1 = c.digest()
     c2 = StrategyConfig(**c.model_dump())
     assert c2.digest() == d1 and len(d1) == 12
-    c3 = c.model_copy(update={"version": "0.1.1"})
+    c3 = c.model_copy(update={"version": "9.9.9"})
     assert c3.digest() != d1
