@@ -15,6 +15,7 @@ portfolio:
   max_gross_exposure: 3.0      # Σ|名义暴露| 上限(倍权益);超出时整体等比缩减
   max_margin_usage: 0.40
   trade_buffer: 0.20
+  vol_scale_update: daily      # daily | weekly:事前组合波动缩放系数的更新频率
 execution:
   fill: next_open
   slippage_ticks: 1

@@ -86,6 +86,7 @@ def compute_signals(panels: dict[str, SymbolPanel], cfg: StrategyConfig) -> Sign
         cfg.portfolio.target_vol,
         window=cfg.signals.vol_window,
         max_leverage_per_symbol=cfg.portfolio.max_leverage_per_symbol,
+        update=cfg.portfolio.vol_scale_update,
     )
     raw_target = sig.cap_gross_exposure(raw_target, cfg.portfolio.max_gross_exposure)
     # 交易缓冲:逐日相对上一日实际目标

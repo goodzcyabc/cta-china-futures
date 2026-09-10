@@ -100,6 +100,11 @@ def vol_target_positions(
         var = float(wv[ok] @ np.atleast_2d(cov) @ wv[ok]) * TRADING_DAYS
         if var > 0:
             k.iloc[i] = target_vol / np.sqrt(var)
+    if update == "weekly":
+        # 只在每周第一个交易日更新缩放系数,其余日子沿用(减少由 k 抖动带来的换手)
+        wk = pd.Series(pd.DatetimeIndex(raw.index).to_period("W").astype(str), index=raw.index)
+        first_of_week = wk != wk.shift(1)
+        k = k.where(first_of_week).ffill()
     scaled: Frame = raw.mul(k, axis=0)
     return scaled.clip(-max_leverage_per_symbol, max_leverage_per_symbol)
 

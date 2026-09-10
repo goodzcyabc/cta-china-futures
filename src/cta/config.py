@@ -30,6 +30,7 @@ class PortfolioCfg(BaseModel):
     max_gross_exposure: float = Field(gt=0)
     max_margin_usage: float = Field(gt=0, le=1)
     trade_buffer: float = Field(ge=0, le=1)
+    vol_scale_update: Literal["daily", "weekly"] = "daily"
 
 
 class ExecutionCfg(BaseModel):
