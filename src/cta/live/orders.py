@@ -49,7 +49,8 @@ def generate_orders(
     tgt_exp = signals.target.loc[asof_ts].fillna(0.0)
     cur = _load_positions(positions_csv)
     rows = []
-    for s, exp in tgt_exp.items():
+    for s_, exp in tgt_exp.items():
+        s = str(s_)
         f = panels[s].frame
         row = f.loc[asof_ts] if asof_ts in f.index else None
         if row is None:
@@ -86,6 +87,7 @@ def generate_orders(
         )
     orders = pd.DataFrame(rows).set_index("symbol")
     est_margin = float(orders["est_margin_cny"].sum())
+    emu: float | None = est_margin / equity if equity > 0 else None
     out = out_dir / asof
     out.mkdir(parents=True, exist_ok=True)
     orders.to_csv(out / "orders.csv")
@@ -102,7 +104,7 @@ def generate_orders(
     (out / "snapshot.json").write_text(
         json.dumps(snap, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
     )
-    if snap["est_margin_usage"] is not None and snap["est_margin_usage"] > cfg.portfolio.max_margin_usage:
+    if emu is not None and emu > cfg.portfolio.max_margin_usage:
         snap["warning"] = "预计保证金占用超上限,引擎会按比例缩减;请人工复核"
     return {
         "summary": {
