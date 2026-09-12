@@ -156,6 +156,8 @@ def run_research(
     yearly(res.equity).to_csv(out_dir / "yearly.csv")
     meta = {
         "config_digest": cfg.digest(),
+        "instruments_digest": specs.digest(),
+        "instruments_verified": specs.verified,
         "config": cfg.model_dump(),
         "data_manifest": src.manifest(),
         "git_sha": git_sha(),

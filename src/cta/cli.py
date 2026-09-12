@@ -20,17 +20,18 @@ def research(
     data: Path = typer.Option(Path("data/ricecta/data")),
     out: Path = typer.Option(Path("results")),
 ) -> None:
-    """跑完整研究回测,结果写入 results/<config_digest>/。"""
+    """跑完整研究回测,结果写入 results/<config_digest>_<instruments_digest>/。"""
     from cta.pipeline import run_research
 
     cfg = load_config(config)
     specs = load_instruments()
     src = RicequantParquetSource(data)
-    out_dir = out / cfg.digest()
+    out_dir = out / f"{cfg.digest()}_{specs.digest()}"
     meta = run_research(cfg, src, specs, out_dir)
     typer.echo(
         json.dumps(
-            {k: meta[k] for k in ("config_digest", "git_sha", "n_symbols", "period")}, ensure_ascii=False
+            {k: meta[k] for k in ("config_digest", "instruments_digest", "git_sha", "n_symbols", "period")},
+            ensure_ascii=False,
         )
     )
     for k, v in meta["stats"].items():

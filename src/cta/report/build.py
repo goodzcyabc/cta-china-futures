@@ -99,7 +99,7 @@ def build_report(run_dir: Path) -> Path:
         pd.read_csv(trials_path, index_col=0).round(4).to_markdown() if trials_path.exists() else "(无)"
     )
     md = [
-        f"# CTA 回测报告 — 配置 {meta['config_digest']} / 代码 {meta['git_sha']}\n",
+        f"# CTA 回测报告 — 配置 {meta['config_digest']} / 参数表 {meta.get('instruments_digest', 'n/a')} / 代码 {meta['git_sha']}\n",
         f"区间 {meta['period'][0]} 至 {meta['period'][1]},{meta['n_symbols']} 个品种,初始资金 {meta['config']['backtest']['initial_capital_cny']:,.0f} 元。\n",
         "## 绩效\n",
         _fmt(meta["stats"]),

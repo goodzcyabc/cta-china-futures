@@ -95,6 +95,7 @@ def generate_orders(
         "asof": asof,
         "equity": equity,
         "config_digest": cfg.digest(),
+        "instruments_digest": specs.digest(),
         "git_sha": git_sha(),
         "data_manifest": src.manifest(),
         "stale_symbols": stale,

@@ -2,6 +2,7 @@
 
 import sys
 from pathlib import Path
+
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
@@ -26,7 +27,7 @@ for name, upd in variants.items():
     for k, v in upd.items():
         d[k].update(v)
     cfg = type(base)(**d)
-    meta = run_research(cfg, src, specs, Path("results") / "trials" / cfg.digest())
+    meta = run_research(cfg, src, specs, Path("results") / "trials" / f"{cfg.digest()}_{specs.digest()}")
     st = meta["stats"]
     rows[name] = {
         k: st.get(k)

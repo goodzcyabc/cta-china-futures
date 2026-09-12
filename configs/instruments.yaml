@@ -1,30 +1,35 @@
-# 合约参数表。数值为交易所公开规则的近似值(截至 2024 年常见水平),margin_rate 取交易所最低保证金的常见值。
-# 上线前必须逐项对照交易所当前公告核实,并把 verified 改为 true。fee 有两种口径:per_lot(元/手)或 notional_bp(按成交金额的万分比)。
+# 合约参数表(交易所投机标准,主力合约月份档)。2026-09-11 按交易所官网一手公告逐项核验,每项由两名独立复核确认;
+# 差异清单、逐品种来源与历史分段时间点见 docs/instruments_verification.md。
+# 口径:margin_rate = 交易所最低交易保证金(一般月份);limit_pct = 一般月份涨跌停;fee 为交易所开仓费(元/手 或 万分比,二选一);
+# fee_close_today 仅作记录(本策略 T+1 开盘成交、最早 T+2 开盘平仓,不触发平今)。
+# 回测把 2026-09 现行值当常数用于 2016–2026:保证金偏保守(2026 年贵金属保证金处于历史高位),手续费/跳价的历史变更点见核验文档第 6 节;
+# 实盘前仍需替换为经纪商实际费率(交易所标准 + 加收)并按日刷新保证金。
 meta:
-  verified: false
-  note: "所有数值需在上线前对照交易所最新公告核实;回测中用作成本与保证金的保守近似。"
+  verified: true
+  verified_date: "2026-09-11"
+  note: "2026-09-11 交易所参数(结算参数 09-11 / 交易参数 09-14);138 项全部核到一手来源;实盘按经纪商费率与逐日参数覆盖。"
   slippage_ticks_per_side: 1
 symbols:
-  C:  {exchange: DCE,  name: 玉米,     multiplier: 10,    tick: 1,     margin_rate: 0.07, fee_per_lot: 1.2,  fee_notional_bp: 0,    limit_pct: 0.04, asset_class: agri}
-  M:  {exchange: DCE,  name: 豆粕,     multiplier: 10,    tick: 1,     margin_rate: 0.07, fee_per_lot: 1.5,  fee_notional_bp: 0,    limit_pct: 0.04, asset_class: agri}
-  Y:  {exchange: DCE,  name: 豆油,     multiplier: 10,    tick: 2,     margin_rate: 0.07, fee_per_lot: 2.5,  fee_notional_bp: 0,    limit_pct: 0.05, asset_class: agri}
-  P:  {exchange: DCE,  name: 棕榈油,   multiplier: 10,    tick: 2,     margin_rate: 0.08, fee_per_lot: 2.5,  fee_notional_bp: 0,    limit_pct: 0.06, asset_class: agri}
-  JD: {exchange: DCE,  name: 鸡蛋,     multiplier: 10,    tick: 1,     margin_rate: 0.08, fee_per_lot: 0,    fee_notional_bp: 1.5,  limit_pct: 0.04, asset_class: agri}
-  CF: {exchange: CZCE, name: 棉花,     multiplier: 5,     tick: 5,     margin_rate: 0.07, fee_per_lot: 4.3,  fee_notional_bp: 0,    limit_pct: 0.05, asset_class: agri}
-  SR: {exchange: CZCE, name: 白糖,     multiplier: 10,    tick: 1,     margin_rate: 0.07, fee_per_lot: 3.0,  fee_notional_bp: 0,    limit_pct: 0.05, asset_class: agri}
-  V:  {exchange: DCE,  name: PVC,      multiplier: 5,     tick: 5,     margin_rate: 0.07, fee_per_lot: 1.0,  fee_notional_bp: 0,    limit_pct: 0.04, asset_class: chem}
-  TA: {exchange: CZCE, name: PTA,      multiplier: 5,     tick: 2,     margin_rate: 0.07, fee_per_lot: 3.0,  fee_notional_bp: 0,    limit_pct: 0.05, asset_class: chem}
-  MA: {exchange: CZCE, name: 甲醇,     multiplier: 10,    tick: 1,     margin_rate: 0.08, fee_per_lot: 2.0,  fee_notional_bp: 0,    limit_pct: 0.05, asset_class: chem}
-  SA: {exchange: CZCE, name: 纯碱,     multiplier: 20,    tick: 1,     margin_rate: 0.09, fee_per_lot: 3.5,  fee_notional_bp: 0,    limit_pct: 0.05, asset_class: chem}
-  RU: {exchange: SHFE, name: 天然橡胶, multiplier: 10,    tick: 5,     margin_rate: 0.10, fee_per_lot: 3.0,  fee_notional_bp: 0,    limit_pct: 0.06, asset_class: chem}
-  SC: {exchange: INE,  name: 原油,     multiplier: 1000,  tick: 0.1,   margin_rate: 0.15, fee_per_lot: 20.0, fee_notional_bp: 0,    limit_pct: 0.08, asset_class: energy}
-  J:  {exchange: DCE,  name: 焦炭,     multiplier: 100,   tick: 0.5,   margin_rate: 0.20, fee_per_lot: 0,    fee_notional_bp: 1.0,  limit_pct: 0.08, asset_class: ferrous}
-  I:  {exchange: DCE,  name: 铁矿石,   multiplier: 100,   tick: 0.5,   margin_rate: 0.12, fee_per_lot: 0,    fee_notional_bp: 1.0,  limit_pct: 0.06, asset_class: ferrous}
-  RB: {exchange: SHFE, name: 螺纹钢,   multiplier: 10,    tick: 1,     margin_rate: 0.08, fee_per_lot: 0,    fee_notional_bp: 1.0,  limit_pct: 0.06, asset_class: ferrous}
-  CU: {exchange: SHFE, name: 铜,       multiplier: 5,     tick: 10,    margin_rate: 0.10, fee_per_lot: 0,    fee_notional_bp: 0.5,  limit_pct: 0.06, asset_class: metal}
-  AL: {exchange: SHFE, name: 铝,       multiplier: 5,     tick: 5,     margin_rate: 0.10, fee_per_lot: 3.0,  fee_notional_bp: 0,    limit_pct: 0.06, asset_class: metal}
-  NI: {exchange: SHFE, name: 镍,       multiplier: 1,     tick: 10,    margin_rate: 0.12, fee_per_lot: 3.0,  fee_notional_bp: 0,    limit_pct: 0.08, asset_class: metal}
-  SN: {exchange: SHFE, name: 锡,       multiplier: 1,     tick: 10,    margin_rate: 0.12, fee_per_lot: 3.0,  fee_notional_bp: 0,    limit_pct: 0.08, asset_class: metal}
-  AU: {exchange: SHFE, name: 黄金,     multiplier: 1000,  tick: 0.02,  margin_rate: 0.10, fee_per_lot: 10.0, fee_notional_bp: 0,    limit_pct: 0.06, asset_class: precious}
-  AG: {exchange: SHFE, name: 白银,     multiplier: 15,    tick: 1,     margin_rate: 0.12, fee_per_lot: 0,    fee_notional_bp: 0.5,  limit_pct: 0.06, asset_class: precious}
-  TF: {exchange: CFFEX, name: 5年期国债, multiplier: 10000, tick: 0.005, margin_rate: 0.012, fee_per_lot: 3.0, fee_notional_bp: 0,   limit_pct: 0.012, asset_class: rates}
+  C:  {exchange: DCE,   name: 玉米,       multiplier: 10,    tick: 1,     margin_rate: 0.07,  fee_per_lot: 1.2,  fee_notional_bp: 0,   limit_pct: 0.06,  fee_close_today: 1.2, asset_class: agri,     effective: "2026-09-14", source: "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1"}
+  M:  {exchange: DCE,   name: 豆粕,       multiplier: 10,    tick: 1,     margin_rate: 0.07,  fee_per_lot: 1.5,  fee_notional_bp: 0,   limit_pct: 0.06,  fee_close_today: 1.5, asset_class: agri,     effective: "2026-09-14", source: "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1"}
+  Y:  {exchange: DCE,   name: 豆油,       multiplier: 10,    tick: 1,     margin_rate: 0.07,  fee_per_lot: 2.5,  fee_notional_bp: 0,   limit_pct: 0.06,  fee_close_today: 2.5, asset_class: agri,     effective: "2026-04-10", source: "http://www.dce.com.cn/dce/content/2026/ywggytz/18628268.html"}
+  P:  {exchange: DCE,   name: 棕榈油,     multiplier: 10,    tick: 1,     margin_rate: 0.08,  fee_per_lot: 2.5,  fee_notional_bp: 0,   limit_pct: 0.07,  fee_close_today: 2.5, asset_class: agri,     effective: "2026-04-10", source: "http://www.dce.com.cn/dce/content/2026/ywggytz/18628268.html"}
+  JD: {exchange: DCE,   name: 鸡蛋,       multiplier: 10,    tick: 1,     margin_rate: 0.07,  fee_per_lot: 0,    fee_notional_bp: 1.5, limit_pct: 0.06,  fee_close_today: 1.5, asset_class: agri,     effective: "2026-09-14", source: "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1"}
+  CF: {exchange: CZCE,  name: 棉花,       multiplier: 5,     tick: 5,     margin_rate: 0.07,  fee_per_lot: 4.3,  fee_notional_bp: 0,   limit_pct: 0.06,  fee_close_today: 0,   asset_class: agri,     effective: "2026-09-11", source: "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260911/FutureDataClearParams.htm"}
+  SR: {exchange: CZCE,  name: 白糖,       multiplier: 10,    tick: 1,     margin_rate: 0.06,  fee_per_lot: 2.0,  fee_notional_bp: 0,   limit_pct: 0.05,  fee_close_today: 0,   asset_class: agri,     effective: "2026-06-23", source: "https://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm"}
+  V:  {exchange: DCE,   name: PVC,        multiplier: 5,     tick: 1,     margin_rate: 0.07,  fee_per_lot: 1.0,  fee_notional_bp: 0,   limit_pct: 0.06,  fee_close_today: 1.0, asset_class: chem,     effective: "2026-09-14", source: "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1"}
+  TA: {exchange: CZCE,  name: PTA,        multiplier: 5,     tick: 2,     margin_rate: 0.07,  fee_per_lot: 3.0,  fee_notional_bp: 0,   limit_pct: 0.06,  fee_close_today: 0,   asset_class: chem,     effective: "2026-09-11", source: "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260911/FutureDataClearParams.htm"}
+  MA: {exchange: CZCE,  name: 甲醇,       multiplier: 10,    tick: 1,     margin_rate: 0.07,  fee_per_lot: 0,    fee_notional_bp: 1.0, limit_pct: 0.06,  fee_close_today: 1.0, asset_class: chem,     effective: "2023-07-19", source: "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260911/FutureDataClearParams.htm"}
+  SA: {exchange: CZCE,  name: 纯碱,       multiplier: 20,    tick: 1,     margin_rate: 0.08,  fee_per_lot: 0,    fee_notional_bp: 1.0, limit_pct: 0.07,  fee_close_today: 1.0, asset_class: chem,     effective: "2026-06-05", source: "https://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/b4badd9ad3654d43a79ed8577f247ace.htm"}
+  RU: {exchange: SHFE,  name: 天然橡胶,   multiplier: 10,    tick: 5,     margin_rate: 0.09,  fee_per_lot: 3.0,  fee_notional_bp: 0,   limit_pct: 0.07,  fee_close_today: 0,   asset_class: chem,     effective: "2026-07-10", source: "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html"}
+  SC: {exchange: INE,   name: 原油,       multiplier: 1000,  tick: 0.1,   margin_rate: 0.16,  fee_per_lot: 20.0, fee_notional_bp: 0,   limit_pct: 0.14,  fee_close_today: 0,   asset_class: energy,   effective: "2026-06-25", source: "https://www.ine.cn/publicnotice/notice/202606/t20260623_832248.html"}
+  J:  {exchange: DCE,   name: 焦炭,       multiplier: 100,   tick: 0.5,   margin_rate: 0.12,  fee_per_lot: 0,    fee_notional_bp: 1.0, limit_pct: 0.08,  fee_close_today: 1.4, asset_class: ferrous,  effective: "2026-06-12", source: "http://www.dce.com.cn/dce/content/2026/ywggytz/18630879.html"}
+  I:  {exchange: DCE,   name: 铁矿石,     multiplier: 100,   tick: 0.5,   margin_rate: 0.08,  fee_per_lot: 0,    fee_notional_bp: 1.0, limit_pct: 0.06,  fee_close_today: 1.0, asset_class: ferrous,  effective: "2026-09-09", source: "http://www.dce.com.cn/dce/content/2026/ywggytz/18633751.html"}
+  RB: {exchange: SHFE,  name: 螺纹钢,     multiplier: 10,    tick: 1,     margin_rate: 0.07,  fee_per_lot: 0,    fee_notional_bp: 1.0, limit_pct: 0.05,  fee_close_today: 1.0, asset_class: ferrous,  effective: "2026-05-19", source: "https://www.shfe.com.cn/publicnotice/notice/202605/t20260515_831713.html"}
+  CU: {exchange: SHFE,  name: 铜,         multiplier: 5,     tick: 10,    margin_rate: 0.11,  fee_per_lot: 0,    fee_notional_bp: 0.5, limit_pct: 0.09,  fee_close_today: 1.0, asset_class: metal,    effective: "2026-07-02", source: "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html"}
+  AL: {exchange: SHFE,  name: 铝,         multiplier: 5,     tick: 5,     margin_rate: 0.11,  fee_per_lot: 3.0,  fee_notional_bp: 0,   limit_pct: 0.09,  fee_close_today: 3.0, asset_class: metal,    effective: "2026-07-02", source: "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html"}
+  NI: {exchange: SHFE,  name: 镍,         multiplier: 1,     tick: 10,    margin_rate: 0.12,  fee_per_lot: 3.0,  fee_notional_bp: 0,   limit_pct: 0.10,  fee_close_today: 3.0, asset_class: metal,    effective: "2026-07-02", source: "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html"}
+  SN: {exchange: SHFE,  name: 锡,         multiplier: 1,     tick: 10,    margin_rate: 0.14,  fee_per_lot: 3.0,  fee_notional_bp: 0,   limit_pct: 0.12,  fee_close_today: 3.0, asset_class: metal,    effective: "2026-02-09", source: "https://www.shfe.com.cn/publicnotice/notice/202602/t20260205_830383.html"}
+  AU: {exchange: SHFE,  name: 黄金,       multiplier: 1000,  tick: 0.02,  margin_rate: 0.16,  fee_per_lot: 20.0, fee_notional_bp: 0,   limit_pct: 0.14,  fee_close_today: 0,   asset_class: precious, effective: "2026-07-02", source: "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html"}
+  AG: {exchange: SHFE,  name: 白银,       multiplier: 15,    tick: 1,     margin_rate: 0.22,  fee_per_lot: 0,    fee_notional_bp: 0.5, limit_pct: 0.20,  fee_close_today: 0.5, asset_class: precious, effective: "2026-02-09", source: "https://www.shfe.com.cn/publicnotice/notice/202602/t20260205_830383.html"}
+  TF: {exchange: CFFEX, name: 5年期国债,  multiplier: 10000, tick: 0.005, margin_rate: 0.012, fee_per_lot: 3.0,  fee_notional_bp: 0,   limit_pct: 0.012, fee_close_today: 0,   asset_class: rates,    effective: "2026-08-28", source: "http://www.cffex.com.cn/sj/jscs/202608/28/20260828_1.csv"}

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 from typing import Literal
 
@@ -22,6 +24,11 @@ class InstrumentSpec(BaseModel):
     fee_notional_bp: float = Field(ge=0, description="按成交金额万分比,单边")
     limit_pct: float = Field(gt=0, le=1, description="涨跌停幅度")
     asset_class: str
+    fee_close_today: float = Field(
+        default=0.0, ge=0, description="平今手续费(单位同开仓);仅记录,引擎不触发平今"
+    )
+    effective: str = Field(default="", description="现行值生效日或参数表日期")
+    source: str = Field(default="", description="一手来源 URL")
 
     @field_validator("symbol")
     @classmethod
@@ -46,12 +53,18 @@ class InstrumentSpec(BaseModel):
 
 class InstrumentTable(BaseModel):
     verified: bool
+    verified_date: str = ""
     note: str
     slippage_ticks_per_side: float = Field(ge=0)
     specs: dict[str, InstrumentSpec]
 
     def __getitem__(self, symbol: str) -> InstrumentSpec:
         return self.specs[symbol.upper()]
+
+    def digest(self) -> str:
+        """参数表指纹(8 位):同一策略配置在不同参数表下的结果目录必须不同。"""
+        payload = json.dumps(self.model_dump(), sort_keys=True, ensure_ascii=False, default=str)
+        return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:8]
 
     def symbols(self, asset_classes: set[str] | None = None) -> list[str]:
         return sorted(

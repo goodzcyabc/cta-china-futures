@@ -2,6 +2,8 @@
 
 来源:米筐(Ricequant)导出,存于 `data/ricecta/data`(不随仓库分发)。23 个品种,2016-01-04 至 2026-06-05。
 
+基准:`data/benchmarks/nhci_daily.csv` 为南华商品指数(NHCI,收益率指数)日收盘,2004-06-01 至 2026-09-11,取自南华期货官网行情网关(webhq.nanhua.net,WebSocket/protobuf,无 HTTP 接口;旧 akshare 接口已失效),2024-12-24 与 2025-12-19 两个点位已对照南华官方日报核验;随仓库分发(公开数据,125 KB)。
+
 | 表 | 用途 | 注意 |
 |---|---|---|
 | `contracts_daily/<SYM>.parquet` | 合约级 OHLCV + 持仓量,(contract, date) 双索引 | 无结算价;结算以收盘价近似 |
