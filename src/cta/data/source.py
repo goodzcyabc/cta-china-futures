@@ -2,19 +2,39 @@
 
 研究与实盘共用同一接口;换数据源只需实现 DataSource 协议。所有 DataFrame 的形状在 docstring 中写死,由 validate_* 校验。
 """
+
 from __future__ import annotations
 
 import hashlib
 import json
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Protocol
 
 import pandas as pd
 
 CONTRACT_COLS = ["open", "high", "low", "close", "volume", "open_interest"]
-META_COLS = ["symbol", "exchange", "listed_date", "de_listed_date", "maturity_date", "margin_rate", "multiplier"]
-DOM_DAILY_COLS = ["contract", "open", "high", "low", "close", "settlement", "prev_settlement", "limit_up", "limit_down",
-                  "volume", "open_interest"]
+META_COLS = [
+    "symbol",
+    "exchange",
+    "listed_date",
+    "de_listed_date",
+    "maturity_date",
+    "margin_rate",
+    "multiplier",
+]
+DOM_DAILY_COLS = [
+    "contract",
+    "open",
+    "high",
+    "low",
+    "close",
+    "settlement",
+    "prev_settlement",
+    "limit_up",
+    "limit_down",
+    "volume",
+    "open_interest",
+]
 
 
 class DataSource(Protocol):
@@ -79,7 +99,9 @@ class RicequantParquetSource:
         self._meta: pd.DataFrame | None = None
 
     def symbols(self) -> list[str]:
-        return sorted(p.stem for p in (self.root / "contracts_daily").glob("*.parquet") if p.stem != "metadata")
+        return sorted(
+            p.stem for p in (self.root / "contracts_daily").glob("*.parquet") if p.stem != "metadata"
+        )
 
     def contracts(self, symbol: str) -> pd.DataFrame:
         df = pd.read_parquet(self.root / "contracts_daily" / f"{symbol}.parquet")
@@ -103,7 +125,12 @@ class RicequantParquetSource:
             m = self._flat(pd.read_parquet(self.root / "contracts_daily" / "metadata.parquet"))
             # 原表的 symbol 列是中文简称(如 铜2101),先改名以免与品种代码列冲突
             m = m.rename(columns={"symbol": "name"}).rename(
-                columns={"order_book_id": "contract", "underlying_symbol": "symbol", "contract_multiplier": "multiplier"})
+                columns={
+                    "order_book_id": "contract",
+                    "underlying_symbol": "symbol",
+                    "contract_multiplier": "multiplier",
+                }
+            )
             for c in ["listed_date", "de_listed_date", "maturity_date"]:
                 m[c] = pd.to_datetime(m[c])
             m = m.set_index("contract")[META_COLS]
