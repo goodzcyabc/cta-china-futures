@@ -19,6 +19,13 @@ from cta.instruments.specs import InstrumentTable
 from cta.pipeline import build_panels, compute_signals, git_sha
 
 
+def _num(v: object) -> float:
+    """Series 元素 → float(显式收窄,避免不同 pandas-stubs 版本下的类型分歧)。"""
+    if isinstance(v, (int, float, np.integer, np.floating)):
+        return float(v)
+    raise TypeError(f"expected number, got {type(v).__name__}")
+
+
 def _load_positions(path: Path | None) -> pd.DataFrame:
     if path is None or not Path(path).exists():
         return pd.DataFrame(columns=["symbol", "contract", "lots"]).set_index("symbol")
@@ -55,8 +62,8 @@ def generate_orders(
         row = f.loc[asof_ts] if asof_ts in f.index else None
         if row is None:
             continue
-        ref_px = float(row["close"])
-        mult = float(row["multiplier"])
+        ref_px = _num(row["close"])
+        mult = _num(row["multiplier"])
         want = float(np.round(exp * equity / (ref_px * mult))) if ref_px > 0 else 0.0
         held_lots = float(cur.at[s, "lots"]) if s in cur.index else 0.0
         held_c = str(cur.at[s, "contract"]) if s in cur.index else None
@@ -74,8 +81,8 @@ def generate_orders(
                 "delta_lots": want - (0.0 if roll else held_lots),
                 "ref_close": ref_px,
                 "multiplier": mult,
-                "margin_rate": float(row["margin_rate"]),
-                "est_margin_cny": abs(want) * ref_px * mult * float(row["margin_rate"]),
+                "margin_rate": _num(row["margin_rate"]),
+                "est_margin_cny": abs(want) * ref_px * mult * _num(row["margin_rate"]),
                 "signal_tsmom": float(signals.tsmom.at[asof_ts, s])
                 if not np.isnan(signals.tsmom.at[asof_ts, s])
                 else None,
