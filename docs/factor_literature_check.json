@@ -1,0 +1,658 @@
+{
+ "academic": {
+  "items": [
+   {
+    "id": "F1",
+    "canonical_definition": "Baz, Granger, Harvey, Le Roux, Rattray (2015) 'CTA momentum' 信号(原文 SSRN 全文被 Cloudflare 拦截,定义按 Lim, Zohren & Roberts 2019 arXiv:1904.04912 §III-A 对 Baz 的逐式复现核对):对每个时间尺度对 (S_k, L_k) ∈ {(8,24),(16,48),(32,96)}:x_k = EWMA(P; S_k) − EWMA(P; L_k),其中 EWMA 的 'time-scale' n 对应半衰期 HL = log(0.5)/log(1−1/n)(即 8/16/32 与 24/48/96 是 EWMA 时间尺度而不是半衰期本身);y_k = x_k / Run.StDev(P, 63 日)(价格的 63 日滚动标准差);z_k = y_k / Run.StDev(y_k, 252 日);u_k = R(z_k),R(x) = x·exp(−x²/4)/0.89(0.89 为归一化常数,使 max|R|≈1,峰值在 |x|=√2);最终信号 = Σ_k w_k·u_k,w_k = 1/3(三尺度等权)。信号直接作为(经波动率缩放后的)仓位。",
+    "expected_sign": "positive",
+    "original_paper": "Baz J., Granger N., Harvey C.R., Le Roux N., Rattray S. (2015) 'Dissecting Investment Strategies in the Cross Section and Time Series', SSRN 2695101, https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2695101 (Harvey 主页仅链到 SSRN)。逐式复现:Lim, Zohren, Roberts (2019) 'Enhancing Time Series Momentum Strategies Using Deep Neural Networks', https://arxiv.org/abs/1904.04912",
+    "evidence_strength": "strong",
+    "china_evidence": "Zheng, Zhang, Lien, Yu (2025) JFM 'Evaluating Trend-Based Strategies in Chinese Commodity Futures Markets':64 个品种 2003–2023,TSMOM 高收益且不依赖子样本/单品种,扣成本后稳健 https://onlinelibrary.wiley.com/doi/10.1002/fut.70033 ;Ham, Cho, Kim, Ryu (2019) JFM 39(12):1515–1528:中国商品 TSMOM 优于被动多头与截面动量,1 月回看/1 月持有最佳,动量持续期比美国短 https://onlinelibrary.wiley.com/doi/10.1002/fut.22053 ;Li, Zhang, Zhou (2017) JFM 37(12):1226–1254 趋势跟踪技术规则在中国期货扣成本后优于买入持有(作者提示可能有数据挖掘偏差) https://ideas.repec.org/a/wly/jfutmk/v37y2017i12p1226-1254.html ;华泰期货《CTA 量化策略因子系列(二):动量因子》2017-09-25,46 品种 2010.1–2017.8,时间序列动量最佳 R=10 日/H=5 日:年化 5.61%、夏普 1.08 https://htfc.com/upload/20170925/201709251506332534711.pdf",
+    "caveats": "(1) 你写的'半衰期 (8,24)…'与原文不一致:原文 8/16/32、24/48/96 是 EWMA 时间尺度 n(λ=1−1/n),对应半衰期约 5.2/10.7/21.8 与 16.3/32.9/66.2 日;若你按半衰期=8/24 实现,信号更慢。(2) 原文是时序信号(每品种独立),不是横截面排名;若用于截面需另行说明。(3) 第二次 252 日标准化用的是 y_k 序列的滚动 std,不是价格。(4) Baz 原文全文未能直接核对(SSRN 拦截),定义来自被广泛引用的复现;建议你拿到 SSRN PDF 后复核 Exhibit/公式编号。",
+    "sources": [
+     "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2695101",
+     "https://arxiv.org/abs/1904.04912",
+     "https://people.duke.edu/~charvey/research.htm",
+     "https://onlinelibrary.wiley.com/doi/10.1002/fut.70033",
+     "https://onlinelibrary.wiley.com/doi/10.1002/fut.22053",
+     "https://ideas.repec.org/a/wly/jfutmk/v37y2017i12p1226-1254.html",
+     "https://htfc.com/upload/20170925/201709251506332534711.pdf"
+    ]
+   },
+   {
+    "id": "F2",
+    "canonical_definition": "学术文献中没有'Donchian 通道位置 (close−min_N)/(max_N−min_N)−0.5' 的原始论文;最接近的学术锚点是 52 周高点比率:George & Hwang (2004, JF 59(5):2145–2176) 用 P_{t−1}/High_{52 周}(过去 12 个月最高价)排序股票,做多比率最高 30%、做空最低 30%,持有 6 个月;Bianchi, Drew & Fan (2016, JBF 72:133–150) 把 52-week high/low 引入商品期货,报告 52 周高点策略扣成本后显著盈利、且比传统动量更能预测收益。Hurst, Ooi & Pedersen (2017, JPM 44(1):15–29) 用的是 1/3/12 个月时间序列动量(符号×波动率缩放)等权,不是通道信号。你的定义(N=63 与 252 平均、减 0.5 居中)属于对以上思想的工程化改写。",
+    "expected_sign": "positive",
+    "original_paper": "George T.J. & Hwang C.-Y. (2004) 'The 52-Week High and Momentum Investing', Journal of Finance 59(5):2145–2176, DOI 10.1111/j.1540-6261.2004.00695.x;Bianchi R.J., Drew M.E., Fan J.H. (2016) 'Commodities momentum: A behavioral perspective', Journal of Banking & Finance 72:133–150, https://ideas.repec.org/a/eee/jbfina/v72y2016icp133-150.html ;Hurst B., Ooi Y.H., Pedersen L.H. (2017) 'A Century of Evidence on Trend-Following Investing', JPM 44(1):15–29, https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2993026",
+    "evidence_strength": "moderate",
+    "china_evidence": "没有找到直接测试通道位置/52 周高点的中国商品期货公开文献。间接证据:Li, Zhang, Zhou (2017) JFM 趋势跟踪技术规则(含突破类规则,具体规则集未能从摘要核实)在中国期货盈利 https://ideas.repec.org/a/wly/jfutmk/v37y2017i12p1226-1254.html ;Zheng et al. (2025) JFM TSMOM 因子对'新开发的趋势类策略'有强解释力 https://onlinelibrary.wiley.com/doi/10.1002/fut.70033",
+    "caveats": "(1) 通道位置本质上与 EWMAC/TSMOM 高度相关(Zhang & Urquhart 2020 亦发现 GH 52 周高点与 JT 动量在商品上表现同向),预注册时应把 F1/F2 视为同一族,预留相关性/冗余检验。(2) George & Hwang 是股票证据;Bianchi 2016 是美国商品期货。(3) 你的 N=63 部分是短周期,而 52 周高点文献的锚点是 252 日;63 日通道位置更接近短期动量,其证据见 F3 讨论(商品期货短期以延续为主)。",
+    "sources": [
+     "https://ideas.repec.org/a/eee/jbfina/v72y2016icp133-150.html",
+     "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2993026",
+     "https://jpm.pm-research.com/content/44/1/15.abstract",
+     "https://eprints.whiterose.ac.uk/id/eprint/159905/",
+     "https://ideas.repec.org/a/wly/jfutmk/v37y2017i12p1226-1254.html"
+    ]
+   },
+   {
+    "id": "F3",
+    "canonical_definition": "mean(close,12)/close − 1 在数学上等于 −BIAS_12/(1+BIAS_12) 的近似,即 12 日乖离率(close/MA_12 − 1)取负——价格低于 12 日均线做多,是一个约 2 周的价格反转信号。没有找到任何名为 'HTFC_Alpha1' 的公开华泰期货研报或因子库(htfc.com 站内、公开搜索、GitHub 均无);华泰期货公开的《CTA 量化策略因子系列》(一)波动率、(二)动量、(三)期限结构、(四)组合择时中没有该公式。学术侧没有'原始论文'定义这个因子:Miffre & Rallis (2007, JBF 31(6):1863–1886) 测的是 1/3/6/12 月回看的动量与 2–5 年的反转(contrarian),结论是 13 个动量策略盈利、反转策略不盈利;Bianchi, Drew & Fan (2015, JBF 59:423–444) 研究的是动量利润在组合形成后 12–30 个月的长期反转,不是 1–4 周的短期反转。",
+    "expected_sign": "ambiguous",
+    "original_paper": "无原始论文。相关:Miffre J. & Rallis G. (2007) 'Momentum strategies in commodity futures markets', JBF 31(6):1863–1886, https://www.sciencedirect.com/science/article/abs/pii/S037842660700026X ;Bianchi, Drew, Fan (2015) 'Combining momentum with reversal in commodity futures', JBF 59:423–444, https://ideas.repec.org/a/eee/jbfina/v59y2015icp423-444.html ;Wang C. & Yu M. (2004) 'Trading activity and price reversals in futures markets', JBF 28(6):1337–1361, https://www.sciencedirect.com/science/article/abs/pii/S0378426603001201",
+    "evidence_strength": "weak",
+    "china_evidence": "中信期货金融工程《期货多因子系列(二):商品期货截面风格因子初探》2022-06-08:'截面动量、乖离率及期限结构因子在不同参数下都能有较好的多空收益'(BIAS 因子有效,但公开摘要未给出方向与窗口) https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml ;Yang, Göncü & Pantelous (2018) IRFA 60:177–196:31 个中国商品品种,分钟级数据,'在较低频率与更长持有期下,动量与反转策略都能获得超额收益,但回撤更大' https://www.sciencedirect.com/science/article/abs/pii/S1057521918305696 ;反向证据:Ham et al. (2019) JFM 中国商品 1 月回看 TSMOM 最佳(短期延续而非反转) https://onlinelibrary.wiley.com/doi/10.1002/fut.22053 ;华泰期货 2017 动量研报 R=10 日时间序列动量夏普 1.08。",
+    "caveats": "(1) 美国商品期货的主流证据是短期延续而非反转:Kwon, Kang & Yun (2020, FRL 35) 1979–2015 周动量 0.20%/周 (t=4.49),'商品期货观察到的是强短期动量而非短期反转';Zhang & Urquhart (2020, RBF 12(4)) 1979–2017 29 品种、J∈{1,3,…,60}×K∈{1,…,60} 共 189 个窗口无一显著反转利润。(2) 唯一支持周度反转的是 Wang & Yu (2004):24 个美国期货 1983–2000 周度反转显著,但利润与前期成交量/持仓量变化强相关(需要量的条件);Zhao, Ding, Yu, Kang (2026, SSRN 6425598) 用投资者持仓数据把周收益分解后:残差部分预示下周动量,投机者净交易流部分预示反转——纯价格反转信号在下周并不成立。(3) 因此 F3 的符号在预注册中应标为待定/探索性,或改写为'量价条件反转'(见 F12)。",
+    "sources": [
+     "https://strathprints.strath.ac.uk/70084/1/Kwon_etal_FRL_2019_Weekly_momentum_in_the_commodity_futures_market.pdf",
+     "https://eprints.whiterose.ac.uk/id/eprint/159905/",
+     "https://quantpedia.com/strategies/short-term-reversal-with-futures",
+     "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6425598",
+     "https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml",
+     "https://www.sciencedirect.com/science/article/abs/pii/S1057521918305696",
+     "https://www.htfc.com/main/a/20171124/80037391.shtml"
+    ]
+   },
+   {
+    "id": "F4",
+    "canonical_definition": "Boons & Prado (2019, JF 74(1):239–279):Basis-momentum_{i,t} = ∏_{s=t−11}^{t}(1+r^{T1}_{i,s}) − ∏_{s=t−11}^{t}(1+r^{T2}_{i,s}),即近月(first-nearby)与次近月(second-nearby)合约过去 12 个月复利累计收益之差(不跳过最近月);每月末按 BM 排序,做多高 BM、做空低 BM(交易近月合约),持有 1 个月。定义核对自 Kwon, Kang & Yun (2021, FRL) 与 Li, Sun & Zhou (2021) 对 Boons–Prado 的复述(JF 原文全文未能直接下载)。Sakkas & Tessaromatis (2020, JBF 115:105807) 用 38 个品种 1970–2018、前后 30% 等权:高−低 BM 年化 16.36%,夏普 0.93,是九个商品因子中最高。",
+    "expected_sign": "positive",
+    "original_paper": "Boons M. & Prado M.P. (2019) 'Basis-Momentum', Journal of Finance 74(1):239–279, https://onlinelibrary.wiley.com/doi/10.1111/jofi.12738 (SSRN 2587784)",
+    "evidence_strength": "moderate",
+    "china_evidence": "Li, Sun & Zhou (2021) 'The Cross Section of Chinese Commodity Futures Return', J. Management Science and Engineering 6(2):146–164:47 品种 2003.1–2018.6,四分位多空、月度再平衡,BM 年化 +5.0% 但不显著 (t=1.03, SR 0.30) https://www.sciencedirect.com/science/article/pii/S2096232021000147 ;Zhang, Hsieh & Chen (2023) Finance Research Letters(COVID 与中国商品定价溢价):37 个品种 2016–2021,BM(244 日回看)疫情前不显著、疫情期间显著 (0.061, p<0.05) https://pmc.ncbi.nlm.nih.gov/articles/PMC10155417/ ;Luo & Xue (2026, SSRN 6546878):41 个中国品种,'基于现货的' basis 与 basis-momentum 稳健预测近月收益 https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6546878 ;中信期货《期货多因子专题报告(四)》(40 品种 2010–2022.8)将基差动量列为四个有效 alpha 因子之一 https://bigquant.com/square/paper/a8940cf0-7114-4517-be06-41fd6e7631ec",
+    "caveats": "(1) 你的定义写'过去 N 期收益之差',原文 N=12 个月且是复利累计收益之差,不是简单收益差;N 的选择影响很大:Kwon, Kang & Yun (2021) 把 12 个月拆成当月/前 5 个月/更早 6 个月,三段的预测力与经济含义差异显著。(2) 中国次近月合约常常流动性很差(主力合约跳月),用'第二近月'可能取到无成交合约,建议预注册时明确用'主力/次主力'还是'日历顺序近月/次近月'。(3) 中国证据总体偏弱/不稳定(Li–Sun–Zhou 不显著),美国证据强。",
+    "sources": [
+     "https://onlinelibrary.wiley.com/doi/10.1111/jofi.12738",
+     "https://strathprints.strath.ac.uk/75721/1/Yoon_Kwon_etal_FRL_2021_Basis_momentum_strategies_ranking_periods.pdf",
+     "https://climateinstitute.edhec.edu/system/files/publications/factor_based_commodity_investing_1.pdf",
+     "https://www.sciencedirect.com/science/article/pii/S2096232021000147",
+     "https://pmc.ncbi.nlm.nih.gov/articles/PMC10155417/",
+     "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6546878"
+    ]
+   },
+   {
+    "id": "F5",
+    "canonical_definition": "Fernandez-Perez, Frijns, Fuertes & Miffre (2018, JBF 86:143–158):每月末用过去 R=12 个月的日收益率计算 Pearson 矩偏度 skew = (1/D)Σ(r_d−μ)³/σ³;按偏度分五分位,做多偏度最负的 Q1、做空偏度最正的 Q5,全额抵押、等权,持有 H=1 个月。样本 27 个美国商品期货 1987.1–2014.11:Q1−Q5 年化 8.01% (t=3.83),年化波动 10.2%,夏普 0.78;脚注 7 称 R∈{6,36,60,96} 月、H∈{3,6,12} 月结论不变(未测 3 个月)。因此 F5 = −skew 的方向与原文一致。",
+    "expected_sign": "positive",
+    "original_paper": "Fernandez-Perez A., Frijns B., Fuertes A.-M., Miffre J. (2018) 'The skewness of commodity futures returns', Journal of Banking & Finance 86:143–158, https://www.sciencedirect.com/science/article/abs/pii/S0378426617301504 ;接收稿 https://openrepository.aut.ac.nz/bitstreams/05e08e2e-f763-4f46-ac67-4c13ac10a451/download",
+    "evidence_strength": "moderate",
+    "china_evidence": "矛盾:Jiang 等 (2021) JFM 41(8):1268–1285 'How does skewness perform in the Chinese commodity futures market?':中国商品偏度与预期收益负相关、单调,'投资者要求对低偏度的正补偿' https://onlinelibrary.wiley.com/doi/abs/10.1002/fut.22200 ;Li, Sun & Zhou (2021):47 品种 2003–2018,低−高偏度组合年化 −9.78% (t=−2.55),即中国高偏度品种反而跑赢 https://www.sciencedirect.com/science/article/pii/S2096232021000147 ;Fan & Zhang (2020) JFM 40(4):671–706:偏度溢价被时变保证金与持仓限额'扭曲' https://onlinelibrary.wiley.com/doi/abs/10.1002/fut.22087 ;中信期货 2022:'偏度因子在全样本表现不佳'。",
+    "caveats": "(1) 你用 63 日窗口,原文是 12 个月日收益;63 日偏度噪声很大,且原文未检验 3 个月窗口。(2) 美国长样本下效应偏弱:Sakkas & Tessaromatis (2020) 1970–2018 前后 30% 分组低−高偏度仅年化 2.84%、夏普 0.16。(3) 中国证据方向互相矛盾(Jiang 2021 支持,Li–Sun–Zhou 2021 显著反向),预注册应把 F5 标为方向待验证,并预设涨跌停/保证金调整期的剔除规则(Fan & Zhang 指出偏度受制度扭曲)。",
+    "sources": [
+     "https://www.sciencedirect.com/science/article/abs/pii/S0378426617301504",
+     "https://openrepository.aut.ac.nz/bitstreams/05e08e2e-f763-4f46-ac67-4c13ac10a451/download",
+     "https://climateinstitute.edhec.edu/system/files/publications/factor_based_commodity_investing_1.pdf",
+     "https://onlinelibrary.wiley.com/doi/abs/10.1002/fut.22200",
+     "https://www.sciencedirect.com/science/article/pii/S2096232021000147",
+     "https://onlinelibrary.wiley.com/doi/abs/10.1002/fut.22087"
+    ]
+   },
+   {
+    "id": "F6",
+    "canonical_definition": "Hong & Yogo (2012, JFE 105(3):473–490) §3.3.1:先算每个商品的美元持仓量 = 现货价 × 未平仓合约数;在四个板块内加总后算月度增长率;总体'商品市场持仓增长' = 四板块增长率等权平均;因月度增长噪声大,再取 12 个月几何平均平滑。这是一个总体时间序列预测变量:对未来 1 个月全额抵押商品期货组合收益的预测回归中,持仓增长上升 1 个标准差 → 预期商品收益 +0.73%/月 (t=2.50),控制短端利率、期限利差、基差、动量后仍成立。脚注 4:用各品种合约数增长率的板块中位数替代美元持仓,结果几乎一致。论文没有做按品种排序的横截面检验。",
+    "expected_sign": "ambiguous",
+    "original_paper": "Hong H. & Yogo M. (2012) 'What does futures market interest tell us about the macroeconomy and asset prices?', Journal of Financial Economics 105(3):473–490, https://www.sciencedirect.com/science/article/abs/pii/S0304405X12000657 ;NBER w16712 https://www.nber.org/system/files/working_papers/w16712/w16712.pdf",
+    "evidence_strength": "weak",
+    "china_evidence": "Li, Sun & Zhou (2021):OI 因子定义为月度持仓量变化 ΔOI,做多变化最大/做空最小四分位,年化 −5.73% (t=−2.07),与 Hong–Yogo 方向相反,作者归因于中国市场以投机散户为主、套保需求影响小 https://www.sciencedirect.com/science/article/pii/S2096232021000147 ;Fan & Zhang (2020) JFM:持仓量溢价'对制度环境敏感' https://onlinelibrary.wiley.com/doi/abs/10.1002/fut.22087 ;中信期货 2022:'持仓量/金额因子能获取一定正收益,但稳定性较差'(那是水平而非增长) https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml",
+    "caveats": "(1) 你的定义(单品种 21 日全合约持仓对数变化)是横截面/单品种用法,而 Hong–Yogo 的证据是总体市场层面的时序预测(12 个月几何平均、板块等权);两者不是一回事。(2) 横截面排序在美国也不成立:Sakkas & Tessaromatis (2020) 高−低持仓量组合年化 −0.45%、夏普 −0.03。(3) 中国横截面证据为显著负号。若保留,建议拆成两个预注册假设:H6a 总体持仓增长(时序、对全市场 beta)符号为正;H6b 品种级持仓增长(截面)符号待定。",
+    "sources": [
+     "https://www.nber.org/system/files/working_papers/w16712/w16712.pdf",
+     "https://www.sciencedirect.com/science/article/abs/pii/S0304405X12000657",
+     "https://climateinstitute.edhec.edu/system/files/publications/factor_based_commodity_investing_1.pdf",
+     "https://www.sciencedirect.com/science/article/pii/S2096232021000147",
+     "https://onlinelibrary.wiley.com/doi/abs/10.1002/fut.22087"
+    ]
+   },
+   {
+    "id": "F7",
+    "canonical_definition": "Keloharju, Linnainmaa & Nyberg (2016, JF 71(4):1557–1590):股票策略按过去 20 年同一日历月的平均收益排序;商品部分(§5.4.3、表 8 Panel C)用 24 个商品期货 1970.1–2011.7,要求至少 5 年历史,按'历史同月平均收益'(全部可得历史,不限 20 年)排序,做多最高 2 个、做空最低 2 个品种(1993.12 后各 3 个),每月再平衡,自 1974.12 起形成组合:同月策略 0.93%/月 (t=1.93),'其他月'策略 −0.22%/月 (t=−0.58),两者之差 1.15% (t=1.97);剔除 1 月后 0.96% (t=2.03)。",
+    "expected_sign": "positive",
+    "original_paper": "Keloharju M., Linnainmaa J.T., Nyberg P. (2016) 'Return Seasonalities', Journal of Finance 71(4):1557–1590, https://onlinelibrary.wiley.com/doi/abs/10.1111/jofi.12398 ;工作论文版 https://www.aqr.com/-/media/AQR/Documents/News/2015/AllSeasons20141219pdf.pdf",
+    "evidence_strength": "weak",
+    "china_evidence": "none(未找到对中国商品期货做 KLN 式同月收益截面检验的公开研报或论文;中信期货《商品期货 CTA 专题报告(十)基本面因子构建需考虑季节效应》讨论的是库存等基本面数据的季节调整,不是价格季节性因子)",
+    "caveats": "(1) 商品部分在 KLN 原文里只是边际显著 (t=1.93),且组合只有 2–3 个品种。(2) Li, Liu, Miao & Tse (2024, IREF 93:448–462) 用 26 个商品 1970–2023 复检:同月策略仅在 1990–1999 子样本优于其他月策略,'不稳健',近年季节性基本消失 https://ideas.repec.org/a/eee/reveco/v93y2024ipbp448-462.html 。(3) 你要求至少 3 年历史比 KLN 的 5 年更宽松,3 个观测点的均值几乎全是噪声;中国多数品种上市不足 15 年,该因子在样本前半段几乎不可用。建议降级为探索性因子或与 carry1-12(见 F8)合并处理季节性。",
+    "sources": [
+     "https://onlinelibrary.wiley.com/doi/abs/10.1111/jofi.12398",
+     "https://www.aqr.com/-/media/AQR/Documents/News/2015/AllSeasons20141219pdf.pdf",
+     "https://ideas.repec.org/a/eee/reveco/v93y2024ipbp448-462.html"
+    ]
+   },
+   {
+    "id": "F8",
+    "canonical_definition": "Koijen, Moskowitz, Pedersen & Vrugt (2018, JFE 127(2):197–225) 式(9):商品 carry C_t = (S_t − F_t)/F_t,S_t 为用最近两个到期合约外推得到的合成现货价、F_t 为线性插值得到的合成 1 个月期货价(工业金属用 LME 现货与 3 个月价插值);carry 即基差/展期收益。组合权重式(19):w_t^i = z_t·(rank(C_t^i) − (N_t+1)/2),z_t 使多空各为 1,不是 z-score;每月再平衡。另有 'carry1-12' = 过去 12 个月 carry 的均值,用于消除商品季节性。24 个商品:当期 carry 多空年化 11.22%、夏普 0.60;carry1-12 夏普 0.65。",
+    "expected_sign": "positive",
+    "original_paper": "Koijen R.S.J., Moskowitz T.J., Pedersen L.H., Vrugt E.B. (2018) 'Carry', Journal of Financial Economics 127(2):197–225, https://www.sciencedirect.com/science/article/abs/pii/S0304405X17302908 ;接收稿 https://research-api.cbs.dk/ws/files/57294842/lasse_heje_pedersen_et_al_carry_acceptedmanuscript.pdf",
+    "evidence_strength": "strong",
+    "china_evidence": "Li, Sun & Zhou (2021):期限结构因子(近月/次近月对数价差),四分位多空年化 11.56% (t=2.26) https://www.sciencedirect.com/science/article/pii/S2096232021000147 ;Fan & Zhang (2020) JFM:期限结构与动量溢价在中国'持续存在' https://onlinelibrary.wiley.com/doi/abs/10.1002/fut.22087 ;'An anatomy of commodity futures returns in China' (Pacific-Basin Finance Journal 62, 2020, 101366):carry 与动量在中国显著,三因子(均值、carry、动量)解释大部分截面 https://www.sciencedirect.com/science/article/abs/pii/S0927538X20301086 ;'Risk premia in Chinese commodity markets' (J. Commodity Markets 15, 2019, 100075):含 carry 的三因子模型解释中国现货溢价 https://www.sciencedirect.com/science/article/abs/pii/S2405851316301234 ;华泰期货《CTA 量化策略因子系列(三):期限结构因子》2017-10-25:持有 60/120 日、对冲前 30%,年化 7.88%、夏普 2.09 https://www.htfc.com/upload/20171025/201710251508893187512.pdf",
+    "caveats": "(1) 原文用秩权重而非 z-score;z-score 会放大极端基差品种(中国鸡蛋、苹果、生猪等季节性极强的品种基差可达 ±30% 年化),建议预注册用秩或对 z-score 截尾。(2) 年化时应按两合约到期间隔而非固定月数,Koijen 是插值到固定 1 个月期限。(3) 中国品种季节性强,Koijen 的 carry1-12 变体值得作为预设稳健性检验。(4) 次近月流动性问题同 F4。",
+    "sources": [
+     "https://research-api.cbs.dk/ws/files/57294842/lasse_heje_pedersen_et_al_carry_acceptedmanuscript.pdf",
+     "https://www.sciencedirect.com/science/article/abs/pii/S0304405X17302908",
+     "https://www.sciencedirect.com/science/article/pii/S2096232021000147",
+     "https://onlinelibrary.wiley.com/doi/abs/10.1002/fut.22087",
+     "https://www.sciencedirect.com/science/article/abs/pii/S0927538X20301086",
+     "https://www.sciencedirect.com/science/article/abs/pii/S2405851316301234",
+     "https://www.htfc.com/upload/20171025/201710251508893187512.pdf"
+    ]
+   },
+   {
+    "id": "F9",
+    "canonical_definition": "Asness, Moskowitz & Pedersen (2013, JF 68(3):929–985):所有资产类统一用 MOM2–12 = 过去 12 个月累计原始收益、跳过最近 1 个月;组合用秩权重 w = c·(rank − 均值秩);商品 27 个品种 1972.1–2011.7,动量 P3−P1 年化 12.4% (t=3.29)、夏普 0.53,因子版 11.5%、夏普 0.51。原文明确指出:对商品等资产'不跳过最近 1 个月时动量收益更强',跳过只是为了跨资产统一。Miffre & Rallis (2007, JBF 31(6):1863–1886):回看 1/3/6/12 个月的平均收益 × 持有 1/3/6/12 个月,13 个动量策略平均年化 9.38%,动量组合多 backwardation、空 contango;反转策略不盈利。",
+    "expected_sign": "positive",
+    "original_paper": "Asness C.S., Moskowitz T.J., Pedersen L.H. (2013) 'Value and Momentum Everywhere', Journal of Finance 68(3):929–985, https://w4.stern.nyu.edu/facdir/lpederse/papers/ValMomEverywhere.pdf ;Miffre J. & Rallis G. (2007) 'Momentum strategies in commodity futures markets', JBF 31(6):1863–1886, https://www.sciencedirect.com/science/article/abs/pii/S037842660700026X",
+    "evidence_strength": "strong",
+    "china_evidence": "Li, Sun & Zhou (2021):CS-MOM(过去 12 个月月收益简单平均,不跳月)四分位多空年化 20.34% (t=3.19)、夏普 1.12,为 13 个因子中最强;CUM-MOM(12 月复利)19.62% (t=2.98) https://www.sciencedirect.com/science/article/pii/S2096232021000147 ;Fan & Zhang (2020) JFM:动量溢价持续 https://onlinelibrary.wiley.com/doi/abs/10.1002/fut.22087 ;PBFJ 2020 'An anatomy of commodity futures returns in China':动量显著且与 A 股羊群效应相关 https://www.sciencedirect.com/science/article/abs/pii/S0927538X20301086 ;华泰期货 2017:46 品种 2010.1–2017.8,面板动量(前后 10%)最佳 R=250 日/H=10 日:年化 6.64%、夏普 0.93 https://htfc.com/upload/20170925/201709251506332534711.pdf",
+    "caveats": "(1) 是否剔除最近 1 个月:商品文献倾向不剔除(Asness 2013 原文;Kwon–Kang–Yun 2020 显示 12 个月动量利润主要来自最近一周);中国证据(Li–Sun–Zhou、Ham 2019)也是不跳月;建议预注册主规格为不跳月,跳月作为稳健性。(2) 华泰研报显示中国动量在夜盘推出前后、牛熊转换期表现差异大,需预设子样本检验。",
+    "sources": [
+     "https://w4.stern.nyu.edu/facdir/lpederse/papers/ValMomEverywhere.pdf",
+     "https://www.sciencedirect.com/science/article/abs/pii/S037842660700026X",
+     "https://www.sciencedirect.com/science/article/pii/S2096232021000147",
+     "https://strathprints.strath.ac.uk/70084/1/Kwon_etal_FRL_2019_Weekly_momentum_in_the_commodity_futures_market.pdf",
+     "https://htfc.com/upload/20170925/201709251506332534711.pdf"
+    ]
+   },
+   {
+    "id": "F10",
+    "canonical_definition": "Asness, Moskowitz & Pedersen (2013) 原文:'对商品,value 定义为 5 年前现货价(实际取 4.5–5.5 年前的平均现货价)除以最新现货价的对数,本质上是过去 5 年现货收益的负值'(源自 DeBondt & Thaler 1985 的长期反转)。组合秩权重,三分位;商品 27 品种 1972–2011:value P3−P1 年化 6.3% (t=1.61)、夏普 0.26,相对等权商品组合 alpha 7.7% (t=2.02);value 与动量相关 −0.39,50/50 组合夏普 0.71。",
+    "expected_sign": "ambiguous",
+    "original_paper": "Asness C.S., Moskowitz T.J., Pedersen L.H. (2013) 'Value and Momentum Everywhere', Journal of Finance 68(3):929–985, https://w4.stern.nyu.edu/facdir/lpederse/papers/ValMomEverywhere.pdf",
+    "evidence_strength": "weak",
+    "china_evidence": "反向:Li, Sun & Zhou (2021) 按 Asness 定义(4.5–5.5 年前平均价/当前 1 月均价的对数)构造,做多高 value 四分位、做空低 value,年化 −13.82% (t=−2.85)、夏普 −0.62,'长期赢家继续赢,中国缺乏长期反转' https://www.sciencedirect.com/science/article/pii/S2096232021000147 。未找到中国券商/期货公司对 5 年价值因子的公开研报。",
+    "caveats": "(1) 文献原始符号为正,但美国长样本也只是弱证据:Sakkas & Tessaromatis (2020) 1970–2018 低−高 value 年化 2.87%、夏普 0.136;Chaves & Viswanathan (2016, JCM 3:39–53) 发现均值回归在现货有效、在期货无效。(2) 中国 2003–2018 显著反向。(3) 中国多数品种历史不足 5 年+样本期,因子覆盖率低。预注册建议:符号待定,并明确 3 年变体为探索性(见 notes (a))。",
+    "sources": [
+     "https://w4.stern.nyu.edu/facdir/lpederse/papers/ValMomEverywhere.pdf",
+     "https://climateinstitute.edhec.edu/system/files/publications/factor_based_commodity_investing_1.pdf",
+     "https://www.sciencedirect.com/science/article/abs/pii/S2405851315300416",
+     "https://www.sciencedirect.com/science/article/pii/S2096232021000147"
+    ]
+   },
+   {
+    "id": "F11",
+    "canonical_definition": "Blitz & de Groot (2014, JAI 17(2):103–115) 报告商品动量、carry、低波动三个因子溢价;其低波动多空组合的具体窗口(是否 36 个月、日/月收益)未能从原文核实(SSRN、Robeco 与 JAI 页面均被拦截/404,原文只有摘要可得);Miffre (2016, JCM 1:3–13) 综述给出其低波动多空组合夏普 0.35(对比 S&P GSCI 0.06)。你的定义(63 日已实现波动率横截面排名取负,做多低波动)方向与 Blitz–de Groot 一致,但窗口是你自己的。",
+    "expected_sign": "ambiguous",
+    "original_paper": "Blitz D. & de Groot W. (2014) 'Strategic Allocation to Commodity Factor Premiums', Journal of Alternative Investments 17(2):103–115, https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2265901 ;https://jai.pm-research.com/content/17/2/103 。综述:Miffre J. (2016) 'Long-short commodity investing: A review of the literature', J. Commodity Markets 1:3–13, https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2700719",
+    "evidence_strength": "weak",
+    "china_evidence": "反向:Li, Sun & Zhou (2021) 波动率因子按 Szymanowska 定义(过去 36 个月日收益方差/均值),做多高波动、做空低波动,年化 +10.53% (t=2.09)——即中国高波动品种跑赢 https://www.sciencedirect.com/science/article/pii/S2096232021000147 ;Fan & Zhang (2020) JFM:波动率溢价被保证金与持仓限额扭曲 https://onlinelibrary.wiley.com/doi/abs/10.1002/fut.22087 ;中信期货 2022 变异系数因子(3–5 日回看)年化 7.5%、夏普 0.98(方向未在摘要给出) https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml",
+    "caveats": "商品期货上'低风险'的证据方向是互相矛盾的:支持低波动的只有 Blitz & de Groot (SR 0.35) 与特质波动率版本(Fuertes, Miffre & Fernandez-Perez 2015, JFM 35(3):274–297,低特质波动多空 SR 0.38、alpha 4.62%/年);反向的有 Gorton, Hayashi & Rouwenhorst (2013, RoF) 高波动跑赢低波动 5.41%/年 (t=3.64,库存渠道)、Szymanowska et al. (2014, JF) 最高变异系数四分位跑赢最低 8.13%/年 (t=2.37)、Sakkas & Tessaromatis (2020) 高−低波动 +7.09%/年 (SR 0.415)、中国 Li–Sun–Zhou +10.53%;Frazzini & Pedersen BAB 商品版 0.42%/月 (t=1.44)、夏普 0.22,不显著。见 notes (c) 关于波动率缩放。",
+    "sources": [
+     "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2265901",
+     "https://roycheng.cn/files/papers/paper_Miffre_2016.pdf",
+     "https://www.nber.org/system/files/working_papers/w16601/w16601.pdf",
+     "https://climateinstitute.edhec.edu/system/files/publications/factor_based_commodity_investing_1.pdf",
+     "https://academic.oup.com/rof/article-abstract/17/1/35/1581689",
+     "https://onlinelibrary.wiley.com/doi/abs/10.1111/jofi.12096",
+     "https://onlinelibrary.wiley.com/doi/abs/10.1002/fut.21656",
+     "https://www.sciencedirect.com/science/article/pii/S2096232021000147"
+    ]
+   },
+   {
+    "id": "F12",
+    "canonical_definition": "该公式逐字等于 WorldQuant '101 Formulaic Alphas' 的 Alpha#35:((Ts_Rank(volume, 32) * (1 − Ts_Rank(((close + high) − low), 16))) * (1 − Ts_Rank(returns, 32)))(Kakushadze 2016, arXiv:1601.00991 第 434 行)。三项含义:32 日内成交量时序排名高 × 价格水平(close+high−low)在 16 日内排名低 × 32 日内日收益排名低,即'放量 + 价格处于近期低位 + 近期下跌'→ 做多,是一个量价条件短期反转信号。WorldQuant 约定:alpha 值越大仓位越多(dollar-neutral、按值加权),原文针对美股日频,平均持有期数天。没有找到任何名为 'HTFC_Alpha19' 的华泰期货公开研报;编号 19 与 WorldQuant 编号(#35)不符,可能是你所用因子库的内部编号。",
+    "expected_sign": "positive",
+    "original_paper": "Kakushadze Z. (2016) '101 Formulaic Alphas', Wilmott Magazine 2016(84):72–81; arXiv:1601.00991, https://arxiv.org/abs/1601.00991 (Alpha#35)。'HTFC_Alpha19' 来源未找到。",
+    "evidence_strength": "none",
+    "china_evidence": "none(未找到在中国商品期货上公开检验 Alpha#35 的研报或论文;华泰期货 htfc.com 公开研报中无 WorldQuant 101 商品期货测试;中信期货 2022 的乖离率/变异系数因子是间接相关的量价证据)",
+    "caveats": "(1) 原始证据仅限美股,在商品期货上为零公开证据;(2) 其反转成分与 F3 同源,而商品期货短期主流证据是延续而非反转(见 F3、notes (b)),但 Wang & Yu (2004) 显示反转利润与成交量上升正相关、与持仓量上升负相关——Alpha#35 的'放量'条件恰好对应这一支持性证据,所以它比纯价格反转(F3)更有理论依据;(3) Ts_Rank 窗口 16/32 日为美股参数,直接搬到 T+0、有夜盘的中国商品期货应在预注册中标为探索性。",
+    "sources": [
+     "https://arxiv.org/abs/1601.00991",
+     "https://quantpedia.com/strategies/short-term-reversal-with-futures",
+     "https://www.htfc.com/main/a/20171124/80037391.shtml"
+    ]
+   }
+  ],
+  "notes": "方法说明:全部通过公开页面(WebSearch/WebFetch/curl+pdftotext,少量被 Cloudflare 拦截的公开摘要页用本机 Chrome 只读打开)核对,未登录任何网站。未能取得全文的:Baz et al. 2015(SSRN 拦截,定义按 Lim–Zohren–Roberts 2019 复现)、Boons & Prado 2019 JF(按两篇复述核对公式)、Blitz & de Groot 2014(仅摘要+Miffre 2016 综述)、Fan & Zhang 2020(仅摘要)。\n\n(a) AMP(2013) 商品价值 5 年回看,有没有 3 年或更短的商品验证?——没有找到任何用期货数据、把 AMP 价值信号回看期改成 ≤3 年并作为'价值因子'验证的文献。最接近的证据:① Zaremba, Bianchi & Mikutowski (2021, JBF 133:106238)用 52 个商品现货年度价格 1265–2017:过去 1–3 年收益在截面上负向预测,过去 3 年收益五分位价差年化 −13.07% (t=−18.81)——支持 3 年回看,但是现货、年频、不可交易 https://www.sciencedirect.com/science/article/pii/S0378426621001977 ;② Bianchi, Drew & Fan (2015, JBF 59:423–444)美国商品期货:动量利润在组合形成后 12–30 个月出现明显反转,双排序(动量+反转)年化 20.24%——暗示 1–2.5 年尺度的反转信息有用,但它是作为动量的条件变量而非独立价值因子;③ 反面:Miffre & Rallis (2007) 2–5 年反转策略不盈利;Zhang & Urquhart (2020) J=24/36/48/60 月的反转在 189 个窗口无一显著;Chaves & Viswanathan (2016, JCM) 均值回归在现货有效、期货无效;Sakkas & Tessaromatis (2020) 5 年价值夏普仅 0.136;④ 中国:Li–Sun–Zhou (2021) 5 年价值显著反向 (−13.82%/年)。结论:3 年回看没有'已验证'的地位,预注册应把 F10 的 3 年变体明确写成探索性,并以 5 年 AMP 定义为主规格;考虑到中国品种历史短,也可预注册'可得历史内最长(≥3 年)'的规则但要承认这是新设计。\n\n(b) 商品期货 1–4 周短期反转的学术证据:总体是'不支持',更接近'反向'。支持:Wang & Yu (2004, JBF) 24 个美国期货周度反转显著,但利润依赖成交量/持仓量变化的条件;Zhao, Ding, Yu, Kang (2026, SSRN 6425598) 周频只有投机者交易流部分反转,残差收益部分是动量。反对/不显著:Kwon, Kang & Yun (2020, FRL) 1979–2015 周动量 0.20%/周 (t=4.49),明确'商品期货是短期动量而非短期反转',且 12 个月动量利润主要来自最近一周;Shen et al. (2007)、Kang & Kwon (2017) 一个月动量强;Miffre & Rallis (2007)、Bianchi et al. (2015) 反转策略不盈利;Zhang & Urquhart (2020) 含 J=1 月在内 189 个窗口无显著反转;AMP (2013) 商品不跳最近月时动量更强。中国:Ham et al. (2019) 1 月 TSMOM 最佳、华泰 2017 R=10 日时序动量夏普 1.08(延续);Yang–Göncü–Pantelous (2018) 称低频下动量与反转都能赚钱(未给方向细节);中信 2022 乖离率因子有效但方向未公开。预注册建议:F3 符号待定或改为量价条件反转(F12 思路),把'纯价格 12 日反转在中国商品期货为正'当作一个可被证伪的假设而不是先验。\n\n(c) Blitz & de Groot (2014) 低风险因子在波动率缩放组合里是否还有意义?——文献没有直接回答,但可以从证据推断意义很有限:① 他们的低波动多空组合夏普 0.35(Miffre 2016 转述),在商品因子里本就是最弱的一个;② 同类型但方向相反的证据更多更强:Gorton–Hayashi–Rouwenhorst (2013) 高波动跑赢 5.41%/年 (t=3.64,低库存→高波动→高溢价的存储理论渠道)、Szymanowska et al. (2014) 高变异系数跑赢 8.13%/年、Sakkas–Tessaromatis (2020) 1970–2018 高−低波动 +7.09%/年、中国 Li–Sun–Zhou (2021) +10.53%/年;③ Frazzini & Pedersen 的 BAB 就是'先按 beta 缩放再做多低 beta/空高 beta'的等风险版本,商品 BAB 月均 0.42% (t=1.44)、夏普 0.22,不显著——这正是低风险效应在风险缩放后剩余的部分;④ 机制上,等名义多空的低波动因子有一半以上来自'多头腿波动小、空头腿波动大'带来的负 beta/杠杆效应,而 CTA 组合对每个品种做逆波动率缩放后这部分已经内化,剩下的只是'低波动品种夏普是否更高'——商品上这一点的证据是反向或不显著的。结论:在波动率缩放的 CTA 框架里,F11 不应作为 alpha 因子预注册为正号;可以保留为风险控制/仓位上限规则,或者作为探索性双向假设(允许高波动=低库存的正号解释)。\n\n其他跨因子提醒:① F1/F2/F9 属同一趋势族,预注册应声明相关性阈值与冗余处理;② 中国证据最强的是动量(F9)与期限结构(F8),基差动量(F4)、偏度(F5)、持仓(F6)、价值(F10)、低波动(F11)在中国要么不显著要么显著反向,预注册时应对这些因子采用双侧检验;③ 'HTFC_Alpha1/HTFC_Alpha19' 命名未能追溯到任何公开华泰期货研报,建议核对你因子库的来源文档,避免在预注册文件里引用不存在的出处。"
+ },
+ "china": {
+  "items": [
+   {
+    "id": "F1 EWMAC(时序趋势)",
+    "canonical_definition": "Baz et al. 2015 §3.1:对每组 (S,L)∈{(8,24),(16,48),(32,96)}(EWMA 跨度,文中给出跨度→半衰期换算),x_k = EWMA_S(P) − EWMA_L(P);y_k = x_k / σ_63(P)(价格 3 个月滚动标准差);z_k = y_k / σ_252(y_k);响应函数 R(z)=z·exp(−z²/4)/0.89(0.89 使最大值归 1);CTA 信号 = Σ_k w_k R(z_k),w_k=1/3 等权;信号为正做多。",
+    "expected_sign": "positive",
+    "original_paper": "Baz, Granger, Harvey, Le Roux, Sargaison (2015) 'Dissecting Investment Strategies in the Cross Section and Time Series', SSRN 2695101, https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2695101",
+    "china_evidence": "未找到中国公开研报/论文对 EWMAC(三组 EMA 差 + 双重波动率标准化 + 响应函数)的直接复现。最接近的时序动量公开证据:(1) 华泰期货 2017-09-25《CTA 量化策略因子系列(二):动量因子》(46 品种,2010.1–2017.8,万五成本):时序动量 = 过去 R 日平均收益正做多/负做空,全时段最佳 (R=10,H=5) 年化 5.61%、夏普 1.08、最大回撤 7.58%;夜盘后 2015.6–2017.8 (R=22,H=5) 年化 10.52%、夏普 1.45;熊市段 2011.3–2012.2 全部 36 组参数为负 (R=250,H=60 夏普 −2.06);报告指出 2016 年底市场强烈反转时动量整体回撤。https://htfc.com/upload/20170925/201709251506332534711.pdf (2) 海通 2017-09-06 海量专题(31)(2010.1–2017.7):时序动量 R=30–50、H=5–20 日年化 >5%,优于横截面动量。https://www.sohu.com/a/190085518_683085 (3) 海通 2019-08-14 海量专题(135):时序动量 (R=40,H=5) 黑色系年化 8.13%/夏普 0.56,农产品、贵金属、有色较差。https://www.sohu.com/a/333666152_683085 (4) 华泰期货《期货多因子专题报告(四):商品期货 alpha 因子拾遗》(样本 2010.1–2022.8,40 品种):'时序回归因子'(三项式回归的趋势强度×流畅性)一年回看/10 日持有,年化 8.9%、夏普 1.34;复合动量(截面+时序)年化 9.61%、夏普 0.95。https://bigquant.com/square/paper/a8940cf0-7114-4517-be06-41fd6e7631ec (5) 国泰君安期货 2022-05-19《因子与指数投资揭秘系列三:商品期货市场的趋势因子》:引介 JFM 2022 基于短/中/长均线的趋势因子,并称'中国商品期货市场亦存在动量效应,传统的动量因子在近几年表现差强人意'。https://finance.sina.cn/option/2022-05-20/detail-imcwiwst8520137.d.html (6) 华泰金工 2026-06-12《时序 CTA 方法论综述》:方法论综述(时序动量、EWMA、双均线、波动率归一化),实证只覆盖 ETF,无商品期货参数。https://finance.sina.com.cn/wm/2026-06-12/doc-inicazrw1882110.shtml (7) 华泰期货 2024-11-14 CTA 报告摘要:'CTA 基金在经历了连续两年的震荡回撤行情之后' (2022–2023 趋势策略普遍回撤)。https://www.htfc.com/wz_upload/png_upload/20241114/1731576619994d43be9.pdf",
+    "evidence_strength": "moderate",
+    "sources": [
+     "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2695101",
+     "https://htfc.com/upload/20170925/201709251506332534711.pdf",
+     "https://www.sohu.com/a/190085518_683085",
+     "https://www.sohu.com/a/333666152_683085",
+     "https://bigquant.com/square/paper/a8940cf0-7114-4517-be06-41fd6e7631ec",
+     "https://finance.sina.cn/option/2022-05-20/detail-imcwiwst8520137.d.html",
+     "https://finance.sina.com.cn/wm/2026-06-12/doc-inicazrw1882110.shtml",
+     "https://www.htfc.com/wz_upload/png_upload/20241114/1731576619994d43be9.pdf"
+    ],
+    "caveats": "中国证据全部是'过去 R 日收益'型时序动量,没有 EWMAC 的标准化与响应函数;中国研报最优回看普遍很短(10–40 日),与 (32,96) 这类慢速组差异大;在 2011–12 熊市、2016 年底反转、2022–23 震荡期回撤明显;板块差异大(黑色/能化强,农产品/贵金属/有色弱)。"
+   },
+   {
+    "id": "F2 通道位置(Donchian/52 周高点)",
+    "canonical_definition": "项目定义:(close − min_N)/(max_N − min_N) − 0.5,N=63 与 252 平均。文献原型:George & Hwang 2004 用 P_t / 52 周最高价 排序(股票);Hurst-Ooi-Pedersen 2017 用 1/3/12 月时序动量(非通道);Bianchi-Drew-Fan 2015 JBF 用 52 周高点比值等与长期反转组合(商品)。",
+    "expected_sign": "positive",
+    "original_paper": "George & Hwang (2004) 'The 52-Week High and Momentum Investing', JF 59(5), https://doi.org/10.1111/j.1540-6261.2004.00695.x;Bianchi, Drew & Fan (2015) 'Combining momentum with reversal in commodity futures', JBF 59 (DOI 待核);Bianchi, Drew & Fan (2016) 'Microscopic momentum in commodity futures' (SSRN 工作论文);Hurst, Ooi & Pedersen (2017) 'A Century of Evidence on Trend-Following Investing', JPM 44(1), https://doi.org/10.3905/jpm.2017.44.1.015",
+    "china_evidence": "未找到中国商品期货上以'通道位置/52 周高点比值'为截面或时序因子的公开研报或论文。最接近:(1) 中信期货 2022-06-08《期货多因子系列(二):商品期货截面风格因子初探》:'乖离率因子(BIAS)'(收盘价相对过去 K 日均价偏离,顺势方向)与截面动量、期限结构并列为'不同参数下都能有较好多空收益'的稳定因子。https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml (2) 银河期货 2025-05-30《商品期货 CTA 截面策略初探》(74 品种,2010.1–2024.12,无手续费):'偏离动量' = (P − P̄_N)/P̄_N,做多偏离高者,IC 均值 0.019、ICIR 0.89、夏普 0.73、卡玛 0.45、胜率 51.2%,Q1(低)组累计约 −140%、Q5(高)组约 +75%。https://www.yhqh.com.cn/upload/cn/file/2025-06/col17/1751246892575.pdf (3) 52 周高点动量的中文实证只见 A 股(维普期刊)。(4) 唐奇安通道在国内只作为时序 CTA 规则策略(海龟)出现,未见因子化回测。",
+    "evidence_strength": "weak",
+    "sources": [
+     "https://doi.org/10.1111/j.1540-6261.2004.00695.x",
+     "https://doi.org/10.3905/jpm.2017.44.1.015",
+     "https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml",
+     "https://www.yhqh.com.cn/upload/cn/file/2025-06/col17/1751246892575.pdf"
+    ],
+    "caveats": "'价格高于均线'型顺势因子在中国有正向证据,但通道位置(相对区间极值)未被直接测试;方向只能由趋势类因子间接推断;63/252 双窗口是项目自设,无中国参数依据。"
+   },
+   {
+    "id": "F3 短期反转 mean(close,12)/close − 1",
+    "canonical_definition": "项目/朋友仓库 'HTFC_Alpha1':mean(close,12)/close − 1,价格低于 12 日均值做多。公开文献无此精确定义:Miffre & Rallis 2007 主要证据是 1–12 月动量;Bianchi-Drew-Fan 2015 的'反转'指 3–5 年长期反转,均非 12 日均值回归。",
+    "expected_sign": "ambiguous",
+    "original_paper": "Miffre & Rallis (2007) 'Momentum strategies in commodity futures markets', JBF 31(6), https://doi.org/10.1016/j.jbankfin.2006.12.005;Bianchi, Drew & Fan (2015) 'Combining momentum with reversal in commodity futures', JBF 59;'HTFC_Alpha1' 未在任何华泰期货公开报告中检索到(仅见于项目 docs/design_log.md 注明的私有仓库)",
+    "china_evidence": "(1) 支持极短期反转:中信期货 2022-04《期货多因子系列(一):动量及高阶矩因子》(40 品种,日频+5 分钟):'期货市场上存在较为明显的月度动量效应和 3–5 日的短期反转效应',动量因子滞后 3 日执行更优(回看 23 日、持有 1 日,年化 7.2%、夏普 0.97)。https://bigquant.com/square/paper/b3519bbf-fde0-4c12-bd4d-5496be6deb87 、https://blog.csdn.net/weixin_42219751/article/details/124660494 (2) 相反证据(价格相对均线偏离为顺势因子):中信期货 2022-06-08 乖离率 BIAS 稳定正收益;银河期货 2025-05-30 偏离动量 (P−P̄)/P̄ 做多高偏离,2010–2024 夏普 0.73、IC 0.019(即'价格低于均值做多'的分组方向相反)。https://www.yhqh.com.cn/upload/cn/file/2025-06/col17/1751246892575.pdf (3) 申万宏源 2019-11-12《挖掘商品期货风险溢价因子》(42 品种,2010.1–2019.8):截面动量在 R≤40 日呈短期动量效应(正),未见 5–40 日反转。https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf (4) 国泰君安期货 2024-06-13 期权 CTA:10 日动量反转因子对商品期权波动率预测效果好(目标是波动率而非收益,不可直接类比)。",
+    "evidence_strength": "weak",
+    "sources": [
+     "https://doi.org/10.1016/j.jbankfin.2006.12.005",
+     "https://bigquant.com/square/paper/b3519bbf-fde0-4c12-bd4d-5496be6deb87",
+     "https://blog.csdn.net/weixin_42219751/article/details/124660494",
+     "https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml",
+     "https://www.yhqh.com.cn/upload/cn/file/2025-06/col17/1751246892575.pdf",
+     "https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf"
+    ],
+    "caveats": "中国公开证据只支持 3–5 日尺度反转;12 日均值偏离在中信期货/银河的测试里是顺势(动量)方向,与 F3 预期相反;来源'HTFC_Alpha1'不可公开核对,建议预注册时标注方向不确定,勿以单一方向假设做符号约束。"
+   },
+   {
+    "id": "F4 基差动量 Basis-momentum",
+    "canonical_definition": "Boons & Prado 2019 JF:BM_t = Π_{s=t−R}^{t}(1+r_{s,front}) − Π_{s=t−R}^{t}(1+r_{s,second}),R=12 个月(约 252 日),近月(第一)与次近月(第二)合约累计收益之差;截面排序做多高 BM、做空低 BM(亦有时序版本)。",
+    "expected_sign": "positive",
+    "original_paper": "Boons & Prado (2019) 'Basis-Momentum', Journal of Finance 74(1), https://doi.org/10.1111/jofi.12738",
+    "china_evidence": "(1) 海通 2017-09-06 海量专题(31)(2010.1–2017.7):定义同原文,R=120 日、H=5 日年化 7.10%、收益风险比 1.52,'比原始信号(展期收益率)更好的收益预测效果',为该报告最有效因子。https://www.sohu.com/a/190085518_683085 (2) 海通 2019-08-14 海量专题(135):基差动量 (R=120,H=40) 农产品最佳年化 4.61%/夏普 0.64,黑色系平均收益为负;后续组合中'从基差动量因子中剔除黑色系'。https://www.sohu.com/a/333666152_683085 (3) 申万宏源 2019-11-12(42 品种,2010.1–2019.8,H=1–8 周):R=5–90 日扫描,最优 R=50、H=5 周年化 7.7%、夏普 0.68、最大回撤 16.6%(出现在 2016 年 12 月)。https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf (4) 华宝证券 2020-11-12《大宗商品 CTA 多因子模型构建及回测》(2011.1–2020.9):40 日回看,'该因子表现十分显著',为技术面因子中最有效,纳入最终 5 因子模型。https://finance.sina.com.cn/money/fund/fundzmt/2020-11-12/doc-iiznezxs1538825.shtml (5) 华泰期货《期货多因子专题报告(四)》(2010.1–2022.8):通过创新的近/远月合约定义消除季节性影响,243 日回看、3 日持有年化 6.89%、夏普 0.81、Calmar 0.43。https://bigquant.com/square/paper/a8940cf0-7114-4517-be06-41fd6e7631ec (6) 银河期货 2025-05-30(74 品种,2010–2024):IC 0.026、ICIR 1.93、夏普 1.48、卡玛 0.78、胜率 54.3%,为五个单因子中夏普最高。https://www.yhqh.com.cn/upload/cn/file/2025-06/col17/1751246892575.pdf (7) 检索摘要中海通系列另有表述:2015 年前表现突出,2015 年后投机资金进入收益下降,近年随黑色 contango 修复回升(原文页未直接取到,仅引自检索摘要)。",
+    "evidence_strength": "strong",
+    "sources": [
+     "https://doi.org/10.1111/jofi.12738",
+     "https://www.sohu.com/a/190085518_683085",
+     "https://www.sohu.com/a/333666152_683085",
+     "https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf",
+     "https://finance.sina.com.cn/money/fund/fundzmt/2020-11-12/doc-iiznezxs1538825.shtml",
+     "https://bigquant.com/square/paper/a8940cf0-7114-4517-be06-41fd6e7631ec",
+     "https://www.yhqh.com.cn/upload/cn/file/2025-06/col17/1751246892575.pdf"
+    ],
+    "caveats": "最优回看期分歧大(40/50/120/243 日),项目用 63 日属短端;黑色系板块曾为负(海通 2019);最大回撤集中在 2016 年底;近/次近月合约身份切换与交割月季节性需处理(华泰期货为此重定义合约);与展期收益率高度相关(申万:展期收益率与基差相关系数高,其余 <0.2)。"
+   },
+   {
+    "id": "F5 偏度 −skew(63 日)",
+    "canonical_definition": "Fernandez-Perez, Frijns, Fuertes & Miffre 2018 JBF:用过去 12 个月日收益率计算各品种样本偏度,按偏度从低到高排序,做多最低 20%、做空最高 20%(等权,月度调仓),低偏度组合显著跑赢;项目取 −skew_63 使值大做多。",
+    "expected_sign": "positive",
+    "original_paper": "Fernandez-Perez, Frijns, Fuertes & Miffre (2018) 'The skewness of commodity futures returns', JBF 86, https://doi.org/10.1016/j.jbankfin.2017.06.015",
+    "china_evidence": "(1) 申万宏源 2019-11-12(42 品种,2010.1–2019.8):偏度 = 前 R 日收益偏度,预设反向;'回溯期较短的偏度因子正收益更为明显',最优 R=20、H=8 周年化 5.1%、夏普 0.41、最大回撤 26.2%;'偏度因子策略表现不佳','2016 年后表现出较强的有效性,收益多来源于空头部分'。https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf (2) 中信期货 2022-04 系列(一):偏度因子'表现一般';上行偏度负向选期(回看 20 日、持有 4 日,年化 5.5%、夏普 0.90);峰度负向(回看 14 日、持有 2 日,6.0%/0.95)。https://bigquant.com/square/paper/b3519bbf-fde0-4c12-bd4d-5496be6deb87 (3) 中信期货 2022-06-08 系列(二):'偏度因子则在全样本表现不佳'。https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml (4) 中信期货 2024-10-29《CTA 风格因子手册(一):量价类因子》:偏度、峰度为反向指标;峰度 60 日回看年化 6.03%、夏普 0.90。https://finance.sina.com.cn/money/future/wemedia/2024-10-29/doc-incuepae2142601.shtml (5) 中信建投期货 2023-11-27《量化 CTA 风格因子跟踪》:偏度长期为'负向因子'(做多低偏度)。https://finance.sina.com.cn/money/future/wemedia/2023-11-27/doc-imzwaeuu8261080.shtml (6) 海通 2017-09-06:偏度 R=100–180 日有效(引海外 8.01%/风险调整后 6.58%)。https://www.sohu.com/a/190085518_683085 (7) 《偏而不倚:偏度因子策略再研究》(2025-06-12,'晨报之声',机构未标注;财联社与中国经济报道网转载):150 日窗口、月末调仓、多空各 5 品种、无杠杆;2010–2025.5 年化 5.60%、夏普 0.79、最大回撤 −20.46%;2014 年至今 9.55%/1.20、回撤 −10.03%;2016、2019、2020、2021 年突出;'2023–2024 年大多数品种贡献趋零或为负,策略整体表现平平';九月长期显著为负(年化 −10.96%,夏普 −1.68)。https://www.cls.cn/detail/2055409 、https://cnews.org.cn/62/436477.html (8) BigQuant 用户研究(qxiao,2022-11,非机构):回看 90 日最好,多头效应强。https://bigquant.com/wiki/doc/CiJcvYoKKo",
+    "evidence_strength": "moderate",
+    "sources": [
+     "https://doi.org/10.1016/j.jbankfin.2017.06.015",
+     "https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf",
+     "https://bigquant.com/square/paper/b3519bbf-fde0-4c12-bd4d-5496be6deb87",
+     "https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml",
+     "https://finance.sina.com.cn/money/future/wemedia/2024-10-29/doc-incuepae2142601.shtml",
+     "https://finance.sina.com.cn/money/future/wemedia/2023-11-27/doc-imzwaeuu8261080.shtml",
+     "https://www.sohu.com/a/190085518_683085",
+     "https://www.cls.cn/detail/2055409",
+     "https://cnews.org.cn/62/436477.html",
+     "https://bigquant.com/wiki/doc/CiJcvYoKKo"
+    ],
+    "caveats": "方向在各家一致(低偏度做多),但全样本夏普仅 0.4–0.8、被中信期货两次判为'表现一般/不佳';最优窗口分歧极大(20 日 vs 90–180 日),63 日无人测过;2023–2024 失效;收益偏向空头端;有九月效应。"
+   },
+   {
+    "id": "F6 持仓量增长 log(ΣOI_t/ΣOI_{t−21})",
+    "canonical_definition": "Hong & Yogo 2012 JFE:用全部商品期货合约(按板块/总体)持仓量的 12 个月对数增长率(名义 OI 增长)作为市场层面时序预测变量,预测未来商品指数、股票与债券收益为正;原文是市场层面时序变量,不是单品种截面因子。项目改为单品种 21 日全合约持仓量对数变化。",
+    "expected_sign": "ambiguous",
+    "original_paper": "Hong & Yogo (2012) 'What does futures market interest tell us about the macroeconomy and asset prices?', JFE 105(3), https://doi.org/10.1016/j.jfineco.2012.04.005",
+    "china_evidence": "(1) 申万宏源 2019-11-12(42 品种,2010.1–2019.8):持仓变化率 = 品种全部合约持仓量 t / t−R,预设正向,做多变化率高者;R=5–90、H=1–8 周的 80 组参数中多数年化为负,最优 R=30、H=8 周年化 6.4%、夏普 0.48、最大回撤 19.1%('收益回撤集中于 2010 年'),2016 年下半年回撤 9.1%。https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf (2) 华宝证券 2020-11-12(2011.1–2020.9):持仓量变化率'表现并不尽如人意','无论是从显著度还是从分档累计收益率上来看都并不能看出各档长期具有显著的差异',未纳入最终模型。https://finance.sina.com.cn/money/fund/fundzmt/2020-11-12/doc-iiznezxs1538825.shtml (3) 中信期货 2022-06-08 系列(二):'持仓量/金额因子…能获取一定正收益,但稳定性较差'。https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml (4) 中信建投期货 2023-11-27:持仓因子长期为'负向因子'(与 Hong-Yogo 方向相反)。https://finance.sina.com.cn/money/future/wemedia/2023-11-27/doc-imzwaeuu8261080.shtml (5) 国联期货 2024-08-31《商品多因子模型研究框架初探》:列出总持仓变化率 ln(OI_T)−ln(OI_{T−K+1}) 为标准因子定义,仅框架无回测。https://www.glqh.com/u/cms/www/202409/020951533a6t.pdf (6) 未找到 Hong & Yogo 市场层面时序预测在中国商品期货上的公开复现。",
+    "evidence_strength": "weak",
+    "sources": [
+     "https://doi.org/10.1016/j.jfineco.2012.04.005",
+     "https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf",
+     "https://finance.sina.com.cn/money/fund/fundzmt/2020-11-12/doc-iiznezxs1538825.shtml",
+     "https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml",
+     "https://finance.sina.com.cn/money/future/wemedia/2023-11-27/doc-imzwaeuu8261080.shtml",
+     "https://www.glqh.com/u/cms/www/202409/020951533a6t.pdf"
+    ],
+    "caveats": "原文是市场层面时序变量,项目用作单品种时序/截面因子属于外推;中国截面证据弱且参数极敏感(申万多数参数为负),华宝判无效,中信建投给出相反方向;更受认可的是'对冲压力/会员持仓结构'类因子(中信期货 243 日回看年化 6.0%/夏普 0.90;海通套保者 5.79%、投机者 5.37%),但需会员持仓数据。"
+   },
+   {
+    "id": "F7 季节性(同日历月历史平均收益)",
+    "canonical_definition": "Keloharju, Linnainmaa & Nyberg 2016 JF:以资产在过去 20 年同一日历月的平均收益为信号(横截面排序),做多历史同月收益高者、做空低者;在股票、商品、国别指数上均发现季节性溢价。项目:同一日历月在过去各年的平均月收益(≥3 年)。",
+    "expected_sign": "positive",
+    "original_paper": "Keloharju, Linnainmaa & Nyberg (2016) 'Return Seasonalities', Journal of Finance 71(4), https://doi.org/10.1111/jofi.12398",
+    "china_evidence": "none(未找到以'历史同月平均收益'为因子的中国商品期货截面/时序回测)。相关但不等价的公开材料:(1) 商品期货 CTA 专题报告(十)《基本面因子构建需考虑季节效应》(系列名与兴证期货一致,机构待核;BigQuant 转载):强调库存等基本面数据的季节性,用库存同比(农历/公历)、环比、二阶增速构建截面因子,二阶增速 2016 以来年化 >10%;库存-展期收益三因子年化 11.3%、夏普/Calmar 2.1——处理的是基本面季节性,不是价格季节性因子。https://bigquant.com/square/paper/d3988edc-589d-4029-bc03-082dfe366d2d (2)《商品期货季节效应测试——金融工程专题报告》(机构未标注,BigQuant 转载):按品种描述月份涨跌概率(棉花 5–8 月上涨概率大、白糖 10 月新糖上市下跌、螺纹 5/9/10 月旺季),并'警示不能单纯依据季节效应做决策',无多空组合回测。https://bigquant.com/square/paper/134f15cc-6369-4a81-8087-6185b20d28a3 (3) 学术:《中国黄金期货的月份效应和节日效应研究》(上期所《期货与金融衍生品》2014):黄金期货 2 月、4 月及较弱的 11 月有正超额收益。https://www.shfe.com.cn/upload/20140423/1398233524706.pdf ;晏艳阳、彭瑕瑜 2015《中国黄金期货市场期货价格收益及波动的日历效应研究》。https://www.sinoss.net/uploadfile/2015/0515/20150515102346692.pdf ;GARCH 研究沪铜/沪铝/连豆/郑麦收益无系统性周/季度效应(皮书数据库《中国商品期货市场日历效应研究》摘要)。",
+    "evidence_strength": "none",
+    "sources": [
+     "https://doi.org/10.1111/jofi.12398",
+     "https://bigquant.com/square/paper/d3988edc-589d-4029-bc03-082dfe366d2d",
+     "https://bigquant.com/square/paper/134f15cc-6369-4a81-8087-6185b20d28a3",
+     "https://www.shfe.com.cn/upload/20140423/1398233524706.pdf",
+     "https://www.sinoss.net/uploadfile/2015/0515/20150515102346692.pdf"
+    ],
+    "caveats": "中国多数品种上市晚,'≥3 年同月样本'远少于原文 20 年,估计噪声大;中国研报把季节性当作需要剔除的干扰(库存同比化、合约季节性月份)而非可交易溢价;单品种月份效应(黄金 2/4 月)与横截面季节性因子不是同一命题。"
+   },
+   {
+    "id": "F8 横截面展期收益(Carry)",
+    "canonical_definition": "Koijen, Moskowitz, Pedersen & Vrugt 2018 JFE:商品 carry_t = (F_{t,T1} − F_{t,T2}) / F_{t,T2} × 365/(T2 − T1)(最近与次近合约,年化),横截面按 carry 排序做多高 carry、做空低 carry(等权或 rank 加权);等价于年化展期收益率。项目:年化展期收益的横截面 z-score。",
+    "expected_sign": "positive",
+    "original_paper": "Koijen, Moskowitz, Pedersen & Vrugt (2018) 'Carry', JFE 127(2), https://doi.org/10.1016/j.jfineco.2017.11.002",
+    "china_evidence": "(1) 申万宏源 2019-11-12(42 品种,2010.1–2019.8):展期收益率 = ln(f_front) − ln(f_second),做多高者;H=6 周年化 12.5%、波动 8.8%、最大回撤 −12.9%、夏普 1.33,'除 2016 年策略回撤较多外,其余年份均具有良好收益';年化斜率版'基差因子'H=6 周年化 14.8%、回撤 7.7%、夏普 1.73,更稳健;两者截面相关系数高。https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf (2) 海通 2017-09-06(2010.1–2017.7):展期收益率(TS3/TS4)年化约 5%、收益风险比 >1、'稳定性较高',但'2015 年后收益下降明显',2017 年以来 (TS4,H=5) 6.78%。https://www.sohu.com/a/190085518_683085 (3) 海通 2019-08-14:展期收益率 (ts4,H=5) 黑色系年化 11.86%/夏普 0.77,'所有板块均为正收益',贵金属适用期限结构因子。https://www.sohu.com/a/333666152_683085 (4) 中信期货 2022-06-08:期限结构因子持有期 3 日年化 6.5%、夏普 0.96,属'不同参数下都能有较好多空收益'的稳定因子,2016 后增强。https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml (5) 银河期货 2025-05-30(74 品种,2010–2024):展期收益率 = [ln P远 − ln P近]×365/(T远−T近)(升水率,做多因子值低者=做多贴水),IC 0.043、ICIR 2.47、夏普 1.02、卡玛 0.47、胜率 53.2%。https://www.yhqh.com.cn/upload/cn/file/2025-06/col17/1751246892575.pdf (6) 中信建投期货 2023-11-27:期限结构长期为正向因子;中信期货手册系列称其'长期有效但也易短期大亏'。https://finance.sina.com.cn/money/future/wemedia/2023-11-27/doc-imzwaeuu8261080.shtml (7) 华泰期货 2018-04-27《商品期货投资收益的阿尔法与贝塔》:将期限结构价差标准化用于选品种并优化合约期限,优于传统期限结构对冲。https://www.htfc.com/wz_upload/png_upload/20180427/1524798177367504190.pdf (8) BigQuant 用户研究(非机构,2010.1–2022.6):期限结构 ts_mean 年化 7.31%、回撤 18.44%、夏普约 0.6,2010–2015 全正(2010/2013/2014 夏普约 3.5),'2016 年以及以后收益开始变得不稳定'。https://bigquant.com/wiki/doc/Mzkiif3P2n (9) 二手汇总(quantease 引华泰期货图):期限结构策略 2010、2013、2017 年好,动量 2011、2012、2016 年好,两者相关性低。https://quantease.cn/index.php/2022/01/11/",
+    "evidence_strength": "strong",
+    "sources": [
+     "https://doi.org/10.1016/j.jfineco.2017.11.002",
+     "https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf",
+     "https://www.sohu.com/a/190085518_683085",
+     "https://www.sohu.com/a/333666152_683085",
+     "https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml",
+     "https://www.yhqh.com.cn/upload/cn/file/2025-06/col17/1751246892575.pdf",
+     "https://finance.sina.com.cn/money/future/wemedia/2023-11-27/doc-imzwaeuu8261080.shtml",
+     "https://www.htfc.com/wz_upload/png_upload/20180427/1524798177367504190.pdf",
+     "https://bigquant.com/wiki/doc/Mzkiif3P2n",
+     "https://quantease.cn/index.php/2022/01/11/"
+    ],
+    "caveats": "公认最稳的商品截面因子之一,但 2016 年有明显回撤(申万、BigQuant),海通称 2015 后收益下降;与基差动量高度相关,组合时需去重;各家近/次近月定义、是否按剩余期限年化、是否取 K 日均值不同;主力/次主力价差版本(国联)在换月附近噪声大。"
+   },
+   {
+    "id": "F9 横截面动量(12−1 月)",
+    "canonical_definition": "Miffre & Rallis 2007 JBF:排序期 1/3/6/12 月、持有期 1/3/6/12 月,做多过去收益最高 20%、做空最低 20%(等权),13 组策略平均年化 9.38%;Asness, Moskowitz & Pedersen 2013 JF:MOM = 过去 12 个月收益剔除最近 1 个月(t−12 至 t−2),横截面排名。项目:过去 252 日收益(剔除最近 21 日)的横截面 z-score。",
+    "expected_sign": "positive",
+    "original_paper": "Miffre & Rallis (2007) 'Momentum strategies in commodity futures markets', JBF 31(6), https://doi.org/10.1016/j.jbankfin.2006.12.005;Asness, Moskowitz & Pedersen (2013) 'Value and Momentum Everywhere', JF 68(3), https://doi.org/10.1111/jofi.12021",
+    "china_evidence": "(1) 华泰期货 2017-09-25(46 品种,2010.1–2017.8,前/后 10% 多空,万五成本):面板动量全时段最佳 R=250、H=10:年化 6.64%、夏普 0.93、回撤 14.19%;夜盘后 2015.6–2017.8 最佳 R=22、H=5:14.72%/1.73;牛市 2015.12–2016.11 R=22,H=5:29.39%/3.37;熊市 2011.3–2012.2 各参数普遍负(R=60,H=5:−10.62%/−1.25);10 组低相关周期等权组合样本外 8.65%/1.64;单一参数在不同时段表现不稳定。https://htfc.com/upload/20170925/201709251506332534711.pdf (2) 海通 2017-09-06:横截面动量 R=30–45、H=5–10 年化 >4%,'平均收益低于时间序列动量'。https://www.sohu.com/a/190085518_683085 (3) 申万宏源 2019-11-12(42 品种,2010.1–2019.8):对 R 敏感,呈短期(R≤40)与长期(R>100)动量效应,最优 R=220、H=2 周年化 20.6%、夏普 1.23、回撤 22%,空头组合贡献大(空头 −12.0%)。https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf (4) 华宝证券 2020-11-12(2011.1–2020.9):5–120 日扫描,20 日最优,有效。https://finance.sina.com.cn/money/fund/fundzmt/2020-11-12/doc-iiznezxs1538825.shtml (5) 中信期货 2022-04:回看 23 日、滞后 3 日、持有 1 日年化 7.2%、夏普 0.97;'月度动量效应'。https://bigquant.com/square/paper/b3519bbf-fde0-4c12-bd4d-5496be6deb87 (6) 中信期货 2022-06-08:截面动量'不同参数下都能有较好的多空收益',2016 后增强。https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml (7) 银河期货 2025-05-30(74 品种,2010–2024):IC 0.021、ICIR 0.46、夏普 0.65、卡玛 0.29、胜率 51.3%,五因子中最弱但为正。https://www.yhqh.com.cn/upload/cn/file/2025-06/col17/1751246892575.pdf (8) 韦勇凤、赵伟 2022《动量策略、动量崩溃及其风险管理——基于中国商品期货市场的实证研究》,中国科学院大学学报 39(5):2005.1–2020.2,25 品种,周频 J,K∈[1,104];最优 MOM(3-1) 周均 0.72%、年化夏普 0.31,万一成本后仍显著;样本期 40 次动量崩溃(周收益 <−2.5%),2008–2012 最频繁;输家组合具类期权性质。https://html.rhhz.net/ZGKXYDXXB/1622453028171-1581418580.htm (9) 国泰君安期货 2022-05-19:'传统的动量因子在近几年表现差强人意'。https://finance.sina.cn/option/2022-05-20/detail-imcwiwst8520137.d.html (10) 中信建投期货 2023-11-27:动量长期正向因子。https://finance.sina.com.cn/money/future/wemedia/2023-11-27/doc-imzwaeuu8261080.shtml",
+    "evidence_strength": "strong",
+    "sources": [
+     "https://doi.org/10.1016/j.jbankfin.2006.12.005",
+     "https://doi.org/10.1111/jofi.12021",
+     "https://htfc.com/upload/20170925/201709251506332534711.pdf",
+     "https://www.sohu.com/a/190085518_683085",
+     "https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf",
+     "https://finance.sina.com.cn/money/fund/fundzmt/2020-11-12/doc-iiznezxs1538825.shtml",
+     "https://bigquant.com/square/paper/b3519bbf-fde0-4c12-bd4d-5496be6deb87",
+     "https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml",
+     "https://www.yhqh.com.cn/upload/cn/file/2025-06/col17/1751246892575.pdf",
+     "https://html.rhhz.net/ZGKXYDXXB/1622453028171-1581418580.htm",
+     "https://finance.sina.cn/option/2022-05-20/detail-imcwiwst8520137.d.html",
+     "https://finance.sina.com.cn/money/future/wemedia/2023-11-27/doc-imzwaeuu8261080.shtml"
+    ],
+    "caveats": "方向一致为正,但参数极敏感:中国最优回看集中在 20–60 日或 220–250 日,'12−1 月剔除最近月'的学术标准形态在中国研报里几乎无人单独测试;动量崩溃(2008–2012、2011–12 熊市、2016 年底反转)显著;2019 年后多家称动量减弱;银河 2010–2024 全样本夏普仅 0.65。"
+   },
+   {
+    "id": "F10 价值 −log(P_t / P_{t−5y})",
+    "canonical_definition": "Asness, Moskowitz & Pedersen 2013 JF:商品价值 = log(5 年前现货价格(4.5–5.5 年均值) / 当前现货价格),即长期(5 年)价格反转,截面排序做多高价值(长期跌得多)、做空低价值。",
+    "expected_sign": "positive",
+    "original_paper": "Asness, Moskowitz & Pedersen (2013) 'Value and Momentum Everywhere', JF 68(3), https://doi.org/10.1111/jofi.12021",
+    "china_evidence": "仅一处:海通 2017-09-06 海量专题(31)(2010.1–2017.7):价值因子 = 按过去 R 年涨跌幅的相反数排序,R=4 年、H=80–120 日,年化收益'2% 附近','波动较大',与展期收益率一样'自 2000 年以来表现不佳'(后者指海外样本)。https://www.sohu.com/a/190085518_683085 。申万、中信期货、银河、华宝、华泰期货等后续多因子研报均未纳入价值因子;quantease/CSDN 转述《Harvesting Commodity Risk Premia》称海外'期限结构、价值和偏度因子正收益率最为显著',但那是海外结论。https://quantease.cn/index.php/2022/01/11/",
+    "evidence_strength": "weak",
+    "sources": [
+     "https://doi.org/10.1111/jofi.12021",
+     "https://www.sohu.com/a/190085518_683085",
+     "https://quantease.cn/index.php/2022/01/11/"
+    ],
+    "caveats": "中国多数品种上市晚,5 年回看会砍掉大部分样本(项目 design_log 也因此列为'不测');唯一的中国测试年化仅 ~2% 且波动大;无失效年份信息。"
+   },
+   {
+    "id": "F11 低风险 −rank(63 日已实现波动率)",
+    "canonical_definition": "Blitz & de Groot 2014 JAI 'Strategic Allocation to Commodity Factor Premiums':按历史波动率(月度收益,过去数年窗口,详见原文)排序,做多低波动商品、做空高波动商品(低风险溢价),并与动量、carry 组合。项目:−(63 日已实现波动率)的横截面 z-score,值大(低波)做多。",
+    "expected_sign": "negative",
+    "original_paper": "Blitz & de Groot (2014) 'Strategic Allocation to Commodity Factor Premiums', Journal of Alternative Investments 17(2), https://doi.org/10.3905/jai.2014.17.2.103 (DOI 待核)",
+    "china_evidence": "中国公开证据一致指向相反方向(高波动品种未来收益更高):(1) 华宝证券 2020-11-12(2011.1–2020.9):波动率因子 10 日回看有效,但'高波动率标的获取更高收益',与股票市场相反,以正向纳入 5 因子模型。https://finance.sina.com.cn/money/fund/fundzmt/2020-11-12/doc-iiznezxs1538825.shtml (2) 中信期货 2024-10-29《CTA 风格因子手册(一)》:波动率为正向指标,10 日回看年化 3.79%、夏普 0.40、卡玛 0.16;振幅正向(5 日,4.62%/0.45);收益率变异系数正向(5 日,7.77%/1.08)。https://finance.sina.com.cn/money/future/wemedia/2024-10-29/doc-incuepae2142601.shtml (3) 申万宏源 2019-11-12:变异系数(R 日波动/均值)正向,'变异系数越高的期货品种,正收益越明显',最优 R=220、H=8 周年化 13.2%、夏普 1.27;特质波动率反向(做多低特质波)最优仅年化 5.5%、夏普 0.4,结论'过度挖掘统计特征而来的因子(特质波动率等)在国内市场收益较小'。https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf (4) 中信期货 2022-06-08:变异系数 3–5 日回看表现较好(5 日 7.5%/0.98)。https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml (5) 海通 2017-09-06:特质波动率年化 <1%,2016 下半年大幅回撤几乎抹平收益。https://www.sohu.com/a/190085518_683085 (6) 中信建投期货 2023-11-27:波动率为'风险因子'(不作方向性因子)。https://finance.sina.com.cn/money/future/wemedia/2023-11-27/doc-imzwaeuu8261080.shtml (7) 知乎《期货风格因子介绍》(二手):'波动率较高的标的在未来能获取较高收益…短期波动率提升表明活跃度提升,推动单边行情'。https://zhuanlan.zhihu.com/p/384007336",
+    "evidence_strength": "moderate",
+    "sources": [
+     "https://doi.org/10.3905/jai.2014.17.2.103",
+     "https://finance.sina.com.cn/money/fund/fundzmt/2020-11-12/doc-iiznezxs1538825.shtml",
+     "https://finance.sina.com.cn/money/future/wemedia/2024-10-29/doc-incuepae2142601.shtml",
+     "https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf",
+     "https://finance.sina.com.cn/money/future/wemedia/2022-06-08/doc-imizirau7151381.shtml",
+     "https://www.sohu.com/a/190085518_683085",
+     "https://finance.sina.com.cn/money/future/wemedia/2023-11-27/doc-imzwaeuu8261080.shtml",
+     "https://zhuanlan.zhihu.com/p/384007336"
+    ],
+    "caveats": "'moderate'指反向证据的强度:中国研报中'做多高波/高变异系数'为正收益,但测试窗口都很短(5–10 日,变异系数 220 日除外),63 日窗口无人测;中信建投把波动率视为风险因子;在波动率目标化(vol-targeting)组合里低波因子可能只是杠杆效应,应如实报告而非预设方向。"
+   },
+   {
+    "id": "F12 量价复合 HTFC_Alpha19",
+    "canonical_definition": "项目/朋友仓库:TS_Rank(volume,32) × (1 − TS_Rank(close+high−low,16)) × (1 − TS_Rank(returns,32));形式为 WorldQuant '101 Formulaic Alphas'(Kakushadze 2016)风格的时序秩复合,未在任何公开华泰期货文档中检索到该编号或公式。",
+    "expected_sign": "ambiguous",
+    "original_paper": "无公开原始文献;'HTFC_Alpha19'仅见项目 docs/design_log.md 注明来自私有仓库。形式参考:Kakushadze (2016) '101 Formulaic Alphas', Wilmott 2016(84), https://arxiv.org/abs/1601.00991",
+    "china_evidence": "none(该公式无公开验证)。相邻的量价类中国证据:(1) 银河期货 2025-05-30:收益率-成交量相关性因子(T 日 Pearson,做多高相关)2010–2024 IC 0.019、ICIR 0.69、夏普 0.55。https://www.yhqh.com.cn/upload/cn/file/2025-06/col17/1751246892575.pdf (2) 国泰君安期货(据检索摘要)2022-02-28《CTA 量价因子探究系列三:量价相关性因子》(2014–2021):基准因子年化 8.14%/夏普 0.57,成交量排名加权后 19.78%/1.51,复合 23.27%/1.57。https://finance.sina.com.cn/option/2022-02-28/doc-imcwipih5842034.shtml (3) 申万宏源 2019:非流动性因子(Amihud)正向,最优 R=25、H=3 周年化 6.4%、夏普 0.55,2016–2017 大幅回撤,2019 以来显著正。https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf (4) 中信期货 2022-06-08:流动性因子'收益有限且稳定性不足';2024-10-29 手册:流动性因子为反向指标。https://finance.sina.com.cn/money/future/wemedia/2024-10-29/doc-incuepae2142601.shtml (5) 华泰期货公开的量价类研究集中在高频(130+ 高频因子,燃油/螺纹),与该日频公式无关。",
+    "evidence_strength": "none",
+    "sources": [
+     "https://arxiv.org/abs/1601.00991",
+     "https://www.yhqh.com.cn/upload/cn/file/2025-06/col17/1751246892575.pdf",
+     "https://finance.sina.com.cn/option/2022-02-28/doc-imcwipih5842034.shtml",
+     "https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mcg7kHXdmZYWX.pdf",
+     "https://finance.sina.com.cn/money/future/wemedia/2024-10-29/doc-incuepae2142601.shtml"
+    ],
+    "caveats": "三个乘子分别是'放量'、'价位偏低(close+high−low 的 16 日秩低)'、'近期收益秩低',组合起来更像'放量下跌后的反转买入'信号,但方向纯属结构推测;预注册应标为方向未定、且因来源不可公开核对,权重应受限或仅作探索。"
+   }
+  ],
+  "notes": "【方法】按 web-access skill 只用 WebSearch/WebFetch/curl(含 r.jina.ai)读公开页面与期货公司官网 PDF,未登录任何站点。主要一手来源:华泰期货 2017-09-25 动量因子报告与 2018-04-27 阿尔法/贝塔报告(htfc.com PDF)、申万宏源 2019-11-12《挖掘商品期货风险溢价因子》(sywgqh.com.cn PDF,42 品种、2010.1–2019.8、5 类 13 因子)、银河期货 2025-05-30《商品期货 CTA 截面策略初探》(yhqh.com.cn PDF,74 品种、2010–2024)、国联期货 2024-08-31 框架报告、兴证期货 2018-03-27 库存因子(一)(二) PDF;海通 2017/2019 海量专题、中信期货 2022 系列(一)(二)与 2024 手册(一)、华宝 2020、中信建投期货 2023 因子跟踪、国泰君安期货 2022 通过新浪/搜狐/BigQuant 转载页读取(摘要级)。东证期货 2022-03-23《商品因子系列(一)》仅能看到封面(fxbaogao),未取得内容;华泰期货《期货多因子专题报告》(一)–(三)未检索到公开页。\n\n【HTFC_Alpha 命名】所有公开华泰期货文档中均无 'HTFC_Alpha1/5/19' 编号;项目 docs/design_log.md 自己注明来源是'朋友仓库'。华泰期货公开的商品因子系列为:《CTA 量化策略因子系列(一)波动率因子》(2017)、(二)动量因子(2017-09-25)、《商品期货投资收益的阿尔法与贝塔》(2018-04-27)、《期货多因子专题报告(四):商品期货 alpha 因子拾遗》(样本至 2022-08,四因子:时序回归 8.9%/1.34、复合动量 9.61%/0.95、仓单 10.1%/1.48、基差动量 6.89%/0.81)、'华泰杯 2025 因子比赛'。F3/F12 的方向应按'未核'处理。\n\n【中国公开研报最常被验证有效的前 5 类因子】(按被独立机构判为'最有效/稳定'的次数与夏普排序)\n1. 期限结构/展期收益率(含年化基差斜率):申万 展期 12.5%/1.33、基差 14.8%/1.73;海通 2017/2019 所有板块为正;中信期货 6.5%/0.96;银河 IC 0.043、夏普 1.02;中信建投 正向因子。共识:'长期有效但易短期大亏',2016 年、2015 年后有回撤。\n2. 基差动量:海通 2017 最有效 7.10%/1.52;华宝'最有效';申万 7.7%/0.68;华泰期货 6.89%/0.81;银河五因子中夏普最高 1.48。黑色系一度为负。\n3. 库存/仓单(数据本项目没有):申万 仓单水平 17.8%/1.23、仓单变化 17.0%/1.45——全部 13 因子中最高,结论'库存类、期限结构等大类因子表现最佳,具有成熟经济理论支撑';海通 2017 仓单/库存变化率 ~5%、风险比 ~1、'从未发生较大幅度回撤',2019 年 4 因子基准组合(动量、展期、基差动量、仓单/库存)年化 13.3%/夏普 2.55;华泰期货(四)仓单因子 10.1%/1.48 为四因子中夏普最高;兴证期货 2018 全品种库存单边 12.40%/风险比 2.24(有色板块截面 34.89%/3.40);兴证(十)库存二阶增速 2016 以来 >10%,库存-展期三因子 11.3%/2.1。\n4. 截面动量:华泰期货 2017 全时段 0.93(夜盘后 1.73)、申万 20.6%/1.23、中信期货 7.2%/0.97、华宝 20 日有效、银河 0.65;但熊市/反转期崩溃,2019 后多家称减弱。\n5. 波动率/变异系数(高波做多)与对冲压力/会员持仓:申万 变异系数 13.2%/1.27;中信期货 变异系数 7.5%/0.98、手册 7.77%/1.08;华宝 10 日波动率正向;中信期货 对冲压力 243 日 6.0%/0.90;海通 套保者/投机者对冲压力 5.79%/5.37%。\n(时序动量单列:华泰期货 R=10,H=5 夏普 1.08;海通 >5%;华泰期货(四)时序回归 8.9%/1.34。)\n\n【仓单/库存类因子的地位】在申万、海通、华泰期货(四)、兴证、国联框架中都属于第一梯队,且被强调'逻辑简洁、有成熟经济理论支撑、国内外均有效',与期限结构并列为基本面主线;中信期货系列(二)与华宝因数据口径原因未纳入。数据代理:交易所注册仓单(申万、国联),社会库存靠第三方调研;已知问题:仓单季节性需同比/农历处理(兴证十)、农产品品种少且更新慢(兴证二)、注册仓单只覆盖交割库不等于社会库存(申万)。本项目缺该数据意味着放弃研报里夏普最高的一类因子;期限结构/基差动量是反映同一'供需紧张'逻辑的次优替代(申万:库存类与期限结构因子截面相关性低,二者并非冗余)。\n\n【结构性节点】2015 年 6 月夜盘推出后动量增强(华泰期货);2016 年后'几乎所有因子选期能力增强'(中信期货,归因样本池扩充)与偏度 2016 后有效(申万),但期限结构 2016 年回撤(申万)、2015 后收益下降(海通)、基差动量最大回撤 2016-12(申万);2022–2023 CTA 趋势整体回撤(华泰期货 2024-11);偏度 2023–2024 失效(2025 研报)。\n\n【sources 中疑似笔误校正】F12 sources 里申万 PDF 正确 URL 为 https://m.sywgqh.com.cn/upload/file/202108/26/5f0Mgg7kHXdmZYWX.pdf(与其他条目一致)。"
+ },
+ "verdict": {
+  "checks": [
+   {
+    "id": "F1",
+    "field": "canonical_definition (公式 vs Lim–Zohren–Roberts 2019 §III-A)",
+    "verdict": "confirmed",
+    "source": "arXiv:1904.04912 PDF 全文 eq.(4)–(8):MACD=m(S)−m(L);q=MACD/std(p_{t−63:t});Y=q/std(z_{t−252:t});φ(y)=y·exp(−y²/4)/0.894;S_k∈{8,16,32},L_k∈{24,48,96};EWMA time-scale S 对应 HL=log(0.5)/log(1−1/S)",
+    "correction": "两点细节:(1) Lim eq.(8) 把三尺度写成直接求和 Σ_k,没有 1/3 权重;Poh et al. 2020 (arXiv:2012.07149 eq.9) 亦是 Σ_k φ(·) 求和。w_k=1/3 等权平均只能来自 Baz 原文(本次无法核对),对方向/排序无影响,只影响仓位尺度。(2) x·exp(−x²/4) 在 |x|=√2 处最大值 = √2·e^{−1/2} ≈ 0.858,除以 0.89 后 max|R|≈0.96 而非恰好 1;Lim 写的常数是 0.894。半衰期换算 5.2/10.7/21.8 与 16.3/32.9/66.2 日经复算无误。"
+   },
+   {
+    "id": "F1",
+    "field": "canonical_definition (vs Baz et al. 2015 原文)",
+    "verdict": "unverifiable",
+    "source": "SSRN 2695101 摘要页(本机 Chrome 只读打开)只含摘要;PDF 未下载。CME 镜像 (cmegroup.com/…/dissecting-investment-strategies…pdf) 对脚本访问返回 IP 封禁提示,未再尝试;Semantic Scholar 标记 CLOSED;Harvey 主页 (W134) 仅链 SSRN",
+    "correction": "原文公式编号/Exhibit 与 w_k=1/3、0.89 常数仍需拿到 SSRN PDF 后复核。"
+   },
+   {
+    "id": "F1",
+    "field": "expected_sign",
+    "verdict": "confirmed",
+    "source": "趋势信号按构造为正;Lim 2019 表中 MACD 基线 Sharpe 为正;Zheng et al. 2025 JFM 摘要(Semantic Scholar API):64 品种 2003–2023 TSMOM 高收益、不依赖子样本/单品种、扣成本后稳健"
+   },
+   {
+    "id": "F1",
+    "field": "china_evidence (Ham 2019 / 华泰 2017)",
+    "verdict": "confirmed",
+    "source": "Wiley 摘要页(Chrome 只读):JFM 39(12):1515–1528,1 月回看/1 月持有最佳,TSMOM 优于被动多头与截面动量,中国动量持续期更短;华泰研报 PDF 表 5:全时段时间序列策略最佳 H=5、R=10,年化 5.61%,夏普 1.0809,46 品种 2010.1–2017.8"
+   },
+   {
+    "id": "F2",
+    "field": "canonical_definition (George & Hwang 2004)",
+    "verdict": "confirmed",
+    "source": "作者主页 PDF https://www.bauer.uh.edu/tgeorge/papers/gh4-paper.pdf Table I 注:52-week high 组合按'当前价/过去 12 个月最高价'排序,赢家(输家)=比率最高(最低)30%,持有 6 个月;JF 59(5):2145–2176"
+   },
+   {
+    "id": "F2",
+    "field": "canonical_definition (Bianchi, Drew & Fan 2016)",
+    "verdict": "confirmed",
+    "source": "ideas.repec.org 摘要:52 周高点策略扣交易成本后显著盈利,且比传统动量更能预测收益;JBF 72:133–150"
+   },
+   {
+    "id": "F2",
+    "field": "canonical_definition (Hurst, Ooi & Pedersen 2017)",
+    "verdict": "confirmed",
+    "source": "AQR 白皮书版 (Fall 2012) 全文:'an equal-weighted combination of 1-month, 3-month, and 12-month time series momentum strategies',各仓位按等波动率定尺寸,合并组合目标年化事前波动 10%;JPM 2017 版付费墙未读(白皮书版 59 市场 1903–2012,JPM 版 67 市场 1880–2016)"
+   },
+   {
+    "id": "F2",
+    "field": "expected_sign",
+    "verdict": "confirmed",
+    "source": "George & Hwang 2004、Bianchi 2016、Zhang & Urquhart 2020 (RBF 12(4):375–409,whiterose eprint):GH 52 周高点在商品上有显著动量利润、189 个窗口无显著反转"
+   },
+   {
+    "id": "F3",
+    "field": "canonical_definition (Miffre & Rallis 2007;Bianchi, Drew & Fan 2015)",
+    "verdict": "confirmed",
+    "source": "SSRN 702281 与 ScienceDirect 摘要(Chrome 只读):'While contrarian strategies do not work…13 profitable momentum strategies…9.38%…buy backwardated and sell contangoed';共测 56 个动量/反转策略;EconPapers 给出 JBF 31(6):1863–1886(SSRN 引用格式误写为 No.9)。Bianchi 2015 ideas.repec 摘要:动量利润在组合形成后 12–30 个月反转,双排序 20.24%",
+    "correction": "Miffre & Rallis 摘要未写明反转回看为 2–5 年,该细节未从原文核实(可能正确,属正文内容)。"
+   },
+   {
+    "id": "F3",
+    "field": "canonical_definition ('HTFC_Alpha1' 不存在)",
+    "verdict": "unverifiable",
+    "source": "无法证明否定命题;本次未穷举 htfc.com 站内研报"
+   },
+   {
+    "id": "F3",
+    "field": "expected_sign (ambiguous)",
+    "verdict": "confirmed",
+    "source": "Kwon, Kang & Yun (strathprints PDF) 摘要与 Table 2:周动量 0.20%/周 (t=4.49),1979.1–2015.6,'strong short-term momentum, instead of short-term reversal',12 月动量利润'mainly stem from the strong predictability of the past week's return';Wang & Yu 2004 ScienceDirect 摘要(Chrome 只读):24 个美国期货周度反转显著,反转利润与滞后成交量变化正相关、与滞后持仓量变化负相关;Zhao, Ding, Yu & Kang (SSRN 6425598, 2026-03-16) 摘要:残差成分预示下周动量、投机者交易流成分预示反转",
+    "correction": "Wang & Yu 样本年份 '1983–2000' 未出现在摘要中,未核实。"
+   },
+   {
+    "id": "F3",
+    "field": "china_evidence (中信期货 2022 / Yang–Göncü–Pantelous 2018)",
+    "verdict": "confirmed",
+    "source": "新浪财经转载研报摘要原文:'截面动量、乖离率及期限结构因子在不同参数下都能有较好的多空收益','偏度因子则在全样本表现不佳',未给乖离率方向与窗口;Yang et al. IRFA 60:177–196,31 品种分钟数据,低频长持有期下动量与反转策略均有超额收益但回撤更大"
+   },
+   {
+    "id": "F4",
+    "field": "canonical_definition (Boons–Prado 公式)",
+    "verdict": "confirmed",
+    "source": "Kwon, Kang & Yun 2021 FRL (strathprints PDF) 公式:BM(k1,k2)_t=∏_{s=t−k1}^{t−k2}(1+R^{T1}_s)−∏(1+R^{T2}_s),原始 BM(11,0) 即过去 12 个月近月与次近月复利累计收益之差,近月收益=做多 first-nearby;Li–Sun–Zhou 2021 同一定义 n=12;Boons & Prado SSRN 2587784 摘要(Chrome 只读)确认 JF 74(1):239–279 与'slope and curvature'解释",
+    "correction": "JF 原文全文仍未取得;'每月末排序、持有 1 个月、交易近月'来自复述而非原文。"
+   },
+   {
+    "id": "F4",
+    "field": "canonical_definition (Sakkas & Tessaromatis 2020 数字)",
+    "verdict": "confirmed",
+    "source": "EDHEC PDF Table 3 Panel D:High−Low 16.36%,SD 17.60%,SR 0.930,为九个因子中最高;38 品种 1970:01–2018:08,前后 30% 等权"
+   },
+   {
+    "id": "F4",
+    "field": "china_evidence (Li–Sun–Zhou / Zhang–Hsieh–Chen / Luo–Xue)",
+    "verdict": "confirmed",
+    "source": "ScienceDirect 开放获取全文(Chrome 只读)Table 2:BM 0.05 [1.03] SR 0.3027,47 合约 2003.1–2018.6,四分位月度再平衡;PMC10155417:37 品种 2016–2021,244 日 BM 疫情前 −0.017 不显著、疫情期 0.061 显著(PMC 摘录为 p<0.01,比核对表的 p<0.05 更强);SSRN 6546878 (2026-01-30):41 个中国品种,现货基差与基差动量稳健预测近月收益"
+   },
+   {
+    "id": "F4",
+    "field": "caveats (Kwon–Kang–Yun 2021 三段拆分) 与 expected_sign",
+    "verdict": "confirmed",
+    "source": "FRL 2021 摘要:拆为当月、前 5 个月、再前 6 个月三段,预测力与经济含义差异显著;美国证据方向为正"
+   },
+   {
+    "id": "F5",
+    "field": "canonical_definition",
+    "verdict": "confirmed",
+    "source": "AUT 接收稿全文:Pearson 矩偏度用 t−11..t 月日收益;五分位,Q1(最负)做多、Q5 做空,全额抵押;27 品种 1987.1–2014.11;Q1−Q5 年化 8.01% (NW t=3.83),SR 0.7848(隐含波动 10.2%);脚注 7:R={6,36,60,96}、H={3,6,12} 结论不变"
+   },
+   {
+    "id": "F5",
+    "field": "expected_sign 与 china_evidence",
+    "verdict": "confirmed",
+    "source": "F5=−skew 与原文方向一致。Jiang 2021 Wiley 摘要(Chrome 只读):JFM 41(8):1268–1285,偏度与预期收益负相关且完全单调,'Investors require positive risk compensation for lower skewness';Li–Sun–Zhou Table 2:SKEW(低−高) −9.78% [−2.55];Fan & Zhang 2020 JFM 40(4):671–706 摘要:偏度、波动率等溢价被时变保证金与严格持仓限额扭曲;中信 2022:偏度因子全样本表现不佳;Sakkas Table 3 Panel E:低−高偏度 2.84%,SR 0.162"
+   },
+   {
+    "id": "F6",
+    "field": "canonical_definition",
+    "verdict": "confirmed",
+    "source": "NBER w16712 全文 §3.3.1:美元持仓=现货价×未平仓合约数,四板块内加总后算月增长率,板块等权平均,再取 12 个月几何平均;脚注 4 用各品种合约数增长率的板块中位数替代,结果几乎一致;Table 6 第 2 列系数 0.73 (t=2.50);全文未见按品种排序的截面检验"
+   },
+   {
+    "id": "F6",
+    "field": "canonical_definition ('控制短端利率、期限利差、基差、动量后仍成立')",
+    "verdict": "refuted",
+    "source": "NBER w16712 pp.21–22:0.73 (t=2.50) 是 Table 6 第 2 列,仅控制短端利率、期限利差、基差;加入过去商品收益(动量)后的第 4 列 horse race 中持仓增长系数 0.77、t=1.85,仅边际显著",
+    "correction": "应改为:'控制短端利率、期限利差、基差后 +0.73%/月 (t=2.50);再加入 12 个月过去收益后系数 0.77 (t=1.85),边际显著,且持仓增长压倒了动量的预测力'。"
+   },
+   {
+    "id": "F6",
+    "field": "expected_sign 与 china_evidence",
+    "verdict": "confirmed",
+    "source": "Li–Sun–Zhou 全文:OI 信号=ΔOI_t=OI_t−OI_{t−1},做多变化最大/做空最小四分位,Table 2 −5.73% [−2.07];Sakkas Table 3 Panel I:高−低持仓 −0.45%,SR −0.027;Fan & Zhang 摘要:持仓量溢价对制度环境敏感"
+   },
+   {
+    "id": "F7",
+    "field": "canonical_definition",
+    "verdict": "confirmed",
+    "source": "AQR 工作论文版全文 §5.4.3 与 Table 8 Panel C:24 个商品期货 1970.1–2011.7,要求至少 5 年历史,多空各 2 个(1993.12 后 3 个),自 1974.12 末起形成组合,同月 0.93% (t=1.93),其他月 −0.22% (t=−0.58),差 1.15% (t=1.97),剔 1 月 0.96% (t=2.03);Wiley 页确认 JF 71(4):1557–1590",
+    "correction": "核对对象是工作论文版,JF 终稿未读;'全部可得历史、不限 20 年'是从表注'average same-calendar-month returns'推断,原文未明说。"
+   },
+   {
+    "id": "F7",
+    "field": "caveats (Li, Liu, Miao & Tse 2024) 与 expected_sign",
+    "verdict": "confirmed",
+    "source": "ideas.repec 摘要:IREF 93(PB):448–462,26 个商品 1970–2023,同月策略主要仅在 1990–1999 子样本优于其他月策略,季节效应近年减弱"
+   },
+   {
+    "id": "F8",
+    "field": "canonical_definition",
+    "verdict": "confirmed",
+    "source": "CBS 接收稿全文:eq.(9) C_t=(S_t−F_t)/F_t;用两个最近到期合约外推合成现货、插值合成 1 个月期货;工业金属用 LME 现货与 3 个月价插值;eq.(19) w=z_t(rank(C)−(N_t+1)/2),z_t 使多空各为 1;carry1-12 为过去 12 个月 carry 均值以消除季节性;24 个商品,carry 11.22%、SR 0.60,carry1-12 12.69%、SR 0.65"
+   },
+   {
+    "id": "F8",
+    "field": "expected_sign 与 china_evidence",
+    "verdict": "confirmed",
+    "source": "Li–Sun–Zhou:roll-yield=log P_nearest−log P_second,四分位多空 11.56% [2.26];华泰 2017-10-25 研报 PDF:持有 60/120 日、对冲前 30%,年化 7.88%、夏普 2.09;PBFJ 62 (2020) 101366 (Zhang, Xiao & Zhang) carry 与动量显著、三因子解释截面;JCM 15 (2019) (He, Jiang & Molyboga):等权市场+carry+时间序列动量三因子解释现货溢价(注意其动量因子是时序动量);Fan & Zhang:期限结构与动量溢价持续"
+   },
+   {
+    "id": "F9",
+    "field": "canonical_definition",
+    "verdict": "confirmed",
+    "source": "AMP 2013 NYU PDF p.937:MOM2–12,'Momentum returns for these asset classes are in fact stronger when we don't skip the most recent month';eq.(1) 秩权重;Table 商品行:27 品种 1972.1–2011.7,动量 P3−P1 12.4% (t=3.29) SR 0.53,Factor 11.5% SR 0.51;Miffre & Rallis 摘要见 F3"
+   },
+   {
+    "id": "F9",
+    "field": "expected_sign 与 china_evidence",
+    "verdict": "confirmed",
+    "source": "Li–Sun–Zhou:CS-MOM=过去 12 个月月收益简单平均(不跳月),四分位多空 20.34% [3.19] SR 1.1188,CUM-MOM 19.62% [2.98];华泰 2017 表 4:面板动量最佳 H=10、R=250,年化 6.64%,夏普 0.9311;Kwon–Kang–Yun 2020 摘要确认 12 月动量利润主要来自最近一周"
+   },
+   {
+    "id": "F10",
+    "field": "canonical_definition",
+    "verdict": "confirmed",
+    "source": "AMP 2013 p.937 原文:'value as the log of the spot price 5 years ago (actually, the average spot price from 4.5 to 5.5 years ago), divided by the most recent spot price';Table 商品行:value P3−P1 6.3% (t=1.61) SR 0.26,alpha 7.7% (t=2.02),Correlation(Val,Mom) −0.39,50/50 组合 SR 0.71"
+   },
+   {
+    "id": "F10",
+    "field": "expected_sign (ambiguous) 与 china_evidence",
+    "verdict": "confirmed",
+    "source": "Li–Sun–Zhou 全文:VALUE=ln(过去 4.5–5.5 年日均价 / 当前 1 个月日均价),做多最高四分位,Table 2 −13.82% [−2.85] SR −0.6151;Sakkas Panel J:低−高 value 2.87%,SR 0.136;Chaves & Viswanathan JCM 3(1):39–53 摘要:均值回归在现货有效、期货无效;Zaremba–Bianchi–Mikutowski JBF 133 摘要:52 个商品 1265–2017,过去 1–3 年收益负向预测",
+    "correction": "Zaremba 2021 的 '−13.07% (t=−18.81)' 仅摘要不可核,未验证。"
+   },
+   {
+    "id": "F11",
+    "field": "canonical_definition (Blitz & de Groot 2014)",
+    "verdict": "confirmed",
+    "source": "SSRN 2265901 摘要(Chrome 只读):'confirm the existence of sizable momentum, carry and low-volatility factor premiums';JAI 17(2):103–115;Miffre 2016 (roycheng.cn PDF) p.17:Blitz–de Groot 低波动多空 SR 0.35 vs S&P-GSCI 0.06;Miffre 2016 附表:Blitz–de Groot 用 top/bottom 30%、24 品种、1979–2012",
+    "correction": "低波动窗口(是否 36 个月、日/月收益)确如核对表所述无法从公开摘要核实,维持 unverifiable。"
+   },
+   {
+    "id": "F11",
+    "field": "expected_sign (ambiguous) 与 china_evidence",
+    "verdict": "confirmed",
+    "source": "Li–Sun–Zhou 全文:VOL=σ²/μ(过去 36 个月日收益),做多高波动/做空低波动,Table 2 +10.53% [2.09](正文误写 10.75%,核对表取表值正确);中信 2022 摘要;Fan & Zhang 摘要",
+    "correction": "中信'变异系数因子年化 7.5%、夏普 0.98'是 2016 年后子样本、回看期 5 日的数字,并非全样本,应注明。"
+   },
+   {
+    "id": "F11",
+    "field": "caveats (特质波动率证据出处)",
+    "verdict": "refuted",
+    "source": "Miffre 2016 p.17 与参考文献:'Fernandez-Perez, Fuertes and Miffre (2015) measure the idiosyncratic volatility…buy the quintile with the lowest idiosyncratic volatility…Sharpe ratio at 0.38' 对应 EDHEC 工作论文 'Is idiosyncratic volatility priced in commodity futures markets?';而 Fuertes, Miffre & Fernandez-Perez (2015, JFM 35(3):274–297) 是动量+期限结构+特质波动三重筛选论文(ideas.repec 摘要未报告单独特质波动 alpha)",
+    "correction": "SR 0.38 应归于 Fernandez-Perez, Fuertes & Miffre (2015 EDHEC WP;后刊于 IRFA 2016),不是 JFM 35(3) 三重筛选论文;'alpha 4.62%/年'未能核实。"
+   },
+   {
+    "id": "F11",
+    "field": "caveats (Gorton–Hayashi–Rouwenhorst 2013 高波动跑赢 5.41%/年 t=3.64)",
+    "verdict": "unverifiable",
+    "source": "NBER w13249 (2007 WP) 全文中无 5.41/3.64 数字;RoF 17(1):35–105 终稿付费墙;Miffre 2016 仅定性转述'高波动组合跑赢低波动'"
+   },
+   {
+    "id": "F11",
+    "field": "caveats (Szymanowska 2014 / Sakkas / Frazzini–Pedersen BAB)",
+    "verdict": "confirmed",
+    "source": "Szymanowska et al. TIAS PDF 'Alternative Sorts' Panel C (按 CV 排序):P4−P1 短期展期收益 8.13% (t=2.37),Miffre 2016 p.16 同;Sakkas Table 3 Panel G:高−低波动 +7.09%,SR 0.415;NBER w16601 (BAB) Table:Commodities 0.42%/月 (t=1.44),SR 0.22"
+   },
+   {
+    "id": "F12",
+    "field": "canonical_definition",
+    "verdict": "confirmed",
+    "source": "arXiv:1601.00991 PDF 第 434–435 行 Alpha#35 逐字一致:((Ts_Rank(volume, 32) * (1 - Ts_Rank(((close + high) - low), 16))) * (1 - Ts_Rank(returns, 32)));§1:平均持有期 0.6–6.4 天,美股日频价量因子;'HTFC_Alpha19' 出处未找到属否定命题,不可核"
+   },
+   {
+    "id": "F12",
+    "field": "expected_sign",
+    "verdict": "confirmed",
+    "source": "WorldQuant 约定 alpha 值越大多头越多;三项乘积'放量×价位低×近期下跌'为量价条件反转,与 Wang & Yu 2004 摘要(反转利润与滞后成交量变化正相关)方向一致;商品期货上无直接公开检验"
+   }
+  ],
+  "summary": "逐项复核 12 个因子的 canonical_definition 与 expected_sign,全部通过公开一手来源(arXiv/NBER/CBS/AUT/EDHEC/strathprints/whiterose/bauer.uh.edu/htfc.com/aqr.com PDF 全文,ideas.repec、Semantic Scholar API、新浪转载摘要;对 SSRN/Wiley/ScienceDirect 的 Cloudflare 拦截公开摘要页与一篇开放获取全文用本机 Chrome 只读打开、自建 tab 已关闭,未登录、未下载 SSRN PDF)。结论:12 项核心定义与符号无一被推翻;三处次级修正——(1) F6 Hong–Yogo 0.73 (t=2.50) 未控制动量,加入动量后为 0.77 (t=1.85) 仅边际显著;(2) F11 特质波动 SR 0.38 应归于 Fernandez-Perez, Fuertes & Miffre (2015 EDHEC WP) 而非 Fuertes–Miffre–Fernandez-Perez (2015, JFM 35(3)) 三重筛选论文,alpha 4.62% 未核实;(3) F11 中信变异系数 7.5%/0.98 为 2016 年后子样本数字。补充细节:F1 Lim 2019 与 Poh 2020 的复现均把三尺度写成求和而非 1/3 等权,且 0.89 归一化使 max|R|≈0.96;F2 Hurst–Ooi–Pedersen 的 1/3/12 月等权、10% 目标波动已从 AQR 白皮书版原文确认;F4 Zhang–Hsieh–Chen 的疫情期显著性为 p<0.01。仍不可核:Baz 2015 原文(仅摘要)、Boons–Prado JF 全文、Blitz–de Groot 低波动窗口、GHR 2013 的 5.41% (t=3.64)、KLN JF 终稿(以工作论文版核对)、'HTFC_Alpha1/19' 不存在的否定命题。"
+ }
+}
