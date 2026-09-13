@@ -38,6 +38,8 @@ PANEL_COLS = [
     "next_contract",
     "next_close",
     "days_to_next",
+    "oi_total",
+    "volume_total",
 ]
 
 
@@ -156,4 +158,8 @@ def build_symbol_panel(
     f["next_contract"] = nxt
     f["next_close"] = nxt_close
     f["days_to_next"] = days
+    # 全部合约合计(持仓量增长因子用):只在当日有任一合约数据时有值
+    vol_all = contracts["volume"].unstack("contract").reindex(dates)
+    f["oi_total"] = oi.sum(axis=1, min_count=1).to_numpy(dtype=float)
+    f["volume_total"] = vol_all.sum(axis=1, min_count=1).to_numpy(dtype=float)
     return SymbolPanel(symbol, f[PANEL_COLS])

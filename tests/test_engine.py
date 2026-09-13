@@ -29,6 +29,8 @@ def _panel(dates, opens, settles, roll_day=None, limit_up=None):
     f["next_contract"] = "CU2107"
     f["next_close"] = f["close"] * 1.01
     f["days_to_next"] = 30
+    f["oi_total"] = f["open_interest"]
+    f["volume_total"] = f["volume"]
     if roll_day is not None:
         f.loc[roll_day, "roll"] = True
         f.loc[roll_day, "roll_from"] = "CU2105"

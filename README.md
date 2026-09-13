@@ -10,6 +10,7 @@
 - 资金规模扫描(100–500 万):`scripts/capital_scan.py` → `report/capital_scan.md`
 - 行业基线对照(洛书拾壹号、南华商品指数):`docs/baselines.md`
 - 合约参数核验记录:`docs/instruments_verification.md`
+- 因子研究(v0.2):因子库 `src/cta/factors/`(11 个预注册候选 + 统一评估/IC/Deflated Sharpe),脚本 `scripts/factor_screen.py`(样本内默认,样本外需显式确认)、`factor_combo.py`、`factor_walkforward.py`;结果 `docs/factor_research_is.md`、`docs/factor_research_oos_2026-06-05.md`、`docs/factor_combo_*.md`、`docs/factor_walkforward.md`;规则与结论在 `docs/design_log.md` 四–六
 
 ```bash
 pip install -e ".[dev]"

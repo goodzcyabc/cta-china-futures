@@ -27,3 +27,7 @@ docs/               本文件、design_log.md(预注册)、deployment.md(上线�
 4. **无写死的成本。** 一切来自 instruments.yaml,并带 verified 标记。
 5. **每次运行有指纹。** 配置哈希、数据清单哈希、git SHA 写入结果与订单快照。
 6. **研究脚本不进包。** `src/cta` 只放会上线的代码;探索性分析放 `scripts/`,输出到 `results/`。
+
+
+## 因子研究层(v0.2 起)
+`cta.factors`:`base`(输入容器、规格、注册表、统一标准化)、`library`(候选因子,一个 id 一个定义,窗口写死)、`evaluate`(单因子波动率目标组合、成本、TS/XS-IC、逐年、Deflated Sharpe)。研究脚本在 `scripts/factor_*.py`,默认只能跑样本内(≤2021-12-31),样本外要显式 `--confirm-holdout`。生产信号仍只在 `cta.signals`;因子进入生产必须经过设计日志的选入规则与 version 递增。

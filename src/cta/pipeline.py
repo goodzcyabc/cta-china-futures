@@ -66,6 +66,17 @@ def _wide(panels: dict[str, SymbolPanel], col: str) -> pd.DataFrame:
     return pd.DataFrame({s: p.frame[col] for s, p in panels.items()}).sort_index()
 
 
+def eligible_mask(panels: dict[str, SymbolPanel], cfg: StrategyConfig) -> pd.DataFrame:
+    """可投掩码:历史足够 + 主力成交额足够(20 日均值,元)。信号与因子研究共用同一口径。"""
+    adj, close = _wide(panels, "adj_close"), _wide(panels, "close")
+    hist_ok = adj.notna().cumsum() >= cfg.universe.min_history_days
+    turnover = (
+        (_wide(panels, "volume") * close * _wide(panels, "multiplier")).rolling(20, min_periods=10).mean()
+    )
+    out: pd.DataFrame = hist_ok & (turnover >= cfg.universe.min_dominant_turnover_cny)
+    return out
+
+
 def compute_signals(panels: dict[str, SymbolPanel], cfg: StrategyConfig) -> Signals:
     adj = _wide(panels, "adj_close")
     close, nxt, days = _wide(panels, "close"), _wide(panels, "next_close"), _wide(panels, "days_to_next")
@@ -73,12 +84,7 @@ def compute_signals(panels: dict[str, SymbolPanel], cfg: StrategyConfig) -> Sign
     ts = sig.tsmom(adj, tuple(cfg.signals.tsmom_lookbacks), vol=vol)
     cr = sig.carry_signal(sig.carry(close, nxt, days), cfg.signals.carry_scale)
     comb = sig.combine({"tsmom": ts, "carry": cr}, cfg.signals.weights)
-    # 可投:历史足够 + 主力成交额足够(20 日均值,元)
-    hist_ok = adj.notna().cumsum() >= cfg.universe.min_history_days
-    turnover = (
-        (_wide(panels, "volume") * close * _wide(panels, "multiplier")).rolling(20, min_periods=10).mean()
-    )
-    eligible = hist_ok & (turnover >= cfg.universe.min_dominant_turnover_cny)
+    eligible = eligible_mask(panels, cfg)
     raw_target = sig.vol_target_positions(
         comb.where(eligible),
         vol,
