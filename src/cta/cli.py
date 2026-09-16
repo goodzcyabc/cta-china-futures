@@ -68,3 +68,29 @@ def report(run: Path = typer.Argument(..., help="results/<digest> 目录")) -> N
 
 if __name__ == "__main__":
     app()
+
+
+@app.command()
+def paper(
+    action: str = typer.Argument(..., help="step | catchup | status"),
+    date: str = typer.Option(None, help="交易日(默认今天)"),
+    no_ingest: bool = typer.Option(False, help="不拉交易所数据,只用已落盘的数据"),
+) -> None:
+    """纸面交易:step 处理单个交易日(拉数据 → 成交昨日订单并盯市 → 生成今日订单);catchup 补跑到指定日;status 打印账本。"""
+    import pandas as pd
+
+    from cta.paper import runner
+    from cta.paper.book import PaperBook
+
+    d = pd.Timestamp(date) if date else pd.Timestamp.today().normalize()
+    if action == "step":
+        typer.echo(
+            json.dumps(runner.step(d, do_ingest=not no_ingest), ensure_ascii=False, indent=1, default=str)
+        )
+    elif action == "catchup":
+        for log in runner.catchup(d, do_ingest=not no_ingest):
+            typer.echo(json.dumps(log, ensure_ascii=False, default=str))
+    elif action == "status":
+        typer.echo(PaperBook().state.to_json())
+    else:
+        raise typer.BadParameter(action)

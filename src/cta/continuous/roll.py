@@ -102,9 +102,13 @@ def build_symbol_panel(
     f["contract"] = held.values
     for col in ["open", "high", "low", "close", "volume", "open_interest"]:
         f[col] = pick(contracts[col].unstack("contract").reindex(dates), held)
-    # 结算价 ≈ 收盘价;涨跌停按前收盘与交易所幅度自算(合约级数据不含结算价与官方涨跌停)
-    f["settle"] = f["close"].to_numpy(dtype=float)
-    f["prev_settle"] = f["settle"].shift(1).to_numpy(dtype=float)
+    # 结算价:交易所直连数据含官方结算价与前结算价;米筐导出不含,用收盘价近似。涨跌停按前结算 × 交易所幅度。
+    if "settle" in contracts.columns:
+        f["settle"] = pick(contracts["settle"].unstack("contract").reindex(dates), held)
+        f["prev_settle"] = pick(contracts["prev_settle"].unstack("contract").reindex(dates), held)
+    else:
+        f["settle"] = f["close"].to_numpy(dtype=float)
+        f["prev_settle"] = f["settle"].shift(1).to_numpy(dtype=float)
     prev_settle = f["prev_settle"].to_numpy(dtype=float)
     f["limit_up"] = prev_settle * (1 + limit_pct)
     f["limit_down"] = prev_settle * (1 - limit_pct)

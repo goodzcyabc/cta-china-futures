@@ -22,3 +22,11 @@
 
 ## 治理
 - `configs/strategy.yaml` 参数冻结;任何改动进 `docs/design_log.md` 并递增 version;回测结果目录以配置指纹命名,不可覆盖。
+
+## 纸面交易运行手册(2026-09-16 起)
+- 数据:每日 17:10(北京)后由 `cta paper step` 调各交易所模块 `ingest_day` 拉当日行情/持仓排名/仓单,落盘到 `data/exchanges/`(永不覆盖)。
+- 信号路径与研究完全相同:`build_panels → compute_signals → generate_orders`,数据源为 `StitchedSource`(米筐历史到 2026-06-05,之后交易所直连)。
+- 成交模拟:上一交易日生成的订单在当日**开盘价 + 1 跳滑点**成交,手续费按核验参数表;开盘触及涨跌停则该腿顺延;换月先平旧合约再开新合约;每日按官方结算价盯市。规则与回测引擎一致,差异只在"用真实次日开盘价"。
+- 状态与留痕:`paper/state.json`(权益、持仓)、`paper/orders/<日期>/`(订单 + 输入快照与指纹)、`paper/fills/<日期>.csv`、`paper/equity.csv`、`paper/log/<日期>.json`;每日 git 提交一次,提交时间即时间戳。
+- 调度:`deploy/com.cta.paper.plist`(launchd,工作日 05:10 多伦多);漏跑由 `cta paper catchup` 按账本最后盯市日补齐。
+- 通过/中止标准沿用上文(纸面 3 个月:净夏普与回测同期差异在 ±0.5 内、成交率 ≥95%、无盯市对账差异)。
