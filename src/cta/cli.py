@@ -87,10 +87,6 @@ def report(run: Path = typer.Argument(..., help="results/<digest> 目录")) -> N
     typer.echo(f"-> {build_report(run)}")
 
 
-if __name__ == "__main__":
-    app()
-
-
 @app.command()
 def paper(
     action: str = typer.Argument(..., help="step | catchup | status"),
@@ -115,3 +111,7 @@ def paper(
         typer.echo(PaperBook().state.to_json())
     else:
         raise typer.BadParameter(action)
+
+
+if __name__ == "__main__":
+    app()

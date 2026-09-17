@@ -55,6 +55,11 @@ POSITION_COLS = [
 # 仓单:一行 = 某品种某仓库(或合计)的注册仓单数量与当日增减。
 RECEIPT_COLS = ["date", "exchange", "symbol", "warehouse", "is_total", "receipts", "change"]
 
+
+class NotFinalError(RuntimeError):
+    """交易所文件是盘中快照(结算价未出),不得落盘;调用方应删除已缓存的 raw 并稍后重试。"""
+
+
 _COLS: dict[str, list[str]] = {"quotes": QUOTE_COLS, "positions": POSITION_COLS, "receipts": RECEIPT_COLS}
 _CODE_RE = re.compile(r"^([A-Za-z]{1,2})(\d{3,4})$")
 

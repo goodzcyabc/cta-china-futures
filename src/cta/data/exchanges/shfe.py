@@ -34,6 +34,7 @@ from cta.data.exchanges.base import (
     RECEIPT_COLS,
     Exchange,
     Kind,
+    NotFinalError,
     Store,
     normalize_contract,
     symbol_of,
@@ -318,6 +319,7 @@ def parse_quotes(raw: bytes, date: pd.Timestamp, site: Site = SHFE) -> pd.DataFr
     data = _load_json(raw)
     rows = cast(list[dict[str, Any]], data.get("o_curinstrument") or [])
     out: list[dict[str, Any]] = []
+    n_traded = n_empty_settle = 0
     for r in rows:
         pid = _text(r.get("PRODUCTID"))
         dm = _text(r.get("DELIVERYMONTH"))
@@ -331,6 +333,10 @@ def parse_quotes(raw: bytes, date: pd.Timestamp, site: Site = SHFE) -> pd.DataFr
         settle = _num(r.get("SETTLEMENTPRICE"))
         close = _num(r.get("CLOSEPRICE"))
         prev = _num(r.get("PRESETTLEMENTPRICE"))
+        if _num(r.get("VOLUME")) > 0:
+            n_traded += 1
+            if not settle > 0:
+                n_empty_settle += 1
         if not settle > 0:  # 交易所偶有结算价留空(极少):按 收盘价 → 昨结 补,便于通过 validate;文档已记
             settle = close if close > 0 else prev
             log.warning(
@@ -352,6 +358,11 @@ def parse_quotes(raw: bytes, date: pd.Timestamp, site: Site = SHFE) -> pd.DataFr
                 "open_interest": _num(r.get("OPENINTEREST")),
                 "turnover": _num(r.get("TURNOVER")) if "TURNOVER" in r else float("nan"),
             }
+        )
+    if n_traded and n_empty_settle > 0.05 * n_traded:
+        raise NotFinalError(
+            f"{site.exchange} {date.date()}: {n_empty_settle}/{n_traded} traded contracts have no settlement price "
+            "(intraday snapshot, not final)"
         )
     return pd.DataFrame(out, columns=QUOTE_COLS)
 
@@ -654,7 +665,13 @@ def ingest_day(
                 _log_missing(st, site, date, kind, "404", _url_of(site, kind, date))
             continue
         if kind == "quotes":
-            df = parse_quotes(raw, date, site)
+            try:
+                df = parse_quotes(raw, date, site)
+            except NotFinalError:
+                st.raw_path(site.exchange, kind, date, ext).unlink(
+                    missing_ok=True
+                )  # 别让盘中快照卡住次日重抓
+                raise
         elif kind == "positions":
             df = parse_positions(raw, date, site)
         else:

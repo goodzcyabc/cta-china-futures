@@ -93,3 +93,39 @@ def test_fill_mark_and_roll_reconcile(tmp_path: Path) -> None:
     book.save()
     book2 = PaperBook(tmp_path)
     assert book2.state.equity == book.state.equity and book2.state.positions["CU"].ref_price == 71000.0
+
+
+def test_settlement_gate() -> None:
+    from cta.paper.runner import settlement_published
+
+    d = pd.Timestamp("2026-09-17")
+    assert not settlement_published(d, now=pd.Timestamp("2026-09-17 11:21"))
+    assert settlement_published(d, now=pd.Timestamp("2026-09-17 16:30"))
+    assert settlement_published(d, now=pd.Timestamp("2026-09-18 09:00"))
+    assert not settlement_published(pd.Timestamp("2026-09-18"), now=pd.Timestamp("2026-09-17 23:00"))
+
+
+def test_intraday_snapshot_is_rejected() -> None:
+    import gzip
+    import json
+    from pathlib import Path
+
+    import pytest
+
+    from cta.data.exchanges import shfe
+    from cta.data.exchanges.base import NotFinalError
+
+    fx = Path("tests/fixtures/exchanges/shfe")
+    raw_files = sorted(fx.glob("*kx*")) or sorted(fx.glob("*quotes*"))
+    assert raw_files, "需要 shfe quotes fixture"
+    f = raw_files[0]
+    if f.suffix == ".gz":
+        with gzip.open(f, "rb") as fh:
+            raw = fh.read()
+    else:
+        raw = f.read_bytes()
+    data = json.loads(raw.decode("utf-8-sig"))
+    for r in data.get("o_curinstrument", []):
+        r["SETTLEMENTPRICE"] = ""  # 模拟盘中快照:结算价全空
+    with pytest.raises(NotFinalError):
+        shfe.parse_quotes(json.dumps(data).encode("utf-8"), pd.Timestamp("2026-09-11"))

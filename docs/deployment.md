@@ -30,3 +30,8 @@
 - 状态与留痕:`paper/state.json`(权益、持仓)、`paper/orders/<日期>/`(订单 + 输入快照与指纹)、`paper/fills/<日期>.csv`、`paper/equity.csv`、`paper/log/<日期>.json`;每日 git 提交一次,提交时间即时间戳。
 - 调度:`deploy/com.cta.paper.plist`(launchd,工作日 05:10 多伦多);漏跑由 `cta paper catchup` 按账本最后盯市日补齐。
 - 通过/中止标准沿用上文(纸面 3 个月:净夏普与回测同期差异在 ±0.5 内、成交率 ≥95%、无盯市对账差异)。
+
+### 运行中发现并修复的坑(2026-09-17)
+- **交易所网站白天就有"当日"行情文件,是盘中快照(结算价为空)。** 首次试跑在北京 11:21 抓到快照、按空结算价盯市并出单,全部作废(已回滚,留痕见 git 历史 c9c4a10 / 32ed30b)。现在两道闸门:`runner.settlement_published` 北京 16:30 前不抓当天;`shfe.parse_quotes` 若 >5% 成交合约无结算价抛 `NotFinalError` 并删除已缓存 raw,次日重抓。
+- 大商所抓取依赖本机 Chrome 的 CDP 代理(web-access 的 proxy);Chrome 未开时 DCE 当日缺数据 → 该所 8 个品种当日不成交、不盯市、不出单(持仓保持不动),次日 catchup 补上。上线前需要换成不依赖浏览器的抓取(例如带完整 cookie 的请求或经纪商行情)。
+- 每日脚本在账本无变化时也会提交一次空提交?否:`git commit` 无改动时失败被 `|| true` 吞掉,不产生提交。
