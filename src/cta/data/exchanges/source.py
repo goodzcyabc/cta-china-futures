@@ -180,8 +180,16 @@ class StitchedSource:
             parts.append(b[b.index.get_level_values("date") > self.cutover])
         if not parts:
             raise KeyError(symbol)
-        cols = [c for c in parts[0].columns if all(c in p.columns for p in parts)]
-        return validate_contracts(pd.concat([p[cols] for p in parts]).sort_index())
+        # 列取并集:米筐段没有官方结算价,用收盘价近似(settle=close, prev_settle=前一日 settle);交易所段保留官方值
+        filled = []
+        for raw_part in parts:
+            part = raw_part.copy()
+            if "settle" not in part.columns:
+                part["settle"] = part["close"]
+                part["prev_settle"] = part.groupby(level="contract")["settle"].shift(1)
+            filled.append(part)
+        out = pd.concat(filled).sort_index()
+        return validate_contracts(out)
 
     def dominant_map(self) -> pd.DataFrame:
         a = self.primary.dominant_map()

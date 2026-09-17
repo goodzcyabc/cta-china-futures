@@ -102,16 +102,21 @@ def build_symbol_panel(
     f["contract"] = held.values
     for col in ["open", "high", "low", "close", "volume", "open_interest"]:
         f[col] = pick(contracts[col].unstack("contract").reindex(dates), held)
-    # 结算价:交易所直连数据含官方结算价与前结算价;米筐导出不含,用收盘价近似。涨跌停按前结算 × 交易所幅度。
+    # 结算价:交易所直连数据含官方结算价;米筐导出不含,用收盘价近似。
+    # prev_settle 是**面板级**的前一日结算价(昨天持有的合约的结算价):引擎在换月日用它结算旧合约的盈亏,
+    # 不能换成新合约自身的前结算价(否则两合约价差会被记成盈亏)。涨跌停则按当日合约自身的前结算价算。
     if "settle" in contracts.columns:
         f["settle"] = pick(contracts["settle"].unstack("contract").reindex(dates), held)
-        f["prev_settle"] = pick(contracts["prev_settle"].unstack("contract").reindex(dates), held)
+        own_prev = pick(contracts["prev_settle"].unstack("contract").reindex(dates), held).to_numpy(
+            dtype=float
+        )
     else:
         f["settle"] = f["close"].to_numpy(dtype=float)
-        f["prev_settle"] = f["settle"].shift(1).to_numpy(dtype=float)
-    prev_settle = f["prev_settle"].to_numpy(dtype=float)
-    f["limit_up"] = prev_settle * (1 + limit_pct)
-    f["limit_down"] = prev_settle * (1 - limit_pct)
+        own_prev = f["settle"].shift(1).to_numpy(dtype=float)
+    f["prev_settle"] = f["settle"].shift(1).to_numpy(dtype=float)
+    limit_base = np.where(np.isnan(own_prev), f["prev_settle"].to_numpy(dtype=float), own_prev)
+    f["limit_up"] = limit_base * (1 + limit_pct)
+    f["limit_down"] = limit_base * (1 - limit_pct)
     f["multiplier"] = held.map(meta["multiplier"]).values
     f["margin_rate"] = margin_rate if margin_rate is not None else held.map(meta["margin_rate"]).values
     f["maturity"] = held.map(maturity).values

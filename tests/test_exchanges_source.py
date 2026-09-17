@@ -142,7 +142,11 @@ def test_stitched_source_concats_on_cutover(tmp_path: Path) -> None:
         dates.min() == pd.Timestamp("2026-06-01")
         and dates.max() == pd.bdate_range("2026-06-08", periods=6)[-1]
     )
-    assert (dates <= pd.Timestamp("2026-06-08")).sum() == 6 and "settle" not in c.columns  # 公共列取交集
+    assert (dates <= pd.Timestamp("2026-06-08")).sum() == 6 and "settle" in c.columns  # 列取并集
+    prim_part = c[dates <= pd.Timestamp("2026-06-08")]
+    assert (prim_part["settle"] == prim_part["close"]).all()  # 米筐段:结算价用收盘价近似
+    sec_part = c[dates > pd.Timestamp("2026-06-08")]
+    assert (sec_part["settle"] != sec_part["close"]).any()  # 交易所段:官方结算价保留
     meta = src.contract_meta()
     assert {"CU2607", "CU2608", "CU2609"} <= set(meta.index) and meta.loc[
         "CU2607", "listed_date"
