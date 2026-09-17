@@ -766,9 +766,12 @@ def _parse_kinds(s: str) -> list[Kind]:
     out: list[Kind] = []
     for item in s.split(","):
         k = item.strip()
-        if k not in KINDS:
+        for known in KINDS:  # 用已声明为 Kind 的常量收窄类型,避免 cast 在不同 mypy 版本下的判定差异
+            if k == known:
+                out.append(known)
+                break
+        else:
             raise argparse.ArgumentTypeError(f"unknown kind {k!r}; choose from {KINDS}")
-        out.append(cast(Kind, k))
     return out
 
 
