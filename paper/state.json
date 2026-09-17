@@ -1,0 +1,26 @@
+{
+ "equity": 3000711.496,
+ "cash_start": 3000000.0,
+ "last_settled": "2026-09-17",
+ "pending_orders_date": "2026-09-17",
+ "positions": {
+  "AL": {
+   "contract": "AL2610",
+   "lots": 1.0,
+   "ref_price": 24135.0
+  },
+  "NI": {
+   "contract": "NI2610",
+   "lots": -1.0,
+   "ref_price": 121840.0
+  },
+  "RB": {
+   "contract": "RB2701",
+   "lots": -4.0,
+   "ref_price": 3126.0
+  }
+ },
+ "realized_pnl": 0.0,
+ "fees_paid": 18.503999999999998,
+ "slippage_paid": 75.0
+}
