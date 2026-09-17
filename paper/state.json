@@ -1,0 +1,10 @@
+{
+ "equity": 3000000.0,
+ "cash_start": 3000000.0,
+ "last_settled": "2026-09-16",
+ "pending_orders_date": "2026-09-16",
+ "positions": {},
+ "realized_pnl": 0.0,
+ "fees_paid": 0.0,
+ "slippage_paid": 0.0
+}
