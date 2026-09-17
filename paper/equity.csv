@@ -1,3 +1,0 @@
-date,equity,realized_pnl,fees_paid,slippage_paid,margin_used,n_positions,pnl_by_symbol
-2026-09-16,3000000.0,0.0,0.0,0.0,0.0,0,{}
-2026-09-17,3000711.496,0.0,18.503999999999998,75.0,36647.85,3,"{""AL"": -600.0, ""NI"": 1370.0, ""RB"": -40.0}"
