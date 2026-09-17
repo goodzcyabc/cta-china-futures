@@ -1,0 +1,78 @@
+{
+ "o_code": 0,
+ "o_msg": "成交、持仓排名查询成功",
+ "report_date": "20160104",
+ "update_date": "20160104 20:59:30",
+ "o_cursor": [
+  {
+   "INSTRUMENTID": "cu1601                        ",
+   "PRODUCTSORTNO": 10,
+   "RANK": -1,
+   "PARTICIPANTABBR1": "期货公司  ",
+   "CJ1": 14696,
+   "CJ1_CHG": -6847,
+   "PARTICIPANTABBR2": "期货公司  ",
+   "CJ2": 22640,
+   "CJ2_CHG": -1418,
+   "PARTICIPANTABBR3": "期货公司  ",
+   "CJ3": 23685,
+   "CJ3_CHG": -1408
+  },
+  {
+   "INSTRUMENTID": "cu1601                        ",
+   "PRODUCTSORTNO": 10,
+   "RANK": 0,
+   "PARTICIPANTABBR1": "非期货公司",
+   "CJ1": 50,
+   "CJ1_CHG": -375,
+   "PARTICIPANTABBR2": "非期货公司",
+   "CJ2": 2560,
+   "CJ2_CHG": 0,
+   "PARTICIPANTABBR3": "非期货公司",
+   "CJ3": 1515,
+   "CJ3_CHG": -10
+  },
+  {
+   "INSTRUMENTID": "cu1601                        ",
+   "PRODUCTSORTNO": 10,
+   "RANK": 1,
+   "PARTICIPANTABBR1": "金瑞期货  ",
+   "CJ1": 2275,
+   "CJ1_CHG": -534,
+   "PARTICIPANTABBR2": "金瑞期货  ",
+   "CJ2": 9020,
+   "CJ2_CHG": -170,
+   "PARTICIPANTABBR3": "金瑞期货  ",
+   "CJ3": 3295,
+   "CJ3_CHG": -495
+  },
+  {
+   "INSTRUMENTID": "cu1601                        ",
+   "PRODUCTSORTNO": 10,
+   "RANK": 999,
+   "PARTICIPANTABBR1": "",
+   "CJ1": 11615,
+   "CJ1_CHG": -2535,
+   "PARTICIPANTABBR2": "",
+   "CJ2": 20715,
+   "CJ2_CHG": -1071,
+   "PARTICIPANTABBR3": "",
+   "CJ3": 18350,
+   "CJ3_CHG": -1244
+  },
+  {
+   "INSTRUMENTID": "cuactv                        ",
+   "PRODUCTSORTNO": 10,
+   "RANK": 1,
+   "PARTICIPANTABBR1": "海通期货  ",
+   "CJ1": 79514,
+   "CJ1_CHG": -26265,
+   "PARTICIPANTABBR2": "金瑞期货  ",
+   "CJ2": 44763,
+   "CJ2_CHG": 342,
+   "PARTICIPANTABBR3": "金瑞期货  ",
+   "CJ3": 23234,
+   "CJ3_CHG": -791
+  }
+ ]
+}

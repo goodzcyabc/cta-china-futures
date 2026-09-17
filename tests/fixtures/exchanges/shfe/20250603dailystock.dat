@@ -1,0 +1,105 @@
+{
+ "o_code": "0000",
+ "o_msg": "查询成功",
+ "o_tradingday": "20250603",
+ "report_date": "20250603",
+ "update_date": "20250603 15:03:01",
+ "o_cursor": [
+  {
+   "REGNAME": "上海$$Shanghai",
+   "WGHTUNIT": "2",
+   "VARNAME": "铜$$COPPER",
+   "WHROWS": 16,
+   "VARID": "cu",
+   "WHTYPE": "1",
+   "WHABBRNAME": "国储天威$$Guochutianwei",
+   "WRTWGHTS": 0,
+   "ROWSTATUS": "0",
+   "WRTCHANGE": 0
+  },
+  {
+   "REGNAME": "上海$$Shanghai",
+   "WGHTUNIT": "2",
+   "VARNAME": "铜$$COPPER",
+   "WHROWS": 16,
+   "VARID": "cu",
+   "WHTYPE": "1",
+   "WHABBRNAME": "国储外高桥$$Guochu Waigaoqiao",
+   "WRTWGHTS": 0,
+   "ROWSTATUS": "0",
+   "WRTCHANGE": 0
+  },
+  {
+   "REGNAME": "上海$$Shanghai",
+   "WGHTUNIT": "2",
+   "VARNAME": "铜$$COPPER",
+   "WHROWS": 16,
+   "VARID": "cu",
+   "WHTYPE": "1",
+   "WHABBRNAME": "合计$$Subtotal",
+   "WRTWGHTS": 23163,
+   "ROWSTATUS": "1",
+   "WRTCHANGE": -3523
+  },
+  {
+   "REGNAME": "",
+   "WGHTUNIT": "2",
+   "VARNAME": "铜$$COPPER",
+   "WHROWS": 1,
+   "VARID": "cu",
+   "WHTYPE": "1",
+   "WHABBRNAME": "保税商品总计$$Total (Bonded)",
+   "WRTWGHTS": 0,
+   "ROWSTATUS": "2",
+   "WRTCHANGE": 0
+  },
+  {
+   "REGNAME": "",
+   "WGHTUNIT": "2",
+   "VARNAME": "铜$$COPPER",
+   "WHROWS": 1,
+   "VARID": "cu",
+   "WHTYPE": "1",
+   "WHABBRNAME": "完税商品总计$$Total (Tax included)",
+   "WRTWGHTS": 31404,
+   "ROWSTATUS": "2",
+   "WRTCHANGE": -2724
+  },
+  {
+   "REGNAME": "",
+   "WGHTUNIT": "2",
+   "VARNAME": "铜$$COPPER",
+   "WHROWS": 1,
+   "VARID": "cu",
+   "WHTYPE": "1",
+   "WHABBRNAME": "总计$$Total",
+   "WRTWGHTS": 31404,
+   "ROWSTATUS": "2",
+   "WRTCHANGE": -2724
+  },
+  {
+   "REGNAME": "厂库提货地$$Delivery Location",
+   "WGHTUNIT": "2",
+   "VARNAME": "螺纹钢厂库$$Rebar Factory Warehouse",
+   "WHROWS": 6,
+   "VARID": "rb",
+   "WHTYPE": "2",
+   "WHABBRNAME": "鞍钢股份$$Angang Steel",
+   "WRTWGHTS": 0,
+   "ROWSTATUS": "0",
+   "WRTCHANGE": 0
+  },
+  {
+   "REGNAME": "上海$$Shanghai",
+   "WGHTUNIT": "3",
+   "VARNAME": "中质含硫原油$$Medium Sour Crude Oil",
+   "WHROWS": 1,
+   "VARID": "sc",
+   "WHTYPE": "1",
+   "WHABBRNAME": "洋山石油$$Yangshan Shengang",
+   "WRTWGHTS": 190000,
+   "ROWSTATUS": "0",
+   "WRTCHANGE": 0
+  }
+ ]
+}

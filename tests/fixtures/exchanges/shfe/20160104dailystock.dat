@@ -1,0 +1,87 @@
+{
+ "o_code": "0",
+ "o_msg": "期货仓单日报查询成功",
+ "o_tradingday": "20160104",
+ "report_date": "20160104",
+ "update_date": "20160104 20:55:46",
+ "o_cursor": [
+  {
+   "VARNAME": "铜$$COPPER",
+   "VARSORT": 0,
+   "REGNAME": "上海$$Shanghai",
+   "REGSORT": 0,
+   "WHABBRNAME": "期晟公司$$Qisheng",
+   "WHROWS": 12,
+   "WGHTUNIT": "2",
+   "WRTWGHTS": 6601,
+   "WRTCHANGE": 0,
+   "ROWORDER": 15,
+   "ROWSTATUS": "0"
+  },
+  {
+   "VARNAME": "铜$$COPPER",
+   "VARSORT": 0,
+   "REGNAME": "上海$$Shanghai",
+   "REGSORT": 0,
+   "WHABBRNAME": "国储天威$$Guochutianwei",
+   "WHROWS": 12,
+   "WGHTUNIT": "2",
+   "WRTWGHTS": 1503,
+   "WRTCHANGE": 0,
+   "ROWORDER": 16,
+   "ROWSTATUS": "0"
+  },
+  {
+   "VARNAME": "铜$$COPPER",
+   "VARSORT": 0,
+   "REGNAME": "上海$$Shanghai",
+   "REGSORT": 0,
+   "WHABBRNAME": "合计$$Subtotal",
+   "WHROWS": 12,
+   "WGHTUNIT": "2",
+   "WRTWGHTS": 26412,
+   "WRTCHANGE": 0,
+   "ROWORDER": 100000,
+   "ROWSTATUS": "1"
+  },
+  {
+   "VARNAME": "铜$$COPPER",
+   "VARSORT": 0,
+   "REGNAME": "",
+   "REGSORT": 999999999,
+   "WHABBRNAME": "总计$$Total",
+   "WHROWS": 1,
+   "WGHTUNIT": "2",
+   "WRTWGHTS": 30610,
+   "WRTCHANGE": -6263,
+   "ROWORDER": 200000,
+   "ROWSTATUS": "2"
+  },
+  {
+   "VARNAME": "沥青厂库$$BITUMEN Factory Warehouse",
+   "VARSORT": 8,
+   "REGNAME": "广东$$Guangdong",
+   "REGSORT": 1,
+   "WHABBRNAME": "中油高富$$PCFOC-Gaofu",
+   "WHROWS": 1,
+   "WGHTUNIT": "2",
+   "WRTWGHTS": 0,
+   "WRTCHANGE": 0,
+   "ROWORDER": 527,
+   "ROWSTATUS": "0"
+  },
+  {
+   "VARNAME": "黄金$$GOLD",
+   "VARSORT": 9,
+   "REGNAME": "上海$$Shanghai",
+   "REGSORT": 0,
+   "WHABBRNAME": "上期所交割库",
+   "WHROWS": 1,
+   "WGHTUNIT": "1",
+   "WRTWGHTS": 1026,
+   "WRTCHANGE": 0,
+   "ROWORDER": 0,
+   "ROWSTATUS": "0"
+  }
+ ]
+}
