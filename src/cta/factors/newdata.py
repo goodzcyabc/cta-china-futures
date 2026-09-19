@@ -155,7 +155,7 @@ def member_scores(
     prev_date = n.groupby(["symbol", "member"])["date"].shift(1)
     # 只保留连续两个交易日都在榜的变化(前一记录日期必须是上一个交易日)
     trading = pd.DatetimeIndex(adj_close.index)
-    pos = pd.Series(np.arange(len(trading)), index=trading)
+    pos: pd.Series[Any] = pd.Series(np.arange(len(trading)), index=trading)
     ok = (pos.reindex(n["date"]).to_numpy() - pos.reindex(prev_date).to_numpy()) == 1
     n = n[ok & n["dnp"].notna() & (n["dnp"] != 0)]
     n["fwd"] = fwd.stack().reindex(pd.MultiIndex.from_frame(n[["date", "symbol"]])).to_numpy()
