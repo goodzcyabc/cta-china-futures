@@ -15,6 +15,18 @@ class UniverseCfg(BaseModel):
     asset_classes: list[str]
     min_history_days: int = Field(ge=0)
     min_dominant_turnover_cny: float = Field(ge=0)
+    allow_unverified: bool = (
+        False  # True 只允许出现在研究配置:让 instruments.yaml 里 verified: false 的品种进池
+    )
+
+
+class TickFilterCfg(BaseModel):
+    """跳价过滤(design_log 十一 E2):每月末按 tick/EWMA(|Δp|) 排名,前 top_quantile 的大跳价品种次月 tsmom 只用 slow_lookbacks。"""
+
+    enabled: bool = False
+    window: int = Field(default=336, gt=10)
+    top_quantile: float = Field(default=0.5, gt=0, lt=1)
+    slow_lookbacks: list[int] = Field(default_factory=lambda: [126, 252])
 
 
 class SignalCfg(BaseModel):
@@ -22,6 +34,7 @@ class SignalCfg(BaseModel):
     vol_window: int = Field(gt=1)
     carry_scale: float = Field(gt=0)
     weights: dict[str, float]
+    tick_filter: TickFilterCfg = Field(default_factory=TickFilterCfg)
 
 
 class PortfolioCfg(BaseModel):

@@ -1,0 +1,28 @@
+# design_log 十一 E1:扩品种(23 → 57),信号同 v0.1;新品种参数为占位(verified: false),只用于研究
+version: "0.1.2-e1"
+universe:
+  asset_classes: [agri, chem, energy, ferrous, metal, precious]
+  min_history_days: 250
+  min_dominant_turnover_cny: 50000000
+  allow_unverified: true
+signals:
+  tsmom_lookbacks: [21, 63, 126, 252]
+  vol_window: 40
+  carry_scale: 0.20
+  weights: {tsmom: 1.0, carry: 1.0}
+portfolio:
+  target_vol: 0.10
+  max_leverage_per_symbol: 1.0
+  max_gross_exposure: 3.0
+  max_margin_usage: 0.40
+  trade_buffer: 0.30
+  vol_scale_update: daily
+execution:
+  fill: next_open
+  slippage_ticks: 1
+  roll_confirm_days: 3
+backtest:
+  start: "2016-01-04"
+  end: "2026-06-05"
+  initial_capital_cny: 3000000
+  cash_rate: none

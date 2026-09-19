@@ -40,6 +40,7 @@ PANEL_COLS = [
     "days_to_next",
     "oi_total",
     "volume_total",
+    "tick",
 ]
 
 
@@ -78,6 +79,7 @@ def build_symbol_panel(
     limit_pct: float = 0.06,
     confirm_days: int = 3,
     margin_rate: float | None = None,
+    tick: float = float("nan"),
 ) -> SymbolPanel:
     dm = dominant_map[dominant_map["symbol"] == symbol].set_index("date")["contract"]
     maturity = meta.loc[meta["symbol"] == symbol, "maturity_date"]
@@ -170,5 +172,6 @@ def build_symbol_panel(
     # 全部合约合计(持仓量增长因子用):只在当日有任一合约数据时有值
     vol_all = contracts["volume"].unstack("contract").reindex(dates)
     f["oi_total"] = oi.sum(axis=1, min_count=1).to_numpy(dtype=float)
+    f["tick"] = tick
     f["volume_total"] = vol_all.sum(axis=1, min_count=1).to_numpy(dtype=float)
     return SymbolPanel(symbol, f[PANEL_COLS])

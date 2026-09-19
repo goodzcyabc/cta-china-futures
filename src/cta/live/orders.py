@@ -46,6 +46,9 @@ def generate_orders(
     panels = build_panels(src, cfg, specs, end=asof_ts)
     if not panels:
         raise RuntimeError("no panels built; check data path / as-of date")
+    unverified = sorted(s for s in panels if not specs[s].verified)
+    if unverified:
+        raise RuntimeError(f"refusing to generate orders for unverified instruments: {unverified}")
     last_dates = {s: p.frame.index.max() for s, p in panels.items()}
     stale = {s: str(d.date()) for s, d in last_dates.items() if d < asof_ts - pd.Timedelta(days=7)}
     signals = compute_signals(panels, cfg, receipts=_receipts_of(src))

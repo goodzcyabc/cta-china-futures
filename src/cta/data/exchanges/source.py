@@ -186,12 +186,14 @@ class StitchedSource:
 
     def contracts(self, symbol: str) -> pd.DataFrame:
         parts = []
-        if symbol in self.primary.symbols():
+        in_primary = symbol in self.primary.symbols()
+        if in_primary:
             a = self.primary.contracts(symbol)
             parts.append(a[a.index.get_level_values("date") <= self.cutover])
         if symbol in self.secondary.symbols():
             b = self.secondary.contracts(symbol)
-            parts.append(b[b.index.get_level_values("date") > self.cutover])
+            # 米筐里没有的品种:交易所数据全程使用(不只切换日之后)
+            parts.append(b[b.index.get_level_values("date") > self.cutover] if in_primary else b)
         if not parts:
             raise KeyError(symbol)
         # 列取并集:米筐段没有官方结算价,用收盘价近似(settle=close, prev_settle=前一日 settle);交易所段保留官方值
@@ -208,7 +210,10 @@ class StitchedSource:
     def dominant_map(self) -> pd.DataFrame:
         a = self.primary.dominant_map()
         b = self.secondary.dominant_map()
-        out = pd.concat([a[a["date"] <= self.cutover], b[b["date"] > self.cutover]], ignore_index=True)
+        prim_syms = set(self.primary.symbols())
+        b_new = b[~b["symbol"].isin(prim_syms)]  # 米筐没有的品种:全程用交易所主力判定
+        b_after = b[b["symbol"].isin(prim_syms) & (b["date"] > self.cutover)]
+        out = pd.concat([a[a["date"] <= self.cutover], b_after, b_new], ignore_index=True)
         return out.sort_values(["symbol", "date"]).reset_index(drop=True)
 
     def contract_meta(self) -> pd.DataFrame:
@@ -218,6 +223,8 @@ class StitchedSource:
         return validate_meta(pd.concat([a, new]))
 
     def dominant_daily(self, symbol: str) -> pd.DataFrame:
+        if symbol not in self.primary.symbols():
+            return self.secondary.dominant_daily(symbol)
         a = self.primary.dominant_daily(symbol)
         b = self.secondary.dominant_daily(symbol)
         return pd.concat([a[a.index <= self.cutover], b[b.index > self.cutover]]).sort_index()

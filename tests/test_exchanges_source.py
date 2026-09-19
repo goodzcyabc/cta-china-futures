@@ -152,3 +152,23 @@ def test_stitched_source_concats_on_cutover(tmp_path: Path) -> None:
         "CU2607", "listed_date"
     ] == pd.Timestamp("2025-07-15")
     assert src.manifest()["cutover"] == "2026-06-08"
+    # primary 没有的品种:全程用 secondary(不截断到切换日之后)
+    st2 = _make_store(tmp_path / "b")
+    ex2 = ExchangeSource(
+        st2,
+        exchanges=("SHFE",),
+        specs=load_instruments(),
+        calendar=TradingCalendar(st2, holidays=pd.DatetimeIndex([])),
+    )
+
+    class PrimNone(Prim):
+        def symbols(self) -> list[str]:
+            return []
+
+        def dominant_map(self) -> pd.DataFrame:
+            return pd.DataFrame(columns=["date", "symbol", "contract"])
+
+    src2 = StitchedSource(PrimNone(), ex2, pd.Timestamp("2026-06-10"))
+    c2 = src2.contracts("CU")
+    assert c2.index.get_level_values("date").min() == pd.Timestamp("2026-06-08")
+    assert (src2.dominant_map()["date"].min()) == pd.Timestamp("2026-06-08")

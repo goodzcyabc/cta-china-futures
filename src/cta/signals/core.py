@@ -143,3 +143,29 @@ def receipts_level(
     r = cast(Frame, np.log1p(receipts.reindex(index).ffill(limit=5).reindex(columns=columns)))
     pct = r.rolling(window, min_periods=window // 2).rank(pct=True)
     return zscore_xs(-(pct - 0.5), eligible)
+
+
+def large_tick_mask(
+    close: Frame,
+    roll: Frame,
+    ticks: pd.Series[float],
+    eligible: Frame,
+    window: int = 336,
+    top_quantile: float = 0.5,
+) -> Frame:
+    """跳价占日波动比例 ρ̄ = tick / EWMA_window(|Δclose|)(换月日的 Δ 剔除),每月末在可投品种内排名;
+    排名前 top_quantile 的品种在**下一个月**为 True。月末排名只用当月及以前的数据,无前视。"""
+    dp = close.diff().where(~roll.astype(bool))
+    mad = dp.abs().ewm(span=window, adjust=False, min_periods=window // 5).mean()
+    rho = mad.rdiv(ticks, axis=1)  # tick / mad
+    rho = rho.where(eligible.reindex_like(rho).fillna(False).astype(bool))
+    month = pd.DatetimeIndex(rho.index).to_period("M")
+    month_end = rho.groupby(month).tail(1)
+    rank = month_end.rank(axis=1, ascending=False, pct=True)  # 1/N = 最大跳价
+    flag = rank <= top_quantile
+    # 月末标记 → 下个月每天生效
+    flag.index = pd.DatetimeIndex(flag.index) + pd.Timedelta(days=1)
+    out: Frame = (
+        flag.reindex(rho.index.union(flag.index)).ffill().reindex(rho.index).fillna(False).astype(bool)
+    )
+    return out

@@ -36,7 +36,7 @@ def build_panels(
     src: DataSource, cfg: StrategyConfig, specs: InstrumentTable, end: pd.Timestamp | None = None
 ) -> dict[str, SymbolPanel]:
     """为策略品种池里的每个品种构建合约面板;end 给定时只用 <= end 的数据(实盘 as-of)。"""
-    universe = specs.symbols(set(cfg.universe.asset_classes))
+    universe = specs.symbols(set(cfg.universe.asset_classes), verified_only=not cfg.universe.allow_unverified)
     dm = src.dominant_map()
     meta = src.contract_meta()
     out: dict[str, SymbolPanel] = {}
@@ -59,6 +59,7 @@ def build_panels(
             limit_pct=specs[s].limit_pct,
             confirm_days=cfg.execution.roll_confirm_days,
             margin_rate=specs[s].margin_rate,
+            tick=specs[s].tick,
         )
     return out
 
@@ -86,8 +87,17 @@ def compute_signals(
     close, nxt, days = _wide(panels, "close"), _wide(panels, "next_close"), _wide(panels, "days_to_next")
     vol = sig.realized_vol(adj, cfg.signals.vol_window)
     ts = sig.tsmom(adj, tuple(cfg.signals.tsmom_lookbacks), vol=vol)
-    cr = sig.carry_signal(sig.carry(close, nxt, days), cfg.signals.carry_scale)
     eligible = eligible_mask(panels, cfg)
+    tf = cfg.signals.tick_filter
+    if tf.enabled:
+        # 大跳价品种(上月末排名前 top_quantile)本月只用慢回看期;排名只用 T−1 及之前的信息
+        ticks = pd.Series(
+            {s: float(p.frame["tick"].iloc[0]) if "tick" in p.frame else np.nan for s, p in panels.items()}
+        )
+        large = sig.large_tick_mask(close, _wide(panels, "roll"), ticks, eligible, tf.window, tf.top_quantile)
+        ts_slow = sig.tsmom(adj, tuple(tf.slow_lookbacks), vol=vol)
+        ts = ts_slow.where(large, ts)
+    cr = sig.carry_signal(sig.carry(close, nxt, days), cfg.signals.carry_scale)
     parts: dict[str, pd.DataFrame] = {"tsmom": ts, "carry": cr}
     rl: pd.DataFrame | None = None
     if "receipts_level" in cfg.signals.weights:

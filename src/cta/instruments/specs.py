@@ -29,6 +29,9 @@ class InstrumentSpec(BaseModel):
     )
     effective: str = Field(default="", description="现行值生效日或参数表日期")
     source: str = Field(default="", description="一手来源 URL")
+    verified: bool = Field(
+        default=True, description="False = 参数为占位/反推,只准用于研究,禁止进入纸面与实盘"
+    )
 
     @field_validator("symbol")
     @classmethod
@@ -66,9 +69,12 @@ class InstrumentTable(BaseModel):
         payload = json.dumps(self.model_dump(), sort_keys=True, ensure_ascii=False, default=str)
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:8]
 
-    def symbols(self, asset_classes: set[str] | None = None) -> list[str]:
+    def symbols(self, asset_classes: set[str] | None = None, verified_only: bool = False) -> list[str]:
         return sorted(
-            s for s, sp in self.specs.items() if asset_classes is None or sp.asset_class in asset_classes
+            s
+            for s, sp in self.specs.items()
+            if (asset_classes is None or sp.asset_class in asset_classes)
+            and (sp.verified or not verified_only)
         )
 
 
