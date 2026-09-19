@@ -144,6 +144,7 @@ def step(
 def catchup(end: pd.Timestamp, **kw: Any) -> list[dict[str, Any]]:
     """从账本最后盯市日之后的第一个交易日补跑到 end(含);逐日调用 step。"""
     cfg = kw.get("cfg") or load_config()
+    kw["cfg"] = cfg
     specs = kw.get("specs") or load_instruments()
     book = PaperBook(kw.get("paper_dir") or DEFAULT_DIR, initial_capital=cfg.backtest.initial_capital_cny)
     start = (

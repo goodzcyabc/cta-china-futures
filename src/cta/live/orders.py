@@ -16,7 +16,7 @@ import pandas as pd
 from cta.config import StrategyConfig
 from cta.data.source import DataSource
 from cta.instruments.specs import InstrumentTable
-from cta.pipeline import build_panels, compute_signals, git_sha
+from cta.pipeline import _receipts_of, build_panels, compute_signals, git_sha
 
 
 def _num(v: object) -> float:
@@ -48,7 +48,7 @@ def generate_orders(
         raise RuntimeError("no panels built; check data path / as-of date")
     last_dates = {s: p.frame.index.max() for s, p in panels.items()}
     stale = {s: str(d.date()) for s, d in last_dates.items() if d < asof_ts - pd.Timedelta(days=7)}
-    signals = compute_signals(panels, cfg)
+    signals = compute_signals(panels, cfg, receipts=_receipts_of(src))
     if asof_ts not in signals.target.index:
         raise RuntimeError(
             f"as-of {asof} is not a trading day in data (last: {signals.target.index.max().date()})"
@@ -89,6 +89,12 @@ def generate_orders(
                 "signal_carry": float(signals.carry.at[asof_ts, s])
                 if not np.isnan(signals.carry.at[asof_ts, s])
                 else None,
+                "signal_receipts_level": (
+                    float(signals.receipts_level.at[asof_ts, s])
+                    if signals.receipts_level is not None
+                    and not np.isnan(signals.receipts_level.at[asof_ts, s])
+                    else None
+                ),
                 "eligible": bool(signals.eligible.at[asof_ts, s]),
             }
         )

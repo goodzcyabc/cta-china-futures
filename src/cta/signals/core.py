@@ -125,3 +125,21 @@ def trade_buffer(target: pd.Series[float], current: pd.Series[float], band: floa
     thresh = band * target.abs()
     out: pd.Series[float] = target.where(diff.abs() > thresh, cur)
     return out
+
+
+def zscore_xs(x: Frame, eligible: Frame) -> Frame:
+    """每日横截面 z-score(只在可投品种内),clip ±2 再 /2 → [-1, 1]。"""
+    r = x.where(eligible.reindex_like(x).fillna(False).astype(bool))
+    z = r.sub(r.mean(axis=1), axis=0).div(r.std(axis=1).replace(0, np.nan), axis=0)
+    out: Frame = (z.clip(-2, 2) / 2.0).where(x.notna())
+    return out
+
+
+def receipts_level(
+    receipts: Frame, index: pd.DatetimeIndex, columns: list[str], eligible: Frame, window: int = 252
+) -> Frame:
+    """仓单水平信号(design_log 九 H-REC-L):−(log(1+注册仓单) 在自身 window 日窗口的分位 − 0.5) 的横截面 z。
+    仓单高(可交割现货充裕)→ 做空;仓单低(逼仓风险)→ 做多。receipts 为 date × symbol 的注册仓单合计,当日收盘后公布。"""
+    r = cast(Frame, np.log1p(receipts.reindex(index).ffill(limit=5).reindex(columns=columns)))
+    pct = r.rolling(window, min_periods=window // 2).rank(pct=True)
+    return zscore_xs(-(pct - 0.5), eligible)

@@ -6,6 +6,8 @@ mkdir -p paper/log
 TODAY=$(TZ=Asia/Shanghai date +%F)
 echo "=== $(date '+%F %T') paper catchup to $TODAY"
 PYTHONPATH=src python3 -m cta.cli paper catchup --date "$TODAY"
+# 并行账本 v0.3(tsmom+carry+仓单水平;design_log 十):数据已由上一步拉好,不再拉
+PYTHONPATH=src python3 -m cta.cli paper catchup --date "$TODAY" --no-ingest --config configs/strategy_v03.yaml --book paper_v03
 # 每日结果入库,形成不可篡改的时间戳(git 提交时间)
-git add paper && git -c user.name=paper-bot -c user.email=paper@local commit -q -m "paper: $TODAY" || true
+git add paper paper_v03 && git -c user.name=paper-bot -c user.email=paper@local commit -q -m "paper: $TODAY" || true
 git push -q origin HEAD || true

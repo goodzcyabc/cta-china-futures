@@ -1,0 +1,96 @@
+{
+ "equity": 2990866.5974999997,
+ "cash_start": 3000000.0,
+ "last_settled": "2026-09-18",
+ "pending_orders_date": "2026-09-18",
+ "positions": {
+  "C": {
+   "contract": "C2611",
+   "lots": -27.0,
+   "ref_price": 2188.0
+  },
+  "CF": {
+   "contract": "CF2701",
+   "lots": 2.0,
+   "ref_price": 15795.0
+  },
+  "CU": {
+   "contract": "CU2610",
+   "lots": 1.0,
+   "ref_price": 109530.0
+  },
+  "I": {
+   "contract": "I2701",
+   "lots": -2.0,
+   "ref_price": 714.0
+  },
+  "J": {
+   "contract": "J2701",
+   "lots": 1.0,
+   "ref_price": 1985.5
+  },
+  "JD": {
+   "contract": "JD2611",
+   "lots": 5.0,
+   "ref_price": 3820.0
+  },
+  "M": {
+   "contract": "M2701",
+   "lots": 11.0,
+   "ref_price": 3429.0
+  },
+  "MA": {
+   "contract": "MA2701",
+   "lots": 9.0,
+   "ref_price": 2977.0
+  },
+  "NI": {
+   "contract": "NI2610",
+   "lots": -1.0,
+   "ref_price": 123860.0
+  },
+  "P": {
+   "contract": "P2701",
+   "lots": -4.0,
+   "ref_price": 9907.0
+  },
+  "RB": {
+   "contract": "RB2701",
+   "lots": -8.0,
+   "ref_price": 3104.0
+  },
+  "SA": {
+   "contract": "SA2701",
+   "lots": -4.0,
+   "ref_price": 1012.0
+  },
+  "SR": {
+   "contract": "SR2701",
+   "lots": -11.0,
+   "ref_price": 5326.0
+  },
+  "TA": {
+   "contract": "TA2701",
+   "lots": 8.0,
+   "ref_price": 6312.0
+  },
+  "V": {
+   "contract": "V2701",
+   "lots": -8.0,
+   "ref_price": 4718.0
+  },
+  "Y": {
+   "contract": "Y2701",
+   "lots": 4.0,
+   "ref_price": 8905.0
+  },
+  "AL": {
+   "contract": "AL2611",
+   "lots": 2.0,
+   "ref_price": 24385.0
+  }
+ },
+ "realized_pnl": 400.0,
+ "fees_paid": 303.4025,
+ "slippage_paid": 1400.0
+}

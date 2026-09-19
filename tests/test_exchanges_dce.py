@@ -141,8 +141,7 @@ def test_crosscheck_yearly_packages_double_sided() -> None:
     years = sorted(int(p.name.split("_")[0]) for p in _PKG.glob("*_allVarietyFtr.zip"))
     res = dce.crosscheck_yearly_packages(_STORE, years=[years[0], years[-1]])
     assert len(res) == 2, res.to_string()
-    assert (res["n_both"] == res["n_store"]).all() and (res["n_both"] == res["n_package"]).all(), (
-        res.to_string()
-    )
+    # 年度包是下载时刻的快照;store 之后每天增量追加,所以只要求"包里的每一行都在 store 里且一致"
+    assert (res["n_both"] == res["n_package"]).all(), res.to_string()
     for c in ("ohlc_match", "settle_match", "volume_x2_match", "oi_x2_match", "turnover_x2_match"):
         assert (res[c] >= 0.9999).all(), res.to_string()

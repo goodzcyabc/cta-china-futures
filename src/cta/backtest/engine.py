@@ -54,7 +54,9 @@ def run_backtest(
     symbols = [s for s in target_exposure.columns if s in panels]
     frames = {s: panels[s].frame for s in symbols}
     all_dates = sorted(set().union(*[set(f.index) for f in frames.values()]))
-    dates = pd.DatetimeIndex([d for d in all_dates if d >= target_exposure.index.min()])
+    # 只在目标暴露覆盖的区间内运行:end 之后的面板日期不进引擎(否则会以最后目标继续持仓到数据末尾)
+    lo, hi = target_exposure.index.min(), target_exposure.index.max()
+    dates = pd.DatetimeIndex([d for d in all_dates if lo <= d <= hi])
     tgt = target_exposure.reindex(dates).shift(1)  # T 日信号 -> T+1 执行
 
     equity = initial_capital

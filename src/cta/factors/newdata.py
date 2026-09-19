@@ -18,6 +18,7 @@ import pandas as pd
 from scipy import stats as sps
 
 from cta.data.exchanges.base import Store
+from cta.signals.core import receipts_level, zscore_xs
 
 Frame = pd.DataFrame
 CACHE = Path("results/newdata")
@@ -108,13 +109,6 @@ def zscore_ts(x: Frame, window: int = 60, min_periods: int = 30) -> Frame:
     return out
 
 
-def zscore_xs(x: Frame, eligible: Frame) -> Frame:
-    r = x.where(eligible.reindex_like(x).fillna(False).astype(bool))
-    z = r.sub(r.mean(axis=1), axis=0).div(r.std(axis=1).replace(0, np.nan), axis=0)
-    out: Frame = (z.clip(-2, 2) / 2.0).where(x.notna())
-    return out
-
-
 def hpos_a(hp: Frame, index: pd.DatetimeIndex, columns: list[str]) -> Frame:
     x = hp.reindex(index).ffill(limit=5).reindex(columns=columns)
     return zscore_ts(-x)
@@ -127,9 +121,7 @@ def hrec(rec: Frame, index: pd.DatetimeIndex, columns: list[str], eligible: Fram
 
 
 def hrec_level(rec: Frame, index: pd.DatetimeIndex, columns: list[str], eligible: Frame) -> Frame:
-    r = cast(Frame, np.log1p(rec.reindex(index).ffill(limit=5).reindex(columns=columns)))
-    pct = r.rolling(252, min_periods=126).rank(pct=True)
-    return zscore_xs(-(pct - 0.5), eligible)
+    return receipts_level(rec, index, columns, eligible)
 
 
 @dataclass

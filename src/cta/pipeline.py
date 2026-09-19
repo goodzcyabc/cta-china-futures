@@ -26,6 +26,7 @@ class Signals:
     vol: pd.DataFrame
     tsmom: pd.DataFrame
     carry: pd.DataFrame
+    receipts_level: pd.DataFrame | None
     combined: pd.DataFrame
     eligible: pd.DataFrame
     target: pd.DataFrame  # 目标名义暴露/权益(已应用交易缓冲)
@@ -77,14 +78,24 @@ def eligible_mask(panels: dict[str, SymbolPanel], cfg: StrategyConfig) -> pd.Dat
     return out
 
 
-def compute_signals(panels: dict[str, SymbolPanel], cfg: StrategyConfig) -> Signals:
+def compute_signals(
+    panels: dict[str, SymbolPanel], cfg: StrategyConfig, receipts: pd.DataFrame | None = None
+) -> Signals:
+    """信号集合。cfg.signals.weights 里出现 receipts_level 时需要传入仓单表(交易所直连源 `src.receipts()`)。"""
     adj = _wide(panels, "adj_close")
     close, nxt, days = _wide(panels, "close"), _wide(panels, "next_close"), _wide(panels, "days_to_next")
     vol = sig.realized_vol(adj, cfg.signals.vol_window)
     ts = sig.tsmom(adj, tuple(cfg.signals.tsmom_lookbacks), vol=vol)
     cr = sig.carry_signal(sig.carry(close, nxt, days), cfg.signals.carry_scale)
-    comb = sig.combine({"tsmom": ts, "carry": cr}, cfg.signals.weights)
     eligible = eligible_mask(panels, cfg)
+    parts: dict[str, pd.DataFrame] = {"tsmom": ts, "carry": cr}
+    rl: pd.DataFrame | None = None
+    if "receipts_level" in cfg.signals.weights:
+        if receipts is None or receipts.empty:
+            raise ValueError("config weights include receipts_level but no receipts data was provided")
+        rl = sig.receipts_level(receipts, pd.DatetimeIndex(adj.index), list(adj.columns), eligible)
+        parts["receipts_level"] = rl
+    comb = sig.combine(parts, cfg.signals.weights)
     raw_target = sig.vol_target_positions(
         comb.where(eligible),
         vol,
@@ -103,7 +114,15 @@ def compute_signals(panels: dict[str, SymbolPanel], cfg: StrategyConfig) -> Sign
         buffered = sig.trade_buffer(row, prev, cfg.portfolio.trade_buffer)
         tgt.loc[d] = buffered
         prev = buffered
-    return Signals(adj, vol, ts, cr, comb, eligible, tgt)
+    return Signals(adj, vol, ts, cr, rl, comb, eligible, tgt)
+
+
+def _receipts_of(src: DataSource) -> pd.DataFrame | None:
+    fn = getattr(src, "receipts", None)
+    if fn is None:
+        return None
+    df: pd.DataFrame = fn()
+    return None if df.empty else df
 
 
 def git_sha() -> str:
@@ -117,7 +136,7 @@ def run_research(
     cfg: StrategyConfig, src: DataSource, specs: InstrumentTable, out_dir: Path
 ) -> dict[str, Any]:
     panels = build_panels(src, cfg, specs)
-    signals = compute_signals(panels, cfg)
+    signals = compute_signals(panels, cfg, receipts=_receipts_of(src))
     start, end = pd.Timestamp(cfg.backtest.start), pd.Timestamp(cfg.backtest.end)
     idx = signals.target.index
     target = signals.target.loc[(idx >= start) & (idx <= end)]
@@ -158,6 +177,8 @@ def run_research(
     signals.combined.to_csv(out_dir / "signal_combined.csv")
     signals.tsmom.to_csv(out_dir / "signal_tsmom.csv")
     signals.carry.to_csv(out_dir / "signal_carry.csv")
+    if signals.receipts_level is not None:
+        signals.receipts_level.to_csv(out_dir / "signal_receipts_level.csv")
     signals.eligible.to_csv(out_dir / "eligible.csv")
     yearly(res.equity).to_csv(out_dir / "yearly.csv")
     meta = {

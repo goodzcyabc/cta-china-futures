@@ -43,10 +43,10 @@ def research(
     cfg = load_config(config)
     specs = load_instruments()
     src = _make_source(source, data)
-    suffix = "" if source == "ricequant" else f"_{source}"
-    out_dir = out / f"{cfg.digest()}_{specs.digest()}{suffix}"
     if end:
         cfg = cfg.model_copy(update={"backtest": cfg.backtest.model_copy(update={"end": end})})
+    suffix = "" if source == "ricequant" else f"_{source}"
+    out_dir = out / f"{cfg.digest()}_{specs.digest()}{suffix}"
     meta = run_research(cfg, src, specs, out_dir)
     typer.echo(
         json.dumps(
@@ -92,6 +92,8 @@ def paper(
     action: str = typer.Argument(..., help="step | catchup | status"),
     date: str = typer.Option(None, help="交易日(默认今天)"),
     no_ingest: bool = typer.Option(False, help="不拉交易所数据,只用已落盘的数据"),
+    config: Path = typer.Option(Path("configs/strategy.yaml"), help="策略配置(不同账本可用不同配置)"),
+    book: Path = typer.Option(Path("paper"), help="账本目录(默认 paper/;并行账本用 paper_v03/ 等)"),
 ) -> None:
     """纸面交易:step 处理单个交易日(拉数据 → 成交昨日订单并盯市 → 生成今日订单);catchup 补跑到指定日;status 打印账本。"""
     import pandas as pd
@@ -100,15 +102,21 @@ def paper(
     from cta.paper.book import PaperBook
 
     d = pd.Timestamp(date) if date else pd.Timestamp.today().normalize()
+    cfg = load_config(config)
     if action == "step":
         typer.echo(
-            json.dumps(runner.step(d, do_ingest=not no_ingest), ensure_ascii=False, indent=1, default=str)
+            json.dumps(
+                runner.step(d, cfg=cfg, paper_dir=book, do_ingest=not no_ingest),
+                ensure_ascii=False,
+                indent=1,
+                default=str,
+            )
         )
     elif action == "catchup":
-        for log in runner.catchup(d, do_ingest=not no_ingest):
+        for log in runner.catchup(d, cfg=cfg, paper_dir=book, do_ingest=not no_ingest):
             typer.echo(json.dumps(log, ensure_ascii=False, default=str))
     elif action == "status":
-        typer.echo(PaperBook().state.to_json())
+        typer.echo(PaperBook(book, initial_capital=cfg.backtest.initial_capital_cny).state.to_json())
     else:
         raise typer.BadParameter(action)
 

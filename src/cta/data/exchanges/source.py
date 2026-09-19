@@ -150,6 +150,20 @@ class ExchangeSource:
     def shibor(self) -> pd.DataFrame:
         return pd.DataFrame()
 
+    def receipts(self) -> pd.DataFrame:
+        """注册仓单合计(非合计行之和,四所拼接);index=date, columns=symbol。"""
+        parts = []
+        for e in self.exchanges:
+            r = self.store.read_days(e, "receipts")
+            if r.empty:
+                continue
+            parts.append(r[~r["is_total"]].groupby(["date", "symbol"])["receipts"].sum())
+        if not parts:
+            return pd.DataFrame()
+        out: pd.DataFrame = pd.concat(parts).groupby(level=[0, 1]).sum().unstack("symbol").sort_index()
+        out.index = pd.to_datetime(out.index)
+        return out
+
     def manifest(self) -> dict[str, str]:
         h = hashlib.sha256()
         parts = []
@@ -210,6 +224,10 @@ class StitchedSource:
 
     def shibor(self) -> pd.DataFrame:
         return self.primary.shibor()
+
+    def receipts(self) -> pd.DataFrame:
+        """仓单只有交易所直连源有;拼接源直接用 secondary 的全历史(它从 2016 起已回填)。"""
+        return self.secondary.receipts()
 
     def manifest(self) -> dict[str, str]:
         mp, ms = self.primary.manifest(), self.secondary.manifest()

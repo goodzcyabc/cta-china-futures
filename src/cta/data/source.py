@@ -62,6 +62,10 @@ class DataSource(Protocol):
         """index: date; columns: ON, 1W, ..., 1Y(百分数)。"""
         ...
 
+    def receipts(self) -> pd.DataFrame:
+        """index: date; columns: symbol —— 交易所注册仓单合计(当日收盘后公布)。没有该数据的源返回空表。"""
+        ...
+
     def manifest(self) -> dict[str, str]:
         """数据指纹,写入每次运行的结果。"""
         ...
@@ -142,6 +146,9 @@ class RicequantParquetSource:
         df = df.rename(columns={"dominant_id": "contract"})
         df["date"] = pd.to_datetime(df["date"])
         return df.set_index("date")[DOM_DAILY_COLS].sort_index()
+
+    def receipts(self) -> pd.DataFrame:
+        return pd.DataFrame()
 
     def shibor(self) -> pd.DataFrame:
         df = pd.read_parquet(self.root / "shibor" / "shibor.parquet")
