@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Optional
 
 import yaml
 from pydantic import BaseModel, Field
@@ -18,6 +18,8 @@ class UniverseCfg(BaseModel):
     allow_unverified: bool = (
         False  # True 只允许出现在研究配置:让 instruments.yaml 里 verified: false 的品种进池
     )
+    # Python 3.9 运行时 pydantic 无法求值 `list[str] | None`(字符串注解),故用 Optional;显式品种清单,生产配置必填
+    symbols: Optional[list[str]] = None
 
 
 class TickFilterCfg(BaseModel):

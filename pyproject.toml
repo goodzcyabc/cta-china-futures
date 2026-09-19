@@ -40,3 +40,6 @@ plugins = ["pydantic.mypy"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+
+[tool.ruff.lint.per-file-ignores]
+"src/cta/config.py" = ["UP007", "UP045"]  # pydantic 在 3.9 运行时需要 Optional[...]

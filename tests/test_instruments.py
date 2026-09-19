@@ -17,15 +17,13 @@ def test_load_and_costs() -> None:
     assert ma.fee_per_lot == 0 and abs(ma.fee(2500, 1) - 2.5) < 1e-9
     assert "TF" not in t.symbols({"agri", "chem", "energy", "ferrous", "metal", "precious"})
     assert (
-        len(t.symbols({"agri", "chem", "energy", "ferrous", "metal", "precious"}, verified_only=True)) == 22
+        len(t.symbols({"agri", "chem", "energy", "ferrous", "metal", "precious"}, verified_only=True)) == 57
     )
 
 
 def test_every_symbol_has_provenance_and_digest_is_stable() -> None:
     t = load_instruments()
     for s, sp in t.specs.items():
-        if not sp.verified:
-            continue  # 研究用占位品种(design_log 十一 E1)不要求来源 URL
         assert sp.source.startswith("http"), s
         assert len(sp.effective) == 10, s
         assert (sp.fee_per_lot > 0) != (sp.fee_notional_bp > 0), f"{s}: 手续费口径必须二选一"

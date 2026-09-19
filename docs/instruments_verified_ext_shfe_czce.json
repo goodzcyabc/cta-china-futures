@@ -1,0 +1,1538 @@
+{
+  "meta": {
+    "verified": true,
+    "verified_date": "2026-09-18",
+    "param_snapshot": "交易所 2026-09-18 结算参数(上期所 Settlement/ContractDailyTradeArgument .dat; 郑商所 FutureDataClearParams/FutureTradeParam .txt) + 交易所公告/收费一览表/合约文本",
+    "scope": "SHFE 9 + CZCE 13 = 22 品种(任务描述写 21, 实际列出 22; 补充 docs/instruments_verified.json 的 23 品种; DCE/INE 由另一任务核验)",
+    "slippage_ticks_per_side": 1,
+    "field_units": {
+      "fee_per_lot": "元/手(开仓, 交易所投机标准; 按比例品种填 0)",
+      "fee_notional_bp": "成交金额万分比(0.0001→1.0; 元/手品种填 0)",
+      "fee_close_today": "平今手续费, 单位见 fee_close_today_unit(cny_per_lot 或 bp)",
+      "margin_rate": "交易所一般持仓(投机)最低保证金, 一般月份/主力档",
+      "limit_pct": "交易所现行涨跌停板幅度, 一般月份/主力档",
+      "tiers": "按合约月份分档说明(保证金/涨跌停)"
+    }
+  },
+  "counts": {
+    "symbols": 22,
+    "fields_total": 132,
+    "verified": 132,
+    "corrected": 0,
+    "unverified": 0,
+    "diffs_vs_yaml": 88
+  },
+  "symbols": {
+    "FU": {
+      "exchange": "SHFE",
+      "name": "燃料油",
+      "multiplier": 10,
+      "tick": 1,
+      "margin_rate": 0.16,
+      "fee_per_lot": 0,
+      "fee_notional_bp": 0.5,
+      "limit_pct": 0.14,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "bp",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "涨跌停/保证金: 2026-06-25 收盘结算起(上期发〔2026〕249号: 14%/套保15%/一般16%, 全部合约); FU2610/FU2611 自 2026-09-14 收盘结算起升为 16%/17%/18%(上期发〔2026〕316号). 手续费: 2026-06-25 交易起(上期发〔2026〕250号: 1/5/9 月合约 万分之0.5, 其他月 万分之0.1, 进入交割月前第二月起恢复 0.5, 平今免收)",
+      "source": [
+        "https://www.shfe.com.cn/publicnotice/notice/202606/t20260623_832251.html",
+        "https://www.shfe.com.cn/publicnotice/notice/202609/t20260911_833382.html",
+        "https://www.shfe.com.cn/publicnotice/notice/202606/t20260623_832256.html",
+        "https://www.shfe.com.cn/data/busiparamdata/future/Settlement20260918.dat",
+        "https://www.shfe.com.cn/data/busiparamdata/future/ContractDailyTradeArgument20260918.dat",
+        "https://www.shfe.com.cn/reports/businessdata/feeandcharges/202609/W020260907546306371101.xlsx",
+        "https://www.shfe.com.cn/products/futures/energyandchemical/fu_f/"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "主力档取 FU2701/2705/2709 等 1/5/9 月合约: 16%/14%, 万分之0.5; 非 1/5/9 月合约 万分之0.1(FU2612/2702/2703/2704/2706/2707/2708). FU2610/2611 现为 18%/16%(近月加档). 2026 年 3-6 月中东局势下多次调整: 2026-03-10 起 22%/20%(99号), 2026-06-02 起 19%/17%(213号), 2026-03-11~06-24 手续费临时为 万分之1、平今 万分之3(95号); 回测该区间需分段. 合约文本 8%/5% 仅为下限.",
+      "tiers": "FU2610~2611: 18%/16%; FU2612+: 16%/14%",
+      "effective_short": "2026-06-25 结算起 16%/14%(上期发〔2026〕249号); 手续费 2026-06-25 交易起(250号)"
+    },
+    "BU": {
+      "exchange": "SHFE",
+      "name": "石油沥青",
+      "multiplier": 10,
+      "tick": 1,
+      "margin_rate": 0.12,
+      "fee_per_lot": 0,
+      "fee_notional_bp": 0.5,
+      "limit_pct": 0.1,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "bp",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "涨跌停/保证金: 2026-07-10 收盘结算起(上期发〔2026〕260号: 10%/套保11%/一般12%, 全部合约). 手续费: 2024-04-26 交易起(上期发〔2024〕126号: 万分之0.5, 免收平今)",
+      "source": [
+        "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+        "https://www.shfe.com.cn/publicnotice/notice/202404/t20240423_801626.html",
+        "https://www.shfe.com.cn/data/busiparamdata/future/Settlement20260918.dat",
+        "https://www.shfe.com.cn/data/busiparamdata/future/ContractDailyTradeArgument20260918.dat",
+        "https://www.shfe.com.cn/reports/businessdata/feeandcharges/202609/W020260907546306371101.xlsx",
+        "https://www.shfe.com.cn/products/futures/energyandchemical/bu_f/"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "所有上市合约同档(bu2809 为 2026-09-16 新挂牌合约, 涨跌停 20% 系新合约上市初期 2 倍幅度, 有成交后恢复). 2026-03-10~07-09 曾为 14%/12%(99号/93号), 2026-02-05 起曾 11%/9%(54号), 2025-12-09 起曾 9%/7%(上期发〔2025〕352号). 合约文本 4%/3% 仅为下限.",
+      "tiers": "全部合约 12%/10%",
+      "effective_short": "2026-07-10 结算起 12%/10%(上期发〔2026〕260号); 手续费 2024-04-26 起(〔2024〕126号)"
+    },
+    "ZN": {
+      "exchange": "SHFE",
+      "name": "锌",
+      "multiplier": 5,
+      "tick": 5,
+      "margin_rate": 0.11,
+      "fee_per_lot": 3.0,
+      "fee_notional_bp": 0,
+      "limit_pct": 0.09,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "cny_per_lot",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "涨跌停/保证金: 2026-07-02 收盘结算起(上期发〔2026〕253号: ZN2607~ZN2702 9%/套保10%/一般11%); 手续费 3 元/手: 2012-09-01 起(上期办发〔2012〕105号, 由 4 元下调); 平今免收: 2014-04-01 起(上期办发〔2014〕32号)",
+      "source": [
+        "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+        "https://www.shfe.com.cn/publicnotice/notice/201208/t20120802_789152.html",
+        "https://www.shfe.com.cn/publicnotice/notice/201403/t20140320_790284.html",
+        "https://www.shfe.com.cn/data/busiparamdata/future/Settlement20260918.dat",
+        "https://www.shfe.com.cn/data/busiparamdata/future/ContractDailyTradeArgument20260918.dat",
+        "https://www.shfe.com.cn/reports/businessdata/feeandcharges/202609/W020260907546306371101.xlsx",
+        "https://www.shfe.com.cn/products/futures/metal/nonferrousmetal/zn_f/"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "分档: zn2610~2702 11%/9%(主力档, 表中取此档), zn2703 及以后 9%/7%(2026-09-18 结算参数). 2026-02-09~07-01 曾为 12%/10%(上期发〔2026〕56号). 平今折扣率 0(结算参数 DISCOUNTRATE=0). 合约文本 5%/4% 仅为下限.",
+      "tiers": "zn2610~2702: 11%/9%; zn2703+: 9%/7%",
+      "effective_short": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 3元/手 2012-09-01 起; 平今免 2014-04-01 起"
+    },
+    "HC": {
+      "exchange": "SHFE",
+      "name": "热轧卷板",
+      "multiplier": 10,
+      "tick": 1,
+      "margin_rate": 0.07,
+      "fee_per_lot": 0,
+      "fee_notional_bp": 1.0,
+      "limit_pct": 0.05,
+      "fee_close_today": 1.0,
+      "fee_close_today_unit": "bp",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "涨跌停/保证金: 2026-05-19 收盘结算起(上期发〔2026〕191号: hc2606~hc2702 5%/套保6%/一般7%). 手续费: 1/5/10 月合约 万分之1(2016-04-25 起, 上期发〔2016〕65号); 其他月合约 万分之0.2, 进入交割月前第二月起恢复 万分之1(2024-05-31 交易起, 上期发〔2024〕186号); 平今与开仓同价",
+      "source": [
+        "https://www.shfe.com.cn/publicnotice/notice/202605/t20260515_831713.html",
+        "https://www.shfe.com.cn/publicnotice/notice/202405/t20240529_801782.html",
+        "https://www.shfe.com.cn/publicnotice/notice/201604/t20160421_791523.html",
+        "https://www.shfe.com.cn/data/busiparamdata/future/Settlement20260918.dat",
+        "https://www.shfe.com.cn/data/busiparamdata/future/ContractDailyTradeArgument20260918.dat",
+        "https://www.shfe.com.cn/reports/businessdata/feeandcharges/202609/W020260907546306371101.xlsx",
+        "https://www.shfe.com.cn/products/futures/metal/ferrousandpreciousmetal/hc_f/"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "手续费按月份分档(同 RB): 1/5/10 月合约(主力)及进入交割月前第二月起的合约 万分之1(hc2610/2611/2701/2705); 其余月份 万分之0.2. 表中取主力月标准. hc2610(交割月前一月) 保证金 10%. hc2703 及以后新上市合约同为 7%/5%. 合约文本 4%/3% 仅为下限.",
+      "tiers": "hc2611+: 7%/5%; hc2610: 10%/5%",
+      "effective_short": "2026-05-19 结算起 7%/5%(上期发〔2026〕191号); 主力月 万分之1(2016-04-25 起), 非主力月 0.2(2024-05-31 起)"
+    },
+    "PB": {
+      "exchange": "SHFE",
+      "name": "铅",
+      "multiplier": 5,
+      "tick": 5,
+      "margin_rate": 0.11,
+      "fee_per_lot": 0,
+      "fee_notional_bp": 0.4,
+      "limit_pct": 0.09,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "bp",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "涨跌停/保证金: 2026-07-02 收盘结算起(上期发〔2026〕253号: PB2607~PB2702 9%/套保10%/一般11%); 手续费 万分之0.4: 2012-09-01 起(上期办发〔2012〕105号, 由 0.5 下调); 平今免收: 2014-04-01 起(上期办发〔2014〕32号)",
+      "source": [
+        "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+        "https://www.shfe.com.cn/publicnotice/notice/201208/t20120802_789152.html",
+        "https://www.shfe.com.cn/publicnotice/notice/201403/t20140320_790284.html",
+        "https://www.shfe.com.cn/data/busiparamdata/future/Settlement20260918.dat",
+        "https://www.shfe.com.cn/data/busiparamdata/future/ContractDailyTradeArgument20260918.dat",
+        "https://www.shfe.com.cn/reports/businessdata/feeandcharges/202609/W020260907546306371101.xlsx",
+        "https://www.shfe.com.cn/products/futures/metal/nonferrousmetal/pb_f/"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "分档: pb2610~2702 11%/9%(主力档), pb2703 及以后 9%/7%. 2026-02-09~07-01 曾为 12%/10%(56号). 平今折扣率 0. 合约文本 5%/4% 仅为下限.",
+      "tiers": "pb2610~2702: 11%/9%; pb2703+: 9%/7%",
+      "effective_short": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 万分之0.4 2012-09-01 起; 平今免 2014-04-01 起"
+    },
+    "SP": {
+      "exchange": "SHFE",
+      "name": "纸浆",
+      "multiplier": 10,
+      "tick": 2,
+      "margin_rate": 0.07,
+      "fee_per_lot": 0,
+      "fee_notional_bp": 0.2,
+      "limit_pct": 0.05,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "bp",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "涨跌停/保证金: 2026-07-10 收盘结算起(上期发〔2026〕260号: SP2607~SP2703 5%/套保6%/一般7%). 手续费: 2026-07-10 交易起(上期发〔2026〕261号: 万分之0.2, 附件一览表平今 0)",
+      "source": [
+        "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+        "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832508.html",
+        "https://www.shfe.com.cn/publicnotice/notice/202607/W020260708666030903356.doc",
+        "https://www.shfe.com.cn/data/busiparamdata/future/Settlement20260918.dat",
+        "https://www.shfe.com.cn/data/busiparamdata/future/ContractDailyTradeArgument20260918.dat",
+        "https://www.shfe.com.cn/reports/businessdata/feeandcharges/202609/W020260907546306371101.xlsx",
+        "https://www.shfe.com.cn/products/futures/energyandchemical/sp_f/"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "2026-07-10 前手续费 万分之0.5(结算参数 2026-06-01~07-09), 涨跌停/保证金 7%/9%(2026-02-05 起, 54号); 2025-10-14~2026-02-04 为 5%/7%(上期发〔2025〕287号). sp2610(交割月前一月) 10%; sp2704 及以后新上市合约同为 7%/5%. 平今免收(折扣率 0). 合约文本 4%/3% 仅为下限.",
+      "tiers": "sp2611+: 7%/5%; sp2610: 10%/5%",
+      "effective_short": "2026-07-10 结算起 7%/5%(上期发〔2026〕260号); 手续费 万分之0.2 2026-07-10 交易起(261号)"
+    },
+    "SS": {
+      "exchange": "SHFE",
+      "name": "不锈钢",
+      "multiplier": 5,
+      "tick": 5,
+      "margin_rate": 0.07,
+      "fee_per_lot": 2.0,
+      "fee_notional_bp": 0,
+      "limit_pct": 0.05,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "cny_per_lot",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "涨跌停/保证金: 2026-07-02 收盘结算起(上期发〔2026〕253号: SS2607~SS2702 5%/套保6%/一般7%; 此前 2026-05-19 起为 6%/7%/8%, 191号). 手续费 2 元/手、平今免收: 2020-07-07 交易起(上期发〔2020〕236号, 由 万分之1 改为 2 元/手)",
+      "source": [
+        "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+        "https://www.shfe.com.cn/publicnotice/notice/202605/t20260515_831713.html",
+        "https://www.shfe.com.cn/publicnotice/notice/202007/t20200702_796124.html",
+        "https://www.shfe.com.cn/data/busiparamdata/future/Settlement20260918.dat",
+        "https://www.shfe.com.cn/data/busiparamdata/future/ContractDailyTradeArgument20260918.dat",
+        "https://www.shfe.com.cn/reports/businessdata/feeandcharges/202609/W020260907546306371101.xlsx",
+        "https://www.shfe.com.cn/products/futures/metal/ferrousandpreciousmetal/ss_f/"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "ss2610(交割月前一月) 10%; ss2611 及以后 7%/5%. 2026-02-09~05-18 曾为 10%/8%(56号). 平今折扣率 0. 合约文本 5%/4% 仅为下限.",
+      "tiers": "ss2611+: 7%/5%; ss2610: 10%/5%",
+      "effective_short": "2026-07-02 结算起 7%/5%(上期发〔2026〕253号); 2元/手、平今免 2020-07-07 起(〔2020〕236号)"
+    },
+    "BR": {
+      "exchange": "SHFE",
+      "name": "丁二烯橡胶",
+      "multiplier": 5,
+      "tick": 5,
+      "margin_rate": 0.12,
+      "fee_per_lot": 0,
+      "fee_notional_bp": 0.2,
+      "limit_pct": 0.1,
+      "fee_close_today": 0.2,
+      "fee_close_today_unit": "bp",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "涨跌停/保证金: 2026-07-10 收盘结算起(上期发〔2026〕260号: 10%/套保11%/一般12%, 全部合约). 手续费: 2024-04-26 交易起(上期发〔2024〕126号: 万分之0.2, 平今 万分之0.2)",
+      "source": [
+        "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+        "https://www.shfe.com.cn/publicnotice/notice/202404/t20240423_801626.html",
+        "https://www.shfe.com.cn/data/busiparamdata/future/Settlement20260918.dat",
+        "https://www.shfe.com.cn/data/busiparamdata/future/ContractDailyTradeArgument20260918.dat",
+        "https://www.shfe.com.cn/reports/businessdata/feeandcharges/202609/W020260907546306371101.xlsx",
+        "https://www.shfe.com.cn/products/futures/energyandchemical/br_f/"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "所有上市合约同档 12%/10%. 2026-03-10~07-09 曾为 14%/12%(93号/99号); 2025-10-14 起曾 9%/7%(上期发〔2025〕288号). 平今与开仓同价(折扣率 1); 2024-2025 年曾多次对特定合约临时上调平今至 万分之0.6~1. 合约文本 7%/5% 仅为下限. 上市初(2023-07-28)为 万分之1(2023-09-08 起 万分之1/平今万分之1, 上期发〔2023〕295号).",
+      "tiers": "全部合约 12%/10%",
+      "effective_short": "2026-07-10 结算起 12%/10%(上期发〔2026〕260号); 万分之0.2 2024-04-26 起(〔2024〕126号)"
+    },
+    "AO": {
+      "exchange": "SHFE",
+      "name": "氧化铝",
+      "multiplier": 20,
+      "tick": 1,
+      "margin_rate": 0.11,
+      "fee_per_lot": 0,
+      "fee_notional_bp": 1.0,
+      "limit_pct": 0.09,
+      "fee_close_today": 1.0,
+      "fee_close_today_unit": "bp",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "涨跌停/保证金: 2026-07-02 收盘结算起(上期发〔2026〕253号: AO2607~AO2702 9%/套保10%/一般11%). 手续费: 2025-04-08 交易起(上期发〔2025〕92号: 万分之1, 平今 万分之1; 2025-03-11~04-07 曾 万分之1.5)",
+      "source": [
+        "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+        "https://www.shfe.com.cn/publicnotice/notice/202504/t20250401_824937.html",
+        "https://www.shfe.com.cn/publicnotice/notice/202503/t20250307_824724.html",
+        "https://www.shfe.com.cn/data/busiparamdata/future/Settlement20260918.dat",
+        "https://www.shfe.com.cn/data/busiparamdata/future/ContractDailyTradeArgument20260918.dat",
+        "https://www.shfe.com.cn/reports/businessdata/feeandcharges/202609/W020260907546306371101.xlsx",
+        "https://www.shfe.com.cn/products/futures/metal/nonferrousmetal/ao_f/"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "分档: ao2610~2702 11%/9%(主力档), ao2703 及以后 9%/7%. 2026-02-09~07-01 曾为 12%/10%(56号); 2025-11-07 起曾 9%/7%(上期发〔2025〕319号). 平今与开仓同价(折扣率 1); 2024-10~2025-05 曾对特定合约临时上调至 万分之3. 合约文本 5%/4% 仅为下限.",
+      "tiers": "ao2610~2702: 11%/9%; ao2703+: 9%/7%",
+      "effective_short": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 万分之1 2025-04-08 起(〔2025〕92号)"
+    },
+    "FG": {
+      "exchange": "CZCE",
+      "name": "玻璃",
+      "multiplier": 20,
+      "tick": 1,
+      "margin_rate": 0.09,
+      "fee_per_lot": 2.0,
+      "fee_notional_bp": 0,
+      "limit_pct": 0.08,
+      "fee_close_today": 2.0,
+      "fee_close_today_unit": "cny_per_lot",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "保证金 9%/涨跌停 8%: 2026-06-05 结算起; 手续费 2 元/手、平今 2 元/手: 2026-06-05 夜盘起(郑商函〔2026〕476号, 由 6 元/手下调)",
+      "source": [
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/b4badd9ad3654d43a79ed8577f247ace.htm",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/bl/bzhy/qhhy/H077002009001001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "2026-06-05 前: 手续费 6 元/手(平今 6 元), 保证金 10%/涨跌停 9%(2026-05-06 起; 2026-02-12~02-23、04-29~05-05 假期临时 12%/10%). FG610(近月) 保证金 10%. 2026-09-29 结算起国庆临时 10%/9%(郑商函〔2026〕860号), 10-08 后恢复. 合约文本 5% 仅为下限.",
+      "tiers": "FG611+: 9%/8%; FG610: 10%/8%",
+      "effective_short": "2026-06-05 结算起 9%/8%, 夜盘起 2元/手(郑商函〔2026〕476号)"
+    },
+    "OI": {
+      "exchange": "CZCE",
+      "name": "菜籽油",
+      "multiplier": 10,
+      "tick": 1,
+      "margin_rate": 0.07,
+      "fee_per_lot": 2.0,
+      "fee_notional_bp": 0,
+      "limit_pct": 0.06,
+      "fee_close_today": 2.0,
+      "fee_close_today_unit": "cny_per_lot",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "手续费 2 元/手: 2018-01-02 夜盘起(郑商发〔2017〕302号, 由 2.5 元下调), 平今同价; 保证金 7%/涨跌停 6%: 品种级长期基准(结算参数回溯: 2024-12-13 起即为 7%/6%, 仅 2025-04-02~05-19 因清明/劳动节通知(郑商函〔2025〕241号/313号)临时 9%/8%, 2025-05-20 起恢复; 其后各假期临时上调均恢复)",
+      "source": [
+        "https://www.czce.com.cn/cn/rootfiles/2018/05/07/1526089634085979-1526089634138361.pdf",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/czy/bzhy/qhhy/H077002006001001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "平今不免收(2 元/手). 2026-09-29 结算起国庆临时 9%/8%(郑商函〔2026〕860号), 10-08 后恢复. 合约文本 5% 仅为下限.",
+      "tiers": "全部合约 7%/6%",
+      "effective_short": "2元/手 2018-01-02 夜盘起(郑商发〔2017〕302号); 7%/6% 品种级基准(2024-12 起, 2025-05-20 恢复后未变)"
+    },
+    "SF": {
+      "exchange": "CZCE",
+      "name": "硅铁",
+      "multiplier": 5,
+      "tick": 2,
+      "margin_rate": 0.07,
+      "fee_per_lot": 2.0,
+      "fee_notional_bp": 0,
+      "limit_pct": 0.06,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "cny_per_lot",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "保证金 7%/涨跌停 6%: 2026-06-24 结算起; 手续费 2 元/手: 2026-06-24 起(郑商所公告〔2026〕91号, 由 3 元/手下调); 平今免收: 长期基准(2026-09-18 结算参数平今 0)",
+      "source": [
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/gt/bzhy/qhhy/H077002017001001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "2026-06-24 前: 3 元/手、8%/7%(2025-05-06 起, 郑商函〔2025〕313号). SF610(近月) 10%. 2026-09-29 结算起国庆临时 9%/8%(860号). 平今免收的原始公告未定位, 以结算参数(平今 0.00)为准. 合约文本 5% 仅为下限.",
+      "tiers": "SF611+: 7%/6%; SF610: 10%/6%",
+      "effective_short": "2026-06-24 结算起 7%/6%, 2元/手(郑商所公告〔2026〕91号); 平今免 长期基准"
+    },
+    "RM": {
+      "exchange": "CZCE",
+      "name": "菜籽粕",
+      "multiplier": 10,
+      "tick": 1,
+      "margin_rate": 0.07,
+      "fee_per_lot": 1.5,
+      "fee_notional_bp": 0,
+      "limit_pct": 0.06,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "cny_per_lot",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "平今免收: 2026-06-23 夜盘起(郑商所公告〔2026〕91号); 手续费 1.5 元/手: 长期基准(收费一览表+结算参数确认, 原始公告未定位); 保证金 7%/涨跌停 6%: 品种级长期基准(结算参数回溯: 2024-12-13 起即为 7%/6%, 2025-03-10~03-16、04-02~05-19 临时上调(郑商函〔2025〕241号/313号等), 2025-05-20 起恢复)",
+      "source": [
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/czp/bzhy/qhhy/H077002011001001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "2026-06-23 前平今 1.5 元/手. 2026-09-29 结算起国庆临时 9%/8%(860号). 合约文本 5% 仅为下限.",
+      "tiers": "全部合约 7%/6%",
+      "effective_short": "平今免 2026-06-23 夜盘起(公告〔2026〕91号); 1.5元/手 长期基准; 7%/6% 品种级基准(2024-12 起, 2025-05-20 恢复后未变)"
+    },
+    "SM": {
+      "exchange": "CZCE",
+      "name": "锰硅",
+      "multiplier": 5,
+      "tick": 2,
+      "margin_rate": 0.07,
+      "fee_per_lot": 2.0,
+      "fee_notional_bp": 0,
+      "limit_pct": 0.06,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "cny_per_lot",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "保证金 7%/涨跌停 6%: 2026-06-24 结算起; 手续费 2 元/手: 2026-06-24 起(郑商所公告〔2026〕91号, 由 3 元/手下调); 平今免收: 长期基准(结算参数平今 0)",
+      "source": [
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/meng/bzhy/qhhy/H077002020001001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "2026-06-24 前: 3 元/手、8%/7%(2026-02-24 春节后恢复时定为 8%/7%, 郑商函〔2026〕182号; 此前 9%/8%). SM610(近月) 10%. 2026-09-29 结算起国庆临时 9%/8%(860号). 合约文本 5% 仅为下限.",
+      "tiers": "SM611+: 7%/6%; SM610: 10%/6%",
+      "effective_short": "2026-06-24 结算起 7%/6%, 2元/手(郑商所公告〔2026〕91号); 平今免 长期基准"
+    },
+    "AP": {
+      "exchange": "CZCE",
+      "name": "苹果",
+      "multiplier": 10,
+      "tick": 1,
+      "margin_rate": 0.09,
+      "fee_per_lot": 5.0,
+      "fee_notional_bp": 0,
+      "limit_pct": 0.08,
+      "fee_close_today": 10.0,
+      "fee_close_today_unit": "cny_per_lot",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "保证金 9%/涨跌停 8%: 2026-05-06 恢复交易后首个非单边市交易日结算起(郑商函〔2026〕402号第二条); 平今 10 元/手: 2026-06-08 起(郑商函〔2026〕477号, 由 20 元下调); 开仓 5 元/手: 长期基准(收费一览表+结算参数确认)",
+      "source": [
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/4/b60b22ff38fc4ade848e06d1cffaed64.htm",
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/92b969f5573e42c695757733c5df0134.htm",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/pg/bzhy/qhhy/H077002021001001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "平今 10 元 = 开仓 2 倍, 日内往返 15 元. 2026-05-06 前 10%/9%. AP610(近月) 10%. 2026-09-29 结算起国庆临时 10%/9%(860号). 合约文本 7% 仅为下限.",
+      "tiers": "AP611+: 9%/8%; AP610: 10%/8%",
+      "effective_short": "9%/8% 2026-05-06 起(郑商函〔2026〕402号); 平今10元 2026-06-08 起(477号); 5元/手 长期基准"
+    },
+    "UR": {
+      "exchange": "CZCE",
+      "name": "尿素",
+      "multiplier": 20,
+      "tick": 1,
+      "margin_rate": 0.08,
+      "fee_per_lot": 0,
+      "fee_notional_bp": 1.0,
+      "limit_pct": 0.07,
+      "fee_close_today": 1.0,
+      "fee_close_today_unit": "bp",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "手续费 万分之1、平今 万分之1: 2023-08-03 起(郑商函〔2023〕559号); 保证金 8%/涨跌停 7%: 品种级长期基准(结算参数回溯: 2024-12-13 起即为 8%/7%, 各假期临时上调后均恢复)",
+      "source": [
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2023/07/1689460847817820.htm",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/nsqh/bzhy/qhhy/H077002023002001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "按成交金额比例收取, 平今不免收. UR610(近月) 10%. 2026-09-29 结算起国庆临时 9%/8%(860号). 合约文本 5% 仅为下限.",
+      "tiers": "UR611+: 8%/7%; UR610: 10%/7%",
+      "effective_short": "万分之1/平今万分之1 2023-08-03 起(郑商函〔2023〕559号); 8%/7% 品种级基准(2024-12 起未变)"
+    },
+    "CJ": {
+      "exchange": "CZCE",
+      "name": "红枣",
+      "multiplier": 5,
+      "tick": 5,
+      "margin_rate": 0.08,
+      "fee_per_lot": 3.0,
+      "fee_notional_bp": 0,
+      "limit_pct": 0.07,
+      "fee_close_today": 3.0,
+      "fee_close_today_unit": "cny_per_lot",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "保证金 8%/涨跌停 7%: 2026-05-06 恢复交易后首个非单边市交易日结算起(郑商函〔2026〕402号第二条, 由 9%/8% 下调; 9%/8% 自 2025-06-20 起, 郑商函〔2025〕460号); 手续费 3 元/手、平今 3 元/手: 长期基准(收费一览表+结算参数确认)",
+      "source": [
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/4/b60b22ff38fc4ade848e06d1cffaed64.htm",
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/06/1750858509158684.htm",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/hzqh/bzhy/qhhy/H077002022002001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "2023-11-08 曾对 2312~2409 合约临时 10 元/手. 2026-09-29 结算起国庆临时 9%/8%(860号). 合约文本 7% 仅为下限.",
+      "tiers": "全部合约 8%/7%",
+      "effective_short": "8%/7% 2026-05-06 起(郑商函〔2026〕402号); 3元/手 长期基准(结算参数确认)"
+    },
+    "PF": {
+      "exchange": "CZCE",
+      "name": "短纤",
+      "multiplier": 5,
+      "tick": 2,
+      "margin_rate": 0.07,
+      "fee_per_lot": 2.0,
+      "fee_notional_bp": 0,
+      "limit_pct": 0.06,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "cny_per_lot",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "手续费 2 元/手、平今免收: 2025-03-14 夜盘起(郑商函〔2025〕204号); 保证金 7%/涨跌停 6%: 2025-02-05 恢复交易后结算起(郑商函〔2025〕71号第二条); 2026-03-10 起 2604~2609 合约临时升至 13%/11%(郑商函〔2026〕244号), 已随合约到期/恢复",
+      "source": [
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/03/1738067227057437.htm",
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/01/1738062898261399.htm",
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/3/4a462c266e2f4e19a0759ad9d5911921.htm",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/dxqh/bzhy/qhhy/H077002025002001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "2025-03-14 前手续费 3 元/手、平今 3 元/手(结算参数回溯); 2025-02-05 前 8%/7%. PF610(近月) 10%. 2026-09-29 结算起国庆临时 10%/9%(860号). 合约文本 5% 仅为下限.",
+      "tiers": "PF611+: 7%/6%; PF610: 10%/6%",
+      "effective_short": "2元/手、平今免 2025-03-14 夜盘起(郑商函〔2025〕204号); 7%/6% 2025-02-05 起(〔2025〕71号)"
+    },
+    "PK": {
+      "exchange": "CZCE",
+      "name": "花生",
+      "multiplier": 5,
+      "tick": 2,
+      "margin_rate": 0.07,
+      "fee_per_lot": 2.0,
+      "fee_notional_bp": 0,
+      "limit_pct": 0.06,
+      "fee_close_today": 2.0,
+      "fee_close_today_unit": "cny_per_lot",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "手续费 2 元/手、平今 2 元/手: 2026-06-24 起(郑商所公告〔2026〕91号, 由 4 元/手下调); 保证金 7%/涨跌停 6%: 2025-10-09 恢复交易后首个非单边市交易日结算起(郑商函〔2025〕735号第二条)",
+      "source": [
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/9/52ba804f458649eab0e8d23fcb193842.htm",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/hsqh/bzhy/qhhy/H077002026002001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "2026-06-24 前 4 元/手(平今 4 元); 2025-10-09 前 8%/7%. PK610(近月) 10%. 2026-09-29 结算起国庆临时 9%/8%(860号). 合约文本 5% 仅为下限.",
+      "tiers": "PK611+: 7%/6%; PK610: 10%/6%",
+      "effective_short": "2元/手 2026-06-24 起(公告〔2026〕91号); 7%/6% 2025-10-09 起(郑商函〔2025〕735号)"
+    },
+    "SH": {
+      "exchange": "CZCE",
+      "name": "烧碱",
+      "multiplier": 30,
+      "tick": 1,
+      "margin_rate": 0.08,
+      "fee_per_lot": 0,
+      "fee_notional_bp": 1.0,
+      "limit_pct": 0.07,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "bp",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "手续费 万分之1: 2023-09-15 上市起(郑商函〔2023〕692号); 平今免收: 2024-05-29 夜盘起(郑商函〔2024〕323号); 保证金 8%/涨跌停 7%: 品种级长期基准(结算参数回溯: 2024-12-13 起即为 8%/7%, 各假期临时上调后均恢复; 2026-03-09 起 2604~2607 合约临时上调, 郑商函〔2026〕239号, 已随合约到期恢复)",
+      "source": [
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2023/09/1689464652925099.htm",
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2024/05/1715232667290475.htm",
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/3/c28d417b1a7543b2aa131bb516d44329.htm",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/sjqhqq/bzhy/qhhy/H077002028002001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "交易单位 30 吨/手(干吨). 2025 年曾多次对 2509 等合约临时上调手续费至 万分之2. SH610(近月) 10%. 2026-09-29 结算起国庆临时 10%/9%(860号). 合约文本 5% 仅为下限.",
+      "tiers": "SH611+: 8%/7%; SH610: 10%/7%",
+      "effective_short": "万分之1 上市起(郑商函〔2023〕692号); 平今免 2024-05-29 夜盘起(〔2024〕323号); 8%/7% 品种级基准(2024-12 起未变)"
+    },
+    "PX": {
+      "exchange": "CZCE",
+      "name": "对二甲苯",
+      "multiplier": 5,
+      "tick": 2,
+      "margin_rate": 0.07,
+      "fee_per_lot": 0,
+      "fee_notional_bp": 1.0,
+      "limit_pct": 0.06,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "bp",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "手续费 万分之1: 2023-09-15 上市起(郑商函〔2023〕693号); 平今免收: 2024-05-29 夜盘起(郑商函〔2024〕323号); 保证金 7%/涨跌停 6%: 2025-10-09 恢复交易后首个非单边市交易日结算起(郑商函〔2025〕735号第二条); 2026-03-10 起 2604~2609 临时升至 13%/11%(244号), 已恢复",
+      "source": [
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2023/09/1689464653277405.htm",
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2024/05/1715232667290475.htm",
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/9/52ba804f458649eab0e8d23fcb193842.htm",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/dejbqhqq/bzhy/qhhy/H077002027002001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "2025-10-09 前 8%/7%. PX610(近月) 15%. 2026-09-21 结算起 PX2610 涨跌停 9%、PX2611 保证金 9%/涨跌停 8%; 2026-09-29 结算起全品种临时 10%/9%(860号). 合约文本 5% 仅为下限.",
+      "tiers": "PX611+: 7%/6%; PX610: 15%/6%",
+      "effective_short": "万分之1 上市起(郑商函〔2023〕693号); 平今免 2024-05-29 夜盘起(〔2024〕323号); 7%/6% 2025-10-09 起(〔2025〕735号)"
+    },
+    "PR": {
+      "exchange": "CZCE",
+      "name": "瓶片",
+      "multiplier": 15,
+      "tick": 2,
+      "margin_rate": 0.07,
+      "fee_per_lot": 0,
+      "fee_notional_bp": 0.5,
+      "limit_pct": 0.06,
+      "fee_close_today": 0,
+      "fee_close_today_unit": "bp",
+      "status": "verified",
+      "field_status": {
+        "multiplier": "verified",
+        "tick": "verified",
+        "margin_rate": "verified",
+        "fee_open": "verified",
+        "fee_close_today": "verified",
+        "limit_pct": "verified"
+      },
+      "effective_date": "手续费 万分之0.5、平今免收: 2025-03-14 夜盘起(郑商函〔2025〕204号; 上市时 万分之1/平今万分之1, 郑商函〔2024〕558号); 保证金 7%/涨跌停 6%: 2025-02-05 恢复交易后结算起(郑商函〔2025〕71号第二条); 2026-03-10 起 2604~2609 临时升至 13%/11%(244号), 已恢复",
+      "source": [
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/03/1738067227057437.htm",
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2024/08/1715239665634128.htm",
+        "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/01/1738062898261399.htm",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataClearParams.txt",
+        "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureTradeParam.txt",
+        "https://www.czce.com.cn/cn/jysfw/hyfw/sfbz/H077004002017index_1.htm",
+        "https://www.czce.com.cn/cn/sspz/ppqh/bzhy/qhhy/H077002029002001index_1.htm"
+      ],
+      "secondary_source": [
+        "https://www.9qihuo.com/qihuoshouxufei"
+      ],
+      "note": "交易单位 15 吨/手. 2025-03-14 前手续费 万分之1、平今 万分之1(结算参数回溯); 2025-02-05 前 8%/7%. PR610(近月) 10%. 2026-09-29 结算起国庆临时 10%/9%(860号). 合约文本 5% 仅为下限.",
+      "tiers": "PR611+: 7%/6%; PR610: 10%/6%",
+      "effective_short": "万分之0.5、平今免 2025-03-14 夜盘起(郑商函〔2025〕204号); 7%/6% 2025-02-05 起(〔2025〕71号)"
+    }
+  },
+  "diffs": [
+    {
+      "symbol": "FU",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.16,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260623_832251.html",
+      "reason": "2026-06-25 结算起 16%/14%(上期发〔2026〕249号); 手续费 2026-06-25 交易起(250号)"
+    },
+    {
+      "symbol": "FU",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0.5,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260623_832251.html",
+      "reason": "2026-06-25 结算起 16%/14%(上期发〔2026〕249号); 手续费 2026-06-25 交易起(250号)"
+    },
+    {
+      "symbol": "FU",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.14,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260623_832251.html",
+      "reason": "2026-06-25 结算起 16%/14%(上期发〔2026〕249号); 手续费 2026-06-25 交易起(250号)"
+    },
+    {
+      "symbol": "FU",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260623_832251.html",
+      "reason": "2026-06-25 结算起 16%/14%(上期发〔2026〕249号); 手续费 2026-06-25 交易起(250号)"
+    },
+    {
+      "symbol": "BU",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.12,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+      "reason": "2026-07-10 结算起 12%/10%(上期发〔2026〕260号); 手续费 2024-04-26 起(〔2024〕126号)"
+    },
+    {
+      "symbol": "BU",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0.5,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+      "reason": "2026-07-10 结算起 12%/10%(上期发〔2026〕260号); 手续费 2024-04-26 起(〔2024〕126号)"
+    },
+    {
+      "symbol": "BU",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.1,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+      "reason": "2026-07-10 结算起 12%/10%(上期发〔2026〕260号); 手续费 2024-04-26 起(〔2024〕126号)"
+    },
+    {
+      "symbol": "BU",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+      "reason": "2026-07-10 结算起 12%/10%(上期发〔2026〕260号); 手续费 2024-04-26 起(〔2024〕126号)"
+    },
+    {
+      "symbol": "ZN",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.11,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 3元/手 2012-09-01 起; 平今免 2014-04-01 起"
+    },
+    {
+      "symbol": "ZN",
+      "field": "fee_per_lot",
+      "old": 0,
+      "new": 3.0,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 3元/手 2012-09-01 起; 平今免 2014-04-01 起"
+    },
+    {
+      "symbol": "ZN",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 3元/手 2012-09-01 起; 平今免 2014-04-01 起"
+    },
+    {
+      "symbol": "ZN",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.09,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 3元/手 2012-09-01 起; 平今免 2014-04-01 起"
+    },
+    {
+      "symbol": "ZN",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 3元/手 2012-09-01 起; 平今免 2014-04-01 起"
+    },
+    {
+      "symbol": "HC",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.07,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202605/t20260515_831713.html",
+      "reason": "2026-05-19 结算起 7%/5%(上期发〔2026〕191号); 主力月 万分之1(2016-04-25 起), 非主力月 0.2(2024-05-31 起)"
+    },
+    {
+      "symbol": "HC",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.05,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202605/t20260515_831713.html",
+      "reason": "2026-05-19 结算起 7%/5%(上期发〔2026〕191号); 主力月 万分之1(2016-04-25 起), 非主力月 0.2(2024-05-31 起)"
+    },
+    {
+      "symbol": "PB",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.11,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 万分之0.4 2012-09-01 起; 平今免 2014-04-01 起"
+    },
+    {
+      "symbol": "PB",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0.4,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 万分之0.4 2012-09-01 起; 平今免 2014-04-01 起"
+    },
+    {
+      "symbol": "PB",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.09,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 万分之0.4 2012-09-01 起; 平今免 2014-04-01 起"
+    },
+    {
+      "symbol": "PB",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 万分之0.4 2012-09-01 起; 平今免 2014-04-01 起"
+    },
+    {
+      "symbol": "SP",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.07,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+      "reason": "2026-07-10 结算起 7%/5%(上期发〔2026〕260号); 手续费 万分之0.2 2026-07-10 交易起(261号)"
+    },
+    {
+      "symbol": "SP",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0.2,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+      "reason": "2026-07-10 结算起 7%/5%(上期发〔2026〕260号); 手续费 万分之0.2 2026-07-10 交易起(261号)"
+    },
+    {
+      "symbol": "SP",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.05,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+      "reason": "2026-07-10 结算起 7%/5%(上期发〔2026〕260号); 手续费 万分之0.2 2026-07-10 交易起(261号)"
+    },
+    {
+      "symbol": "SP",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+      "reason": "2026-07-10 结算起 7%/5%(上期发〔2026〕260号); 手续费 万分之0.2 2026-07-10 交易起(261号)"
+    },
+    {
+      "symbol": "SS",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.07,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 7%/5%(上期发〔2026〕253号); 2元/手、平今免 2020-07-07 起(〔2020〕236号)"
+    },
+    {
+      "symbol": "SS",
+      "field": "fee_per_lot",
+      "old": 0,
+      "new": 2.0,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 7%/5%(上期发〔2026〕253号); 2元/手、平今免 2020-07-07 起(〔2020〕236号)"
+    },
+    {
+      "symbol": "SS",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 7%/5%(上期发〔2026〕253号); 2元/手、平今免 2020-07-07 起(〔2020〕236号)"
+    },
+    {
+      "symbol": "SS",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.05,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 7%/5%(上期发〔2026〕253号); 2元/手、平今免 2020-07-07 起(〔2020〕236号)"
+    },
+    {
+      "symbol": "SS",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 7%/5%(上期发〔2026〕253号); 2元/手、平今免 2020-07-07 起(〔2020〕236号)"
+    },
+    {
+      "symbol": "BR",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.12,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+      "reason": "2026-07-10 结算起 12%/10%(上期发〔2026〕260号); 万分之0.2 2024-04-26 起(〔2024〕126号)"
+    },
+    {
+      "symbol": "BR",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0.2,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+      "reason": "2026-07-10 结算起 12%/10%(上期发〔2026〕260号); 万分之0.2 2024-04-26 起(〔2024〕126号)"
+    },
+    {
+      "symbol": "BR",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.1,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+      "reason": "2026-07-10 结算起 12%/10%(上期发〔2026〕260号); 万分之0.2 2024-04-26 起(〔2024〕126号)"
+    },
+    {
+      "symbol": "BR",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0.2,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202607/t20260708_832506.html",
+      "reason": "2026-07-10 结算起 12%/10%(上期发〔2026〕260号); 万分之0.2 2024-04-26 起(〔2024〕126号)"
+    },
+    {
+      "symbol": "AO",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.11,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 万分之1 2025-04-08 起(〔2025〕92号)"
+    },
+    {
+      "symbol": "AO",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.09,
+      "source": "https://www.shfe.com.cn/publicnotice/notice/202606/t20260630_832357.html",
+      "reason": "2026-07-02 结算起 11%/9%(上期发〔2026〕253号); 万分之1 2025-04-08 起(〔2025〕92号)"
+    },
+    {
+      "symbol": "FG",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.09,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/b4badd9ad3654d43a79ed8577f247ace.htm",
+      "reason": "2026-06-05 结算起 9%/8%, 夜盘起 2元/手(郑商函〔2026〕476号)"
+    },
+    {
+      "symbol": "FG",
+      "field": "fee_per_lot",
+      "old": 0,
+      "new": 2.0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/b4badd9ad3654d43a79ed8577f247ace.htm",
+      "reason": "2026-06-05 结算起 9%/8%, 夜盘起 2元/手(郑商函〔2026〕476号)"
+    },
+    {
+      "symbol": "FG",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/b4badd9ad3654d43a79ed8577f247ace.htm",
+      "reason": "2026-06-05 结算起 9%/8%, 夜盘起 2元/手(郑商函〔2026〕476号)"
+    },
+    {
+      "symbol": "FG",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.08,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/b4badd9ad3654d43a79ed8577f247ace.htm",
+      "reason": "2026-06-05 结算起 9%/8%, 夜盘起 2元/手(郑商函〔2026〕476号)"
+    },
+    {
+      "symbol": "FG",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 2.0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/b4badd9ad3654d43a79ed8577f247ace.htm",
+      "reason": "2026-06-05 结算起 9%/8%, 夜盘起 2元/手(郑商函〔2026〕476号)"
+    },
+    {
+      "symbol": "OI",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.07,
+      "source": "https://www.czce.com.cn/cn/rootfiles/2018/05/07/1526089634085979-1526089634138361.pdf",
+      "reason": "2元/手 2018-01-02 夜盘起(郑商发〔2017〕302号); 7%/6% 品种级基准(2024-12 起, 2025-05-20 恢复后未变)"
+    },
+    {
+      "symbol": "OI",
+      "field": "fee_per_lot",
+      "old": 0,
+      "new": 2.0,
+      "source": "https://www.czce.com.cn/cn/rootfiles/2018/05/07/1526089634085979-1526089634138361.pdf",
+      "reason": "2元/手 2018-01-02 夜盘起(郑商发〔2017〕302号); 7%/6% 品种级基准(2024-12 起, 2025-05-20 恢复后未变)"
+    },
+    {
+      "symbol": "OI",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0,
+      "source": "https://www.czce.com.cn/cn/rootfiles/2018/05/07/1526089634085979-1526089634138361.pdf",
+      "reason": "2元/手 2018-01-02 夜盘起(郑商发〔2017〕302号); 7%/6% 品种级基准(2024-12 起, 2025-05-20 恢复后未变)"
+    },
+    {
+      "symbol": "OI",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.06,
+      "source": "https://www.czce.com.cn/cn/rootfiles/2018/05/07/1526089634085979-1526089634138361.pdf",
+      "reason": "2元/手 2018-01-02 夜盘起(郑商发〔2017〕302号); 7%/6% 品种级基准(2024-12 起, 2025-05-20 恢复后未变)"
+    },
+    {
+      "symbol": "OI",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 2.0,
+      "source": "https://www.czce.com.cn/cn/rootfiles/2018/05/07/1526089634085979-1526089634138361.pdf",
+      "reason": "2元/手 2018-01-02 夜盘起(郑商发〔2017〕302号); 7%/6% 品种级基准(2024-12 起, 2025-05-20 恢复后未变)"
+    },
+    {
+      "symbol": "SF",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.07,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2026-06-24 结算起 7%/6%, 2元/手(郑商所公告〔2026〕91号); 平今免 长期基准"
+    },
+    {
+      "symbol": "SF",
+      "field": "fee_per_lot",
+      "old": 0,
+      "new": 2.0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2026-06-24 结算起 7%/6%, 2元/手(郑商所公告〔2026〕91号); 平今免 长期基准"
+    },
+    {
+      "symbol": "SF",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2026-06-24 结算起 7%/6%, 2元/手(郑商所公告〔2026〕91号); 平今免 长期基准"
+    },
+    {
+      "symbol": "SF",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.06,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2026-06-24 结算起 7%/6%, 2元/手(郑商所公告〔2026〕91号); 平今免 长期基准"
+    },
+    {
+      "symbol": "SF",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2026-06-24 结算起 7%/6%, 2元/手(郑商所公告〔2026〕91号); 平今免 长期基准"
+    },
+    {
+      "symbol": "RM",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.07,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "平今免 2026-06-23 夜盘起(公告〔2026〕91号); 1.5元/手 长期基准; 7%/6% 品种级基准(2024-12 起, 2025-05-20 恢复后未变)"
+    },
+    {
+      "symbol": "RM",
+      "field": "fee_per_lot",
+      "old": 0,
+      "new": 1.5,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "平今免 2026-06-23 夜盘起(公告〔2026〕91号); 1.5元/手 长期基准; 7%/6% 品种级基准(2024-12 起, 2025-05-20 恢复后未变)"
+    },
+    {
+      "symbol": "RM",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "平今免 2026-06-23 夜盘起(公告〔2026〕91号); 1.5元/手 长期基准; 7%/6% 品种级基准(2024-12 起, 2025-05-20 恢复后未变)"
+    },
+    {
+      "symbol": "RM",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.06,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "平今免 2026-06-23 夜盘起(公告〔2026〕91号); 1.5元/手 长期基准; 7%/6% 品种级基准(2024-12 起, 2025-05-20 恢复后未变)"
+    },
+    {
+      "symbol": "RM",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "平今免 2026-06-23 夜盘起(公告〔2026〕91号); 1.5元/手 长期基准; 7%/6% 品种级基准(2024-12 起, 2025-05-20 恢复后未变)"
+    },
+    {
+      "symbol": "SM",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.07,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2026-06-24 结算起 7%/6%, 2元/手(郑商所公告〔2026〕91号); 平今免 长期基准"
+    },
+    {
+      "symbol": "SM",
+      "field": "fee_per_lot",
+      "old": 0,
+      "new": 2.0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2026-06-24 结算起 7%/6%, 2元/手(郑商所公告〔2026〕91号); 平今免 长期基准"
+    },
+    {
+      "symbol": "SM",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2026-06-24 结算起 7%/6%, 2元/手(郑商所公告〔2026〕91号); 平今免 长期基准"
+    },
+    {
+      "symbol": "SM",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.06,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2026-06-24 结算起 7%/6%, 2元/手(郑商所公告〔2026〕91号); 平今免 长期基准"
+    },
+    {
+      "symbol": "SM",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2026-06-24 结算起 7%/6%, 2元/手(郑商所公告〔2026〕91号); 平今免 长期基准"
+    },
+    {
+      "symbol": "AP",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.09,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/4/b60b22ff38fc4ade848e06d1cffaed64.htm",
+      "reason": "9%/8% 2026-05-06 起(郑商函〔2026〕402号); 平今10元 2026-06-08 起(477号); 5元/手 长期基准"
+    },
+    {
+      "symbol": "AP",
+      "field": "fee_per_lot",
+      "old": 0,
+      "new": 5.0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/4/b60b22ff38fc4ade848e06d1cffaed64.htm",
+      "reason": "9%/8% 2026-05-06 起(郑商函〔2026〕402号); 平今10元 2026-06-08 起(477号); 5元/手 长期基准"
+    },
+    {
+      "symbol": "AP",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/4/b60b22ff38fc4ade848e06d1cffaed64.htm",
+      "reason": "9%/8% 2026-05-06 起(郑商函〔2026〕402号); 平今10元 2026-06-08 起(477号); 5元/手 长期基准"
+    },
+    {
+      "symbol": "AP",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.08,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/4/b60b22ff38fc4ade848e06d1cffaed64.htm",
+      "reason": "9%/8% 2026-05-06 起(郑商函〔2026〕402号); 平今10元 2026-06-08 起(477号); 5元/手 长期基准"
+    },
+    {
+      "symbol": "AP",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 10.0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/4/b60b22ff38fc4ade848e06d1cffaed64.htm",
+      "reason": "9%/8% 2026-05-06 起(郑商函〔2026〕402号); 平今10元 2026-06-08 起(477号); 5元/手 长期基准"
+    },
+    {
+      "symbol": "UR",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.08,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2023/07/1689460847817820.htm",
+      "reason": "万分之1/平今万分之1 2023-08-03 起(郑商函〔2023〕559号); 8%/7% 品种级基准(2024-12 起未变)"
+    },
+    {
+      "symbol": "CJ",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.08,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/4/b60b22ff38fc4ade848e06d1cffaed64.htm",
+      "reason": "8%/7% 2026-05-06 起(郑商函〔2026〕402号); 3元/手 长期基准(结算参数确认)"
+    },
+    {
+      "symbol": "CJ",
+      "field": "fee_per_lot",
+      "old": 0,
+      "new": 3.0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/4/b60b22ff38fc4ade848e06d1cffaed64.htm",
+      "reason": "8%/7% 2026-05-06 起(郑商函〔2026〕402号); 3元/手 长期基准(结算参数确认)"
+    },
+    {
+      "symbol": "CJ",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/4/b60b22ff38fc4ade848e06d1cffaed64.htm",
+      "reason": "8%/7% 2026-05-06 起(郑商函〔2026〕402号); 3元/手 长期基准(结算参数确认)"
+    },
+    {
+      "symbol": "CJ",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 3.0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/4/b60b22ff38fc4ade848e06d1cffaed64.htm",
+      "reason": "8%/7% 2026-05-06 起(郑商函〔2026〕402号); 3元/手 长期基准(结算参数确认)"
+    },
+    {
+      "symbol": "PF",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.07,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/03/1738067227057437.htm",
+      "reason": "2元/手、平今免 2025-03-14 夜盘起(郑商函〔2025〕204号); 7%/6% 2025-02-05 起(〔2025〕71号)"
+    },
+    {
+      "symbol": "PF",
+      "field": "fee_per_lot",
+      "old": 0,
+      "new": 2.0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/03/1738067227057437.htm",
+      "reason": "2元/手、平今免 2025-03-14 夜盘起(郑商函〔2025〕204号); 7%/6% 2025-02-05 起(〔2025〕71号)"
+    },
+    {
+      "symbol": "PF",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/03/1738067227057437.htm",
+      "reason": "2元/手、平今免 2025-03-14 夜盘起(郑商函〔2025〕204号); 7%/6% 2025-02-05 起(〔2025〕71号)"
+    },
+    {
+      "symbol": "PF",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.06,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/03/1738067227057437.htm",
+      "reason": "2元/手、平今免 2025-03-14 夜盘起(郑商函〔2025〕204号); 7%/6% 2025-02-05 起(〔2025〕71号)"
+    },
+    {
+      "symbol": "PF",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/03/1738067227057437.htm",
+      "reason": "2元/手、平今免 2025-03-14 夜盘起(郑商函〔2025〕204号); 7%/6% 2025-02-05 起(〔2025〕71号)"
+    },
+    {
+      "symbol": "PK",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.07,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2元/手 2026-06-24 起(公告〔2026〕91号); 7%/6% 2025-10-09 起(郑商函〔2025〕735号)"
+    },
+    {
+      "symbol": "PK",
+      "field": "fee_per_lot",
+      "old": 0,
+      "new": 2.0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2元/手 2026-06-24 起(公告〔2026〕91号); 7%/6% 2025-10-09 起(郑商函〔2025〕735号)"
+    },
+    {
+      "symbol": "PK",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2元/手 2026-06-24 起(公告〔2026〕91号); 7%/6% 2025-10-09 起(郑商函〔2025〕735号)"
+    },
+    {
+      "symbol": "PK",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.06,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2元/手 2026-06-24 起(公告〔2026〕91号); 7%/6% 2025-10-09 起(郑商函〔2025〕735号)"
+    },
+    {
+      "symbol": "PK",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 2.0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2026/6/9c4c45f4d3594b28934613798bfccb4a.htm",
+      "reason": "2元/手 2026-06-24 起(公告〔2026〕91号); 7%/6% 2025-10-09 起(郑商函〔2025〕735号)"
+    },
+    {
+      "symbol": "SH",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.08,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2023/09/1689464652925099.htm",
+      "reason": "万分之1 上市起(郑商函〔2023〕692号); 平今免 2024-05-29 夜盘起(〔2024〕323号); 8%/7% 品种级基准(2024-12 起未变)"
+    },
+    {
+      "symbol": "SH",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2023/09/1689464652925099.htm",
+      "reason": "万分之1 上市起(郑商函〔2023〕692号); 平今免 2024-05-29 夜盘起(〔2024〕323号); 8%/7% 品种级基准(2024-12 起未变)"
+    },
+    {
+      "symbol": "PX",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.07,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2023/09/1689464653277405.htm",
+      "reason": "万分之1 上市起(郑商函〔2023〕693号); 平今免 2024-05-29 夜盘起(〔2024〕323号); 7%/6% 2025-10-09 起(〔2025〕735号)"
+    },
+    {
+      "symbol": "PX",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.06,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2023/09/1689464653277405.htm",
+      "reason": "万分之1 上市起(郑商函〔2023〕693号); 平今免 2024-05-29 夜盘起(〔2024〕323号); 7%/6% 2025-10-09 起(〔2025〕735号)"
+    },
+    {
+      "symbol": "PX",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2023/09/1689464653277405.htm",
+      "reason": "万分之1 上市起(郑商函〔2023〕693号); 平今免 2024-05-29 夜盘起(〔2024〕323号); 7%/6% 2025-10-09 起(〔2025〕735号)"
+    },
+    {
+      "symbol": "PR",
+      "field": "margin_rate",
+      "old": 0.1,
+      "new": 0.07,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/03/1738067227057437.htm",
+      "reason": "万分之0.5、平今免 2025-03-14 夜盘起(郑商函〔2025〕204号); 7%/6% 2025-02-05 起(〔2025〕71号)"
+    },
+    {
+      "symbol": "PR",
+      "field": "fee_notional_bp",
+      "old": 1.0,
+      "new": 0.5,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/03/1738067227057437.htm",
+      "reason": "万分之0.5、平今免 2025-03-14 夜盘起(郑商函〔2025〕204号); 7%/6% 2025-02-05 起(〔2025〕71号)"
+    },
+    {
+      "symbol": "PR",
+      "field": "limit_pct",
+      "old": 0.07,
+      "new": 0.06,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/03/1738067227057437.htm",
+      "reason": "万分之0.5、平今免 2025-03-14 夜盘起(郑商函〔2025〕204号); 7%/6% 2025-02-05 起(〔2025〕71号)"
+    },
+    {
+      "symbol": "PR",
+      "field": "fee_close_today",
+      "old": 1.0,
+      "new": 0,
+      "source": "http://www.czce.com.cn/cn/gyjys/jysdt/ggytz/webinfo/2025/03/1738067227057437.htm",
+      "reason": "万分之0.5、平今免 2025-03-14 夜盘起(郑商函〔2025〕204号); 7%/6% 2025-02-05 起(〔2025〕71号)"
+    }
+  ],
+  "unverified": [],
+  "notes": [
+    "上期所结算参数字段: SPEC_LONGMARGINRATIO=一般持仓保证金, LONGMARGINRATIO=套保保证金, TRADEFEERATION/TRADEFEEUNIT=开仓手续费(比例/元每手), DISCOUNTRATE=平今折扣率(0 免收, 1 同开仓, 2 两倍); ContractDailyTradeArgument 的 UPPER_VALUE/LOWER_VALUE=涨跌停幅度.",
+    "上期所一般持仓保证金 = 涨跌停 + 2 个百分点, 套保 = 涨跌停 + 1 个百分点(2026 年各公告一致).",
+    "郑商所结算参数 手续费收取方式 比例值 单位为 ‱(万分之一); 交易参数 txt 的交易单位/最小变动价位即合约乘数/跳价.",
+    "郑商所 2026-09-17 郑商函〔2026〕860号: 2026-09-29 结算起国庆临时上调(PTA/甲醇/玻璃/苹果/纯碱/短纤/PX/烧碱/瓶片/丙烯 10%/9%; 棉花/菜油/菜粕/菜籽/硅铁/锰硅/红枣/尿素/花生 9%/8%), 10-08 恢复交易后首个非单边市日结算起恢复; 表中取节前现行值.",
+    "21 个品种的 multiplier/tick 与 YAML 占位值全部一致(由交易所合约文本 + 交易参数/结算参数 + 9qihuo 每跳毛利三方印证); 差异集中在 margin_rate/limit_pct/手续费."
+  ]
+}

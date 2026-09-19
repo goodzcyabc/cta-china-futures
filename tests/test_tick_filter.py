@@ -37,5 +37,11 @@ def test_large_tick_mask_ranks_at_month_end_and_applies_next_month() -> None:
 def test_unverified_symbols_excluded_by_default() -> None:
     t = load_instruments()
     classes = {"agri", "chem", "energy", "ferrous", "metal", "precious"}
-    assert len(t.symbols(classes, verified_only=True)) == 22
-    assert len(t.symbols(classes)) > 22 and not t["JM"].verified and t["CU"].verified
+    # 2026-09-19 起 57 个品种全部核验;生产品种池由 configs/strategy.yaml 的 universe.symbols 显式固定为 22 个
+    assert len(t.symbols(classes, verified_only=True)) == 57 and t["JM"].verified and t["CU"].verified
+    from pathlib import Path
+
+    from cta.config import load_config
+
+    cfg = load_config(Path("configs/strategy.yaml"))
+    assert cfg.universe.symbols is not None and len(cfg.universe.symbols) == 22

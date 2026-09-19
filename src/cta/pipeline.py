@@ -36,7 +36,16 @@ def build_panels(
     src: DataSource, cfg: StrategyConfig, specs: InstrumentTable, end: pd.Timestamp | None = None
 ) -> dict[str, SymbolPanel]:
     """为策略品种池里的每个品种构建合约面板;end 给定时只用 <= end 的数据(实盘 as-of)。"""
-    universe = specs.symbols(set(cfg.universe.asset_classes), verified_only=not cfg.universe.allow_unverified)
+    by_class = specs.symbols(set(cfg.universe.asset_classes), verified_only=not cfg.universe.allow_unverified)
+    if cfg.universe.symbols is not None:
+        unknown = sorted(set(cfg.universe.symbols) - set(by_class))
+        if unknown:
+            raise ValueError(
+                f"universe.symbols not in instrument table / asset classes / verified set: {unknown}"
+            )
+        universe = sorted(cfg.universe.symbols)
+    else:
+        universe = by_class
     dm = src.dominant_map()
     meta = src.contract_meta()
     out: dict[str, SymbolPanel] = {}

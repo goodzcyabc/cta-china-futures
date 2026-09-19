@@ -1,0 +1,929 @@
+{
+ "meta": {
+  "verified": true,
+  "verified_date": "2026-09-18",
+  "param_snapshot": "DCE 2026-09-18 结算参数(futAndOptSettle) / 2026-09-21 日交易参数(dayTradPara, 自 09-18 结算起); INE 2026-09-18 业务参数汇总(结算参数+交易参数 tab) / 2026-09-07 收费一览表",
+  "scope": "docs/instruments_verification.md 之外的 10 个 DCE + 3 个 INE 品种; SHFE/CZCE 由另一任务核验",
+  "slippage_ticks_per_side": 1,
+  "field_units": {
+   "fee_per_lot": "元/手(开仓, 交易所投机非日内标准; 按比例品种填 0)",
+   "fee_notional_bp": "成交金额万分比(0.0001→1.0; 元/手品种填 0)",
+   "fee_close_today": "平今手续费, 单位见 fee_close_today_unit(cny_per_lot 或 bp)",
+   "margin_rate": "交易所一般持仓(投机)最低保证金, 一般月份/主力档",
+   "limit_pct": "交易所现行涨跌停板幅度, 一般月份/主力档"
+  }
+ },
+ "counts": {
+  "symbols": 13,
+  "fields_total": 78,
+  "verified": 78,
+  "corrected": 0,
+  "unverified": 0,
+  "diffs_vs_yaml": 56
+ },
+ "symbols": {
+  "JM": {
+   "exchange": "DCE",
+   "name": "焦煤",
+   "multiplier": 60,
+   "tick": 0.5,
+   "margin_rate": 0.12,
+   "fee_per_lot": 0,
+   "fee_notional_bp": 1.0,
+   "limit_pct": 0.08,
+   "fee_close_today": 1.0,
+   "fee_close_today_unit": "bp",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "保证金 12%: 2024-11-25 结算起(大商所发〔2024〕514号, 由 20%/15% 下调); 涨跌停 8% 与手续费 万分之1 为长期基准(2025-09-24〔2025〕348号、2026-04-27〔2026〕154号、2026-09-18〔2026〕347号 三份假期通知的\"现行/节前标准\"表均为 8%/12%); 2026-09-18 结算参数 / 2026-09-21 日交易参数确认现行",
+   "source": [
+    "http://www.dce.com.cn/dce/content/2024/ywggytz/8624615.html",
+    "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryFutAndOptSettle?variety=all&tradeType=1",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1",
+    "http://www.dce.com.cn/dce/channel/list/2000159.html",
+    "http://www.dce.com.cn/dce/content/2025/ywggytz/18620456.html"
+   ],
+   "secondary_source": [
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124",
+    "https://www.ccbfutures.com/main/a/20241122/70246.shtml"
+   ],
+   "note": "主力 jm2701 12%/8%。jm2610/jm2611/jm2612 自 2026-09-18 结算起为 13%/11%: 三合约 9/18 收于跌停(结算价 1617/1582.5/1534 → 收盘 1488/1456/1411.5, 恰为 -8%), 触发《风险管理办法》涨跌停板后自动扩板加保证金, 无单独通知(9/17 前所有合约均 12%/8%); 属临时状态。手续费 投机开/平/平今 均 万分之1(2025-08-18 起 JM2601 日内曾临时 万分之2, 已到期)。套保 万分之0.5。2024-11-25 前保证金 20%。合约文本 4%/5% 仅为下限。"
+  },
+  "PP": {
+   "exchange": "DCE",
+   "name": "聚丙烯",
+   "multiplier": 5,
+   "tick": 1,
+   "margin_rate": 0.07,
+   "fee_per_lot": 1.0,
+   "fee_notional_bp": 0,
+   "limit_pct": 0.06,
+   "fee_close_today": 1.0,
+   "fee_close_today_unit": "cny_per_lot",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "7%/6% 与 1 元/手 为长期基准(2025-09-24〔2025〕348号、2026-04-27〔2026〕154号、2026-09-18〔2026〕347号 表均为 6%/7%; 手续费由 2024-01-22〔2024〕34号 套保 0.5 元=投机一半反推); 2026-09-18 结算参数确认现行",
+   "source": [
+    "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryFutAndOptSettle?variety=all&tradeType=1",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1",
+    "http://www.dce.com.cn/dce/content/2024/ywggytz/8591482.html",
+    "http://www.dce.com.cn/dce/channel/list/2137.html"
+   ],
+   "secondary_source": [
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124"
+   ],
+   "note": "主力 pp2701。平今=开仓 1 元/手。2026-03-10~05 月间 PP2604~2609 曾临时 11%/9%(〔2026〕73号), 已到期。〔2026〕347号: 2026-09-29 结算起(国庆前)全品种升至 8%/10%, 10-08 后恢复。"
+  },
+  "L": {
+   "exchange": "DCE",
+   "name": "塑料(线型低密度聚乙烯)",
+   "multiplier": 5,
+   "tick": 1,
+   "margin_rate": 0.07,
+   "fee_per_lot": 1.0,
+   "fee_notional_bp": 0,
+   "limit_pct": 0.06,
+   "fee_close_today": 1.0,
+   "fee_close_today_unit": "cny_per_lot",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "同 PP: 7%/6% 与 1 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 0.5 元); 2026-09-18 结算参数确认现行",
+   "source": [
+    "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryFutAndOptSettle?variety=all&tradeType=1",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1",
+    "http://www.dce.com.cn/dce/content/2024/ywggytz/8591482.html",
+    "http://www.dce.com.cn/dce/channel/list/2175.html"
+   ],
+   "secondary_source": [
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124"
+   ],
+   "note": "主力 l2701。平今=开仓 1 元/手。交易品种全称\"线型低密度聚乙烯\", 代码 L。2026-03-10~05 月 L2604~2609 曾临时 11%/9%(〔2026〕73号), 已到期。国庆前 2026-09-29 结算起 8%/10%。"
+  },
+  "A": {
+   "exchange": "DCE",
+   "name": "豆一(黄大豆1号)",
+   "multiplier": 10,
+   "tick": 1,
+   "margin_rate": 0.07,
+   "fee_per_lot": 2.0,
+   "fee_notional_bp": 0,
+   "limit_pct": 0.06,
+   "fee_close_today": 2.0,
+   "fee_close_today_unit": "cny_per_lot",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "7%/6% 与 2 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 1 元); 2026-09-18 结算参数确认现行",
+   "source": [
+    "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryFutAndOptSettle?variety=all&tradeType=1",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1",
+    "http://www.dce.com.cn/dce/content/2024/ywggytz/8591482.html",
+    "http://www.dce.com.cn/dce/channel/list/290.html"
+   ],
+   "secondary_source": [
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124"
+   ],
+   "note": "主力 a2611。平今=开仓 2 元/手。合约月份 1/3/5/7/9/11。国庆前 2026-09-29 结算起 8%/10%。"
+  },
+  "B": {
+   "exchange": "DCE",
+   "name": "豆二(黄大豆2号)",
+   "multiplier": 10,
+   "tick": 1,
+   "margin_rate": 0.07,
+   "fee_per_lot": 1.0,
+   "fee_notional_bp": 0,
+   "limit_pct": 0.06,
+   "fee_close_today": 1.0,
+   "fee_close_today_unit": "cny_per_lot",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "7%/6% 与 1 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 0.5 元); 2026-09-18 结算参数确认现行",
+   "source": [
+    "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryFutAndOptSettle?variety=all&tradeType=1",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1",
+    "http://www.dce.com.cn/dce/content/2024/ywggytz/8591482.html",
+    "http://www.dce.com.cn/dce/channel/list/2092.html"
+   ],
+   "secondary_source": [
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124"
+   ],
+   "note": "主力 b2611。平今=开仓 1 元/手。b2610 已进入交割月前一月档 10%。国庆前 2026-09-29 结算起 8%/10%。"
+  },
+  "CS": {
+   "exchange": "DCE",
+   "name": "淀粉(玉米淀粉)",
+   "multiplier": 10,
+   "tick": 1,
+   "margin_rate": 0.06,
+   "fee_per_lot": 1.5,
+   "fee_notional_bp": 0,
+   "limit_pct": 0.05,
+   "fee_close_today": 1.5,
+   "fee_close_today_unit": "cny_per_lot",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "6%/5% 与 1.5 元/手 为长期基准(三份假期通知表 5%/6%; 2024-01-22〔2024〕34号 套保 0.75 元); 2026-09-18 结算参数确认现行",
+   "source": [
+    "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryFutAndOptSettle?variety=all&tradeType=1",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1",
+    "http://www.dce.com.cn/dce/content/2024/ywggytz/8591482.html",
+    "http://www.dce.com.cn/dce/channel/list/306.html"
+   ],
+   "secondary_source": [
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124"
+   ],
+   "note": "主力 cs2611。平今=开仓 1.5 元/手。合约月份 1/3/5/7/9/11。国庆期间维持不变(〔2026〕347号)。"
+  },
+  "EG": {
+   "exchange": "DCE",
+   "name": "乙二醇",
+   "multiplier": 10,
+   "tick": 1,
+   "margin_rate": 0.07,
+   "fee_per_lot": 3.0,
+   "fee_notional_bp": 0,
+   "limit_pct": 0.06,
+   "fee_close_today": 3.0,
+   "fee_close_today_unit": "cny_per_lot",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "一般月份 7%/6% 与 3 元/手 为长期基准(三份假期通知表\"其他合约\" 6%/7%; 2024-01-22〔2024〕34号 套保 1.5 元); 2026-09-18 结算参数确认现行",
+   "source": [
+    "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryFutAndOptSettle?variety=all&tradeType=1",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1",
+    "http://www.dce.com.cn/dce/content/2024/ywggytz/8591482.html",
+    "http://www.dce.com.cn/dce/channel/list/2123.html"
+   ],
+   "secondary_source": [
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124"
+   ],
+   "note": "取一般月份档(eg2612 及以后 7%/6%)。当前主力 eg2610 已进入交割前月档 10%/6%; 〔2026〕347号: 2026-09-23 结算起 EG2610 8%/10%、EG2611 8%/9%, 09-29 结算起全品种 9%/11%, 10-08 后恢复。平今=开仓 3 元/手。2026-03~05 月 EG2604~2609 曾临时 11%/13%(〔2026〕73号), 已到期。"
+  },
+  "EB": {
+   "exchange": "DCE",
+   "name": "苯乙烯",
+   "multiplier": 5,
+   "tick": 1,
+   "margin_rate": 0.07,
+   "fee_per_lot": 1.0,
+   "fee_notional_bp": 0,
+   "limit_pct": 0.06,
+   "fee_close_today": 1.0,
+   "fee_close_today_unit": "cny_per_lot",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "手续费 1 元/手: 2026-07-10 交易起(大商所发〔2026〕264号, 由 3 元下调, 平今同为 1 元); 7%/6% 为长期基准(三份假期通知表\"其他合约\" 6%/7%); 2026-09-18 结算参数确认现行",
+   "source": [
+    "http://www.dce.com.cn/dce/content/2026/ywggytz/18631364.html",
+    "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryFutAndOptSettle?variety=all&tradeType=1",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1",
+    "http://www.dce.com.cn/dce/channel/list/2329.html"
+   ],
+   "secondary_source": [
+    "https://www.ghlsqh.com.cn/news/show-28473.html",
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124"
+   ],
+   "note": "2026-07-10 前手续费 3 元/手(平今 3 元), 回测需分段。当前主力 eb2610 已进入交割前月档 10%; 一般月份 eb2611+ 7%/6%。2026-03~05 月 EB2604~2609 曾临时 11%/13%(〔2026〕73号), 已到期。国庆前 2026-09-29 结算起 9%/11%。"
+  },
+  "PG": {
+   "exchange": "DCE",
+   "name": "液化石油气",
+   "multiplier": 20,
+   "tick": 1,
+   "margin_rate": 0.11,
+   "fee_per_lot": 6.0,
+   "fee_notional_bp": 0,
+   "limit_pct": 0.09,
+   "fee_close_today": 6.0,
+   "fee_close_today_unit": "cny_per_lot",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "主力档 11%/9%: 2026-03-24 结算起(大商所发〔2026〕87号, PG2610~PG2702 由 7%/6% 上调); 一般月份(PG2703 及以后) 仍为 7%/6%; 手续费 6 元/手 为长期基准(2024-01-22〔2024〕34号 套保 3 元); 2026-09-18 结算参数确认现行",
+   "source": [
+    "http://www.dce.com.cn/dce/content/2026/ywggytz/18628151.html",
+    "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryFutAndOptSettle?variety=all&tradeType=1",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1",
+    "http://www.dce.com.cn/dce/content/2024/ywggytz/8591482.html",
+    "http://www.dce.com.cn/dce/channel/list/2090.html"
+   ],
+   "secondary_source": [
+    "https://finance.sina.com.cn/wm/2026-03-23/doc-inhrysxs2330096.shtml",
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124"
+   ],
+   "note": "与 CU/BC 同口径取主力档: 主力 pg2610 及 2611/2612/2701/2702 为 11%/9%(〔2026〕87号, 〔2026〕347号表亦单列此档); pg2703 及以后 7%/6%, 2702 到期后若无新通知主力将回落到 7%/6%, 回测常数建议按主力档但需知其为 2026-03-24 起的阶段性水平。平今=开仓 6 元/手(〔2026〕88号 PG2604~2606 日内 12 元 已到期)。国庆前 2026-09-29 结算起其他合约 9%/11%。"
+  },
+  "LH": {
+   "exchange": "DCE",
+   "name": "生猪",
+   "multiplier": 16,
+   "tick": 5,
+   "margin_rate": 0.08,
+   "fee_per_lot": 0,
+   "fee_notional_bp": 1.0,
+   "limit_pct": 0.06,
+   "fee_close_today": 2.0,
+   "fee_close_today_unit": "bp",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "手续费 非日内 万分之1 / 日内 万分之2: 2023-05-24 交易起(大商所发〔2023〕201号, 由 万分之2/4 下调); 8%/6% 为长期基准(三份假期通知表 6%/8%); 2026-09-18 结算参数确认现行",
+   "source": [
+    "http://www.dce.com.cn/dce/content/2023/ywggytz/8544536.html",
+    "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryFutAndOptSettle?variety=all&tradeType=1",
+    "http://www.dce.com.cn/frontend/dcereport/#/zh/queryDayTradPara?variety=all&tradeType=1",
+    "http://www.dce.com.cn/dce/content/2024/ywggytz/8591482.html",
+    "http://www.dce.com.cn/dce/channel/list/2279.html"
+   ],
+   "secondary_source": [
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124"
+   ],
+   "note": "主力 lh2611。日内交易(当日开当日平)开仓腿与平今腿均按 万分之2 计(结算参数 shortOpenFee/shortOffsetFee=2), 非日内开/平 万分之1; 同 J 焦炭的结构, 日内往返实收 4bp 而非 1+2。无夜盘。合约月份 1/3/5/7/9/11。lh2609 交割月 20%。国庆前 2026-09-29 结算起 8%/10%。"
+  },
+  "NR": {
+   "exchange": "INE",
+   "name": "20号胶",
+   "multiplier": 10,
+   "tick": 5,
+   "margin_rate": 0.09,
+   "fee_per_lot": 0,
+   "fee_notional_bp": 0.2,
+   "limit_pct": 0.07,
+   "fee_close_today": 0,
+   "fee_close_today_unit": "bp",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "涨跌停 7%/套保 8%/一般 9%: 2026-07-10 收盘结算起(上能发〔2026〕81号, NR2607~NR2703; 后续 nr2704~2709 同档); 手续费 万分之0.2、平今免收(折扣率 0): 2026-09-07 收费一览表 + 2026-09-18 结算参数",
+   "source": [
+    "https://www.ine.cn/publicnotice/notice/202607/t20260708_832502.html",
+    "https://www.ine.cn/reports/businessdata/prmsummary/",
+    "https://www.ine.cn/reports/businessdata/feeandcharges/202609/W020260907547252881829.xlsx",
+    "https://www.ine.cn/products/futures/energyandchemical/nr_f/"
+   ],
+   "secondary_source": [
+    "https://www.guoyuanqh.com/notice/details_616_30889.html",
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124"
+   ],
+   "note": "主力 nr2611 9%/7%。nr2610 10%(交割前月档)。2026-03-12〔2026〕33号 NR2703 上市时曾为 11%/9%, 7/10 起统一下调至 9%/7%。平今免收的起始公告未在 ine.cn 定位, 现行由结算参数表(平今折扣率 0%)与收费一览表确认。套保手续费 万分之0.1(2026 年减半)。"
+  },
+  "LU": {
+   "exchange": "INE",
+   "name": "低硫燃料油",
+   "multiplier": 10,
+   "tick": 1,
+   "margin_rate": 0.16,
+   "fee_per_lot": 0,
+   "fee_notional_bp": 0.1,
+   "limit_pct": 0.14,
+   "fee_close_today": 0.1,
+   "fee_close_today_unit": "bp",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "涨跌停 14%/套保 15%/一般 16%: 2026-06-25 收盘结算起(上能发〔2026〕78号, LU2608~LU2706 及后续新合约); 手续费 万分之0.1、平今 万分之0.1: 2026-06-25 交易起(上能发〔2026〕79号); 2026-09-18 结算参数确认现行",
+   "source": [
+    "https://www.ine.cn/publicnotice/notice/202606/t20260623_832248.html",
+    "https://www.ine.cn/publicnotice/notice/202606/t20260623_832254.html",
+    "https://www.ine.cn/publicnotice/notice/202609/t20260911_833372.html",
+    "https://www.ine.cn/reports/businessdata/prmsummary/",
+    "https://www.ine.cn/reports/businessdata/feeandcharges/202609/W020260907547252881829.xlsx",
+    "https://www.ine.cn/products/futures/energyandchemical/lu_f/"
+   ],
+   "secondary_source": [
+    "https://finance.sina.com.cn/wm/2026-06-23/doc-iniemfsm6335197.shtml",
+    "https://news.qq.com/rain/a/20260911A0EH5F00",
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124"
+   ],
+   "note": "与 SC 同口径取〔2026〕78号 一般档 16%/14%; 但 上能发〔2026〕103号 自 2026-09-14 收盘结算起 LU2610、LU2611(含当前主力 lu2611) 升至 18%/17%/16%, lu2612 及以后仍 16%/14%。平今不免收(折扣率 100%)。2026 年手续费多次临时调整: 03-10 起平今 万分之0.3(〔2026〕24号), 03-11 起开仓 万分之1/平今 万分之3(〔2026〕29号), 05-19 起 万分之0.1/平今 万分之0.3(〔2026〕61号), 06-25 起 万分之0.1/平今 万分之0.1(〔2026〕79号); 回测该区间需分段。"
+  },
+  "BC": {
+   "exchange": "INE",
+   "name": "国际铜",
+   "multiplier": 5,
+   "tick": 10,
+   "margin_rate": 0.11,
+   "fee_per_lot": 0,
+   "fee_notional_bp": 0.1,
+   "limit_pct": 0.09,
+   "fee_close_today": 0,
+   "fee_close_today_unit": "bp",
+   "status": "verified",
+   "field_status": {
+    "multiplier": "verified",
+    "tick": "verified",
+    "margin_rate": "verified",
+    "fee_open": "verified",
+    "fee_close_today": "verified",
+    "limit_pct": "verified"
+   },
+   "effective_date": "主力档 涨跌停 9%/套保 10%/一般 11%: 2026-07-02 收盘结算起(上能发〔2026〕80号, BC2607~BC2702); bc2703 及以后 9%/8%/7%; 手续费 万分之0.1、平今免收(折扣率 0): 2026-09-07 收费一览表 + 2026-09-18 结算参数",
+   "source": [
+    "https://www.ine.cn/publicnotice/notice/202606/t20260630_832355.html",
+    "https://www.ine.cn/reports/businessdata/prmsummary/",
+    "https://www.ine.cn/reports/businessdata/feeandcharges/202609/W020260907547252881829.xlsx",
+    "https://www.ine.cn/products/futures/metal/nonferrousmetal/bc_f/"
+   ],
+   "secondary_source": [
+    "https://www.ghlsqh.com.cn/news/show-28415.html",
+    "https://www.9qihuo.com/qihuoshouxufei",
+    "https://www.bocifco.com/info.aspx?cid=3&id=124"
+   ],
+   "note": "与 SHFE CU 同口径取主力档(主力 bc2610, 2610~2702 均 11%/9%); bc2703+ 为 9%/7%。2026-01-28〔2026〕5号 起 11%/9%, 02-09〔2026〕10号 升至 12%/10%, 07-02〔2026〕80号 回到 11%/9%(仅 2607~2702)。平今免收的起始公告未定位, 现行由结算参数表(折扣率 0%)确认。合约文本 涨跌停 ±3%/保证金 5% 仅为下限。"
+  }
+ },
+ "diffs": [
+  {
+   "symbol": "JM",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.12,
+   "source": "http://www.dce.com.cn/dce/content/2024/ywggytz/8624615.html",
+   "reason": "保证金 12%: 2024-11-25 结算起(大商所发〔2024〕514号, 由 20%/15% 下调); 涨跌停 8% 与手续费 万分之1 为长期基准(2025-09-24〔2025〕348号、2026-04-27〔2026〕154号、2026-09-18〔2026〕347号 三份假期通知的\"现行/节前标准\"表均为 8%/12%); 2026-09-18 结算参数 / 2026-09-21 日交易参数确认现行"
+  },
+  {
+   "symbol": "JM",
+   "field": "limit_pct",
+   "old": 0.07,
+   "new": 0.08,
+   "source": "http://www.dce.com.cn/dce/content/2024/ywggytz/8624615.html",
+   "reason": "保证金 12%: 2024-11-25 结算起(大商所发〔2024〕514号, 由 20%/15% 下调); 涨跌停 8% 与手续费 万分之1 为长期基准(2025-09-24〔2025〕348号、2026-04-27〔2026〕154号、2026-09-18〔2026〕347号 三份假期通知的\"现行/节前标准\"表均为 8%/12%); 2026-09-18 结算参数 / 2026-09-21 日交易参数确认现行"
+  },
+  {
+   "symbol": "PP",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.07,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 1 元/手 为长期基准(2025-09-24〔2025〕348号、2026-04-27〔2026〕154号、2026-09-18〔2026〕347号 表均为 6%/7%; 手续费由 2024-01-22〔2024〕34号 套保 0.5 元=投机一半反推); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "PP",
+   "field": "fee_per_lot",
+   "old": 0,
+   "new": 1.0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 1 元/手 为长期基准(2025-09-24〔2025〕348号、2026-04-27〔2026〕154号、2026-09-18〔2026〕347号 表均为 6%/7%; 手续费由 2024-01-22〔2024〕34号 套保 0.5 元=投机一半反推); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "PP",
+   "field": "fee_notional_bp",
+   "old": 1.0,
+   "new": 0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 1 元/手 为长期基准(2025-09-24〔2025〕348号、2026-04-27〔2026〕154号、2026-09-18〔2026〕347号 表均为 6%/7%; 手续费由 2024-01-22〔2024〕34号 套保 0.5 元=投机一半反推); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "PP",
+   "field": "limit_pct",
+   "old": 0.07,
+   "new": 0.06,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 1 元/手 为长期基准(2025-09-24〔2025〕348号、2026-04-27〔2026〕154号、2026-09-18〔2026〕347号 表均为 6%/7%; 手续费由 2024-01-22〔2024〕34号 套保 0.5 元=投机一半反推); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "PP",
+   "field": "fee_close_today",
+   "old": "1.0 (bp)",
+   "new": "1.0 (cny_per_lot)",
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 1 元/手 为长期基准(2025-09-24〔2025〕348号、2026-04-27〔2026〕154号、2026-09-18〔2026〕347号 表均为 6%/7%; 手续费由 2024-01-22〔2024〕34号 套保 0.5 元=投机一半反推); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "L",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.07,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "同 PP: 7%/6% 与 1 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 0.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "L",
+   "field": "fee_per_lot",
+   "old": 0,
+   "new": 1.0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "同 PP: 7%/6% 与 1 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 0.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "L",
+   "field": "fee_notional_bp",
+   "old": 1.0,
+   "new": 0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "同 PP: 7%/6% 与 1 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 0.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "L",
+   "field": "limit_pct",
+   "old": 0.07,
+   "new": 0.06,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "同 PP: 7%/6% 与 1 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 0.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "L",
+   "field": "fee_close_today",
+   "old": "1.0 (bp)",
+   "new": "1.0 (cny_per_lot)",
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "同 PP: 7%/6% 与 1 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 0.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "A",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.07,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 2 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 1 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "A",
+   "field": "fee_per_lot",
+   "old": 0,
+   "new": 2.0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 2 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 1 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "A",
+   "field": "fee_notional_bp",
+   "old": 1.0,
+   "new": 0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 2 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 1 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "A",
+   "field": "limit_pct",
+   "old": 0.07,
+   "new": 0.06,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 2 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 1 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "A",
+   "field": "fee_close_today",
+   "old": "1.0 (bp)",
+   "new": "2.0 (cny_per_lot)",
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 2 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 1 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "B",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.07,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 1 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 0.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "B",
+   "field": "fee_per_lot",
+   "old": 0,
+   "new": 1.0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 1 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 0.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "B",
+   "field": "fee_notional_bp",
+   "old": 1.0,
+   "new": 0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 1 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 0.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "B",
+   "field": "limit_pct",
+   "old": 0.07,
+   "new": 0.06,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 1 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 0.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "B",
+   "field": "fee_close_today",
+   "old": "1.0 (bp)",
+   "new": "1.0 (cny_per_lot)",
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "7%/6% 与 1 元/手 为长期基准(三份假期通知表 6%/7%; 2024-01-22〔2024〕34号 套保 0.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "CS",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.06,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "6%/5% 与 1.5 元/手 为长期基准(三份假期通知表 5%/6%; 2024-01-22〔2024〕34号 套保 0.75 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "CS",
+   "field": "fee_per_lot",
+   "old": 0,
+   "new": 1.5,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "6%/5% 与 1.5 元/手 为长期基准(三份假期通知表 5%/6%; 2024-01-22〔2024〕34号 套保 0.75 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "CS",
+   "field": "fee_notional_bp",
+   "old": 1.0,
+   "new": 0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "6%/5% 与 1.5 元/手 为长期基准(三份假期通知表 5%/6%; 2024-01-22〔2024〕34号 套保 0.75 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "CS",
+   "field": "limit_pct",
+   "old": 0.07,
+   "new": 0.05,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "6%/5% 与 1.5 元/手 为长期基准(三份假期通知表 5%/6%; 2024-01-22〔2024〕34号 套保 0.75 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "CS",
+   "field": "fee_close_today",
+   "old": "1.0 (bp)",
+   "new": "1.5 (cny_per_lot)",
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "6%/5% 与 1.5 元/手 为长期基准(三份假期通知表 5%/6%; 2024-01-22〔2024〕34号 套保 0.75 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "EG",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.07,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "一般月份 7%/6% 与 3 元/手 为长期基准(三份假期通知表\"其他合约\" 6%/7%; 2024-01-22〔2024〕34号 套保 1.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "EG",
+   "field": "fee_per_lot",
+   "old": 0,
+   "new": 3.0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "一般月份 7%/6% 与 3 元/手 为长期基准(三份假期通知表\"其他合约\" 6%/7%; 2024-01-22〔2024〕34号 套保 1.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "EG",
+   "field": "fee_notional_bp",
+   "old": 1.0,
+   "new": 0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "一般月份 7%/6% 与 3 元/手 为长期基准(三份假期通知表\"其他合约\" 6%/7%; 2024-01-22〔2024〕34号 套保 1.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "EG",
+   "field": "limit_pct",
+   "old": 0.07,
+   "new": 0.06,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "一般月份 7%/6% 与 3 元/手 为长期基准(三份假期通知表\"其他合约\" 6%/7%; 2024-01-22〔2024〕34号 套保 1.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "EG",
+   "field": "fee_close_today",
+   "old": "1.0 (bp)",
+   "new": "3.0 (cny_per_lot)",
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/19622733.html",
+   "reason": "一般月份 7%/6% 与 3 元/手 为长期基准(三份假期通知表\"其他合约\" 6%/7%; 2024-01-22〔2024〕34号 套保 1.5 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "EB",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.07,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/18631364.html",
+   "reason": "手续费 1 元/手: 2026-07-10 交易起(大商所发〔2026〕264号, 由 3 元下调, 平今同为 1 元); 7%/6% 为长期基准(三份假期通知表\"其他合约\" 6%/7%); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "EB",
+   "field": "fee_per_lot",
+   "old": 0,
+   "new": 1.0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/18631364.html",
+   "reason": "手续费 1 元/手: 2026-07-10 交易起(大商所发〔2026〕264号, 由 3 元下调, 平今同为 1 元); 7%/6% 为长期基准(三份假期通知表\"其他合约\" 6%/7%); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "EB",
+   "field": "fee_notional_bp",
+   "old": 1.0,
+   "new": 0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/18631364.html",
+   "reason": "手续费 1 元/手: 2026-07-10 交易起(大商所发〔2026〕264号, 由 3 元下调, 平今同为 1 元); 7%/6% 为长期基准(三份假期通知表\"其他合约\" 6%/7%); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "EB",
+   "field": "limit_pct",
+   "old": 0.07,
+   "new": 0.06,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/18631364.html",
+   "reason": "手续费 1 元/手: 2026-07-10 交易起(大商所发〔2026〕264号, 由 3 元下调, 平今同为 1 元); 7%/6% 为长期基准(三份假期通知表\"其他合约\" 6%/7%); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "EB",
+   "field": "fee_close_today",
+   "old": "1.0 (bp)",
+   "new": "1.0 (cny_per_lot)",
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/18631364.html",
+   "reason": "手续费 1 元/手: 2026-07-10 交易起(大商所发〔2026〕264号, 由 3 元下调, 平今同为 1 元); 7%/6% 为长期基准(三份假期通知表\"其他合约\" 6%/7%); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "PG",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.11,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/18628151.html",
+   "reason": "主力档 11%/9%: 2026-03-24 结算起(大商所发〔2026〕87号, PG2610~PG2702 由 7%/6% 上调); 一般月份(PG2703 及以后) 仍为 7%/6%; 手续费 6 元/手 为长期基准(2024-01-22〔2024〕34号 套保 3 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "PG",
+   "field": "fee_per_lot",
+   "old": 0,
+   "new": 6.0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/18628151.html",
+   "reason": "主力档 11%/9%: 2026-03-24 结算起(大商所发〔2026〕87号, PG2610~PG2702 由 7%/6% 上调); 一般月份(PG2703 及以后) 仍为 7%/6%; 手续费 6 元/手 为长期基准(2024-01-22〔2024〕34号 套保 3 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "PG",
+   "field": "fee_notional_bp",
+   "old": 1.0,
+   "new": 0,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/18628151.html",
+   "reason": "主力档 11%/9%: 2026-03-24 结算起(大商所发〔2026〕87号, PG2610~PG2702 由 7%/6% 上调); 一般月份(PG2703 及以后) 仍为 7%/6%; 手续费 6 元/手 为长期基准(2024-01-22〔2024〕34号 套保 3 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "PG",
+   "field": "limit_pct",
+   "old": 0.07,
+   "new": 0.09,
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/18628151.html",
+   "reason": "主力档 11%/9%: 2026-03-24 结算起(大商所发〔2026〕87号, PG2610~PG2702 由 7%/6% 上调); 一般月份(PG2703 及以后) 仍为 7%/6%; 手续费 6 元/手 为长期基准(2024-01-22〔2024〕34号 套保 3 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "PG",
+   "field": "fee_close_today",
+   "old": "1.0 (bp)",
+   "new": "6.0 (cny_per_lot)",
+   "source": "http://www.dce.com.cn/dce/content/2026/ywggytz/18628151.html",
+   "reason": "主力档 11%/9%: 2026-03-24 结算起(大商所发〔2026〕87号, PG2610~PG2702 由 7%/6% 上调); 一般月份(PG2703 及以后) 仍为 7%/6%; 手续费 6 元/手 为长期基准(2024-01-22〔2024〕34号 套保 3 元); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "LH",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.08,
+   "source": "http://www.dce.com.cn/dce/content/2023/ywggytz/8544536.html",
+   "reason": "手续费 非日内 万分之1 / 日内 万分之2: 2023-05-24 交易起(大商所发〔2023〕201号, 由 万分之2/4 下调); 8%/6% 为长期基准(三份假期通知表 6%/8%); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "LH",
+   "field": "limit_pct",
+   "old": 0.07,
+   "new": 0.06,
+   "source": "http://www.dce.com.cn/dce/content/2023/ywggytz/8544536.html",
+   "reason": "手续费 非日内 万分之1 / 日内 万分之2: 2023-05-24 交易起(大商所发〔2023〕201号, 由 万分之2/4 下调); 8%/6% 为长期基准(三份假期通知表 6%/8%); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "LH",
+   "field": "fee_close_today",
+   "old": "1.0 (bp)",
+   "new": "2.0 (bp)",
+   "source": "http://www.dce.com.cn/dce/content/2023/ywggytz/8544536.html",
+   "reason": "手续费 非日内 万分之1 / 日内 万分之2: 2023-05-24 交易起(大商所发〔2023〕201号, 由 万分之2/4 下调); 8%/6% 为长期基准(三份假期通知表 6%/8%); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "NR",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.09,
+   "source": "https://www.ine.cn/publicnotice/notice/202607/t20260708_832502.html",
+   "reason": "涨跌停 7%/套保 8%/一般 9%: 2026-07-10 收盘结算起(上能发〔2026〕81号, NR2607~NR2703; 后续 nr2704~2709 同档); 手续费 万分之0.2、平今免收(折扣率 0): 2026-09-07 收费一览表 + 2026-09-18 结算参数"
+  },
+  {
+   "symbol": "NR",
+   "field": "fee_notional_bp",
+   "old": 1.0,
+   "new": 0.2,
+   "source": "https://www.ine.cn/publicnotice/notice/202607/t20260708_832502.html",
+   "reason": "涨跌停 7%/套保 8%/一般 9%: 2026-07-10 收盘结算起(上能发〔2026〕81号, NR2607~NR2703; 后续 nr2704~2709 同档); 手续费 万分之0.2、平今免收(折扣率 0): 2026-09-07 收费一览表 + 2026-09-18 结算参数"
+  },
+  {
+   "symbol": "NR",
+   "field": "fee_close_today",
+   "old": "1.0 (bp)",
+   "new": "0 (bp)",
+   "source": "https://www.ine.cn/publicnotice/notice/202607/t20260708_832502.html",
+   "reason": "涨跌停 7%/套保 8%/一般 9%: 2026-07-10 收盘结算起(上能发〔2026〕81号, NR2607~NR2703; 后续 nr2704~2709 同档); 手续费 万分之0.2、平今免收(折扣率 0): 2026-09-07 收费一览表 + 2026-09-18 结算参数"
+  },
+  {
+   "symbol": "LU",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.16,
+   "source": "https://www.ine.cn/publicnotice/notice/202606/t20260623_832248.html",
+   "reason": "涨跌停 14%/套保 15%/一般 16%: 2026-06-25 收盘结算起(上能发〔2026〕78号, LU2608~LU2706 及后续新合约); 手续费 万分之0.1、平今 万分之0.1: 2026-06-25 交易起(上能发〔2026〕79号); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "LU",
+   "field": "fee_notional_bp",
+   "old": 1.0,
+   "new": 0.1,
+   "source": "https://www.ine.cn/publicnotice/notice/202606/t20260623_832248.html",
+   "reason": "涨跌停 14%/套保 15%/一般 16%: 2026-06-25 收盘结算起(上能发〔2026〕78号, LU2608~LU2706 及后续新合约); 手续费 万分之0.1、平今 万分之0.1: 2026-06-25 交易起(上能发〔2026〕79号); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "LU",
+   "field": "limit_pct",
+   "old": 0.07,
+   "new": 0.14,
+   "source": "https://www.ine.cn/publicnotice/notice/202606/t20260623_832248.html",
+   "reason": "涨跌停 14%/套保 15%/一般 16%: 2026-06-25 收盘结算起(上能发〔2026〕78号, LU2608~LU2706 及后续新合约); 手续费 万分之0.1、平今 万分之0.1: 2026-06-25 交易起(上能发〔2026〕79号); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "LU",
+   "field": "fee_close_today",
+   "old": "1.0 (bp)",
+   "new": "0.1 (bp)",
+   "source": "https://www.ine.cn/publicnotice/notice/202606/t20260623_832248.html",
+   "reason": "涨跌停 14%/套保 15%/一般 16%: 2026-06-25 收盘结算起(上能发〔2026〕78号, LU2608~LU2706 及后续新合约); 手续费 万分之0.1、平今 万分之0.1: 2026-06-25 交易起(上能发〔2026〕79号); 2026-09-18 结算参数确认现行"
+  },
+  {
+   "symbol": "BC",
+   "field": "margin_rate",
+   "old": 0.1,
+   "new": 0.11,
+   "source": "https://www.ine.cn/publicnotice/notice/202606/t20260630_832355.html",
+   "reason": "主力档 涨跌停 9%/套保 10%/一般 11%: 2026-07-02 收盘结算起(上能发〔2026〕80号, BC2607~BC2702); bc2703 及以后 9%/8%/7%; 手续费 万分之0.1、平今免收(折扣率 0): 2026-09-07 收费一览表 + 2026-09-18 结算参数"
+  },
+  {
+   "symbol": "BC",
+   "field": "fee_notional_bp",
+   "old": 1.0,
+   "new": 0.1,
+   "source": "https://www.ine.cn/publicnotice/notice/202606/t20260630_832355.html",
+   "reason": "主力档 涨跌停 9%/套保 10%/一般 11%: 2026-07-02 收盘结算起(上能发〔2026〕80号, BC2607~BC2702); bc2703 及以后 9%/8%/7%; 手续费 万分之0.1、平今免收(折扣率 0): 2026-09-07 收费一览表 + 2026-09-18 结算参数"
+  },
+  {
+   "symbol": "BC",
+   "field": "limit_pct",
+   "old": 0.07,
+   "new": 0.09,
+   "source": "https://www.ine.cn/publicnotice/notice/202606/t20260630_832355.html",
+   "reason": "主力档 涨跌停 9%/套保 10%/一般 11%: 2026-07-02 收盘结算起(上能发〔2026〕80号, BC2607~BC2702); bc2703 及以后 9%/8%/7%; 手续费 万分之0.1、平今免收(折扣率 0): 2026-09-07 收费一览表 + 2026-09-18 结算参数"
+  },
+  {
+   "symbol": "BC",
+   "field": "fee_close_today",
+   "old": "1.0 (bp)",
+   "new": "0 (bp)",
+   "source": "https://www.ine.cn/publicnotice/notice/202606/t20260630_832355.html",
+   "reason": "主力档 涨跌停 9%/套保 10%/一般 11%: 2026-07-02 收盘结算起(上能发〔2026〕80号, BC2607~BC2702); bc2703 及以后 9%/8%/7%; 手续费 万分之0.1、平今免收(折扣率 0): 2026-09-07 收费一览表 + 2026-09-18 结算参数"
+  }
+ ],
+ "unverified": [],
+ "notes": "复核结果: 13 品种 × 6 字段 = 78 项全部核到交易所一手来源(DCE dcereport 后端 结算参数/日交易参数 + 品种页合约文本 + 公告; INE 业务参数汇总查询 + 收费一览表 xlsx + 品种页合约文本 + 公告), 并各有 ≥2 处次级印证(期货公司转发件/九期网逐合约表/中银国际期货保证金表), 0 unverified。乘数与最小变动价位 13/13 与 YAML 占位值一致, 无需改动。与 YAML 占位值的差异 56 处: 保证金 13/13 不同(占位 10% 无一命中); 涨跌停 12/13 不同(占位 7% 仅 NR 命中; JM 为 8%); 手续费 11/13 不同(占位 万分之1 仅 JM、LH 命中; 其余 8 个 DCE 品种实为 元/手 绝对值, INE 三品种为 万分之0.1~0.2), 共 19 行 diff; 平今 12/13 数值或单位不同(仅 JM 相同)。\n\n平今手续费(fee_close_today)备注: (1) 平今高于开仓: LH 生猪 日内开/平均 万分之2 vs 非日内 万分之1(同 J 焦炭结构, 日内往返实收 4bp); (2) 平今免收(0): NR、BC(结算参数 平今折扣率 0%); (3) 平今=开仓: JM(万分之1)、PP/L/B/EB(1 元)、CS(1.5 元)、A(2 元)、EG(3 元)、PG(6 元)、LU(万分之0.1, 折扣率 100%)。\n\n主力档 vs 一般月份的取值口径(与 instruments_verification.md 中 CU/SC 一致): PG、BC 取主力档(分别为 PG2610~2702 11%/9% 〔2026〕87号、BC2610~2702 11%/9% 上能发〔2026〕80号), 其后月份为 7%/6%; LU 取〔2026〕78号一般档 16%/14%, 但 LU2610/LU2611(含主力 lu2611) 自 2026-09-14 结算起为 18%/16%(〔2026〕103号); JM 取 12%/8%, jm2610~2612 自 2026-09-18 结算起因当日跌停触发规则性扩板为 13%/11%(无通知, 临时); EG/EB 取一般月份 7%/6%, 当前主力 eg2610/eb2610 已进入交割前月档 10%。\n\n回测注意: (1) 大商所发〔2026〕347号(2026-09-18): 09-23 结算起 EG2610 8%/10%、EG2611 8%/9%; 09-29 结算起 A/B/L/PP/LH 8%/10%, EG/EB/PG 9%/11%, JM/CS 不变; 10-08 恢复交易后恢复节前标准。(2) 历史分段: JM 2024-11-25 前保证金 20%; EB 2026-07-10 前手续费 3 元; PG 2026-03-24 前主力 7%/6%; LH 2023-05-24 前 万分之2/4; LU 2026-03-10~06-24 手续费/平今多次临时上调(见 LU 备注), 06-25 前保证金按当时通知; NR 2026-07-10 前主力 11%/9%; BC 2026-02-09~07-01 12%/10%; DCE 2026-03-10~05 月 EB/EG/PG/L/PP/JM 近月曾临时上调(〔2026〕73号)。(3) 交割月合约 20%(DCE)/INE 按交割细则, 表中取一般月份或主力档。(4) 手续费为交易所投机标准, 期货公司会加收; DCE/INE 2026 年套保减半。"
+}

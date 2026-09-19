@@ -4,6 +4,7 @@ universe:
   asset_classes: [agri, chem, energy, ferrous, metal, precious]   # 不含 rates(TF)
   min_history_days: 250
   min_dominant_turnover_cny: 50000000
+  symbols: [AG, AL, AU, C, CF, CU, I, J, JD, M, MA, NI, P, RB, RU, SA, SC, SN, SR, TA, V, Y]   # 预注册的 22 个品种(design_log 一);参数表扩到 57 后品种池必须显式固定
 signals:
   tsmom_lookbacks: [21, 63, 126, 252]
   vol_window: 40
