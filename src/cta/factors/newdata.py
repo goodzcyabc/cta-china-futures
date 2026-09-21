@@ -295,3 +295,21 @@ def placebo_queues(
         )
         ics[d] = pooled_ic(z, adj_close)
     return ics
+
+
+# ---------------------------------------------------------------- 现货基差(design_log 十三)
+def basis_rate_wide(spot_basis: Frame, index: pd.DatetimeIndex, columns: list[str]) -> Frame:
+    """dom_basis_rate = (主力期货 − 现货)/现货 的宽表,按交易日历重排并向前填充 ≤5 日(现货报价非日更)。"""
+    w = spot_basis.pivot(index="date", columns="symbol", values="dom_basis_rate")
+    return w.reindex(index).ffill(limit=5).reindex(columns=columns)
+
+
+def hbasis(basis_rate: Frame, eligible: Frame, lag: int = 1) -> Frame:
+    """H-BASIS:xs z(−basis_rate_{T−lag})。期货贴水(基差负)→ 做多。"""
+    return zscore_xs(-basis_rate.shift(lag), eligible)
+
+
+def hbasis_mom(basis_rate: Frame, eligible: Frame, lag: int = 1, window: int = 21) -> Frame:
+    """H-BASIS-MOM:xs z(−(basis_rate_{T−lag} − basis_rate_{T−lag−window}))。贴水加深 → 做多。"""
+    b = basis_rate.shift(lag)
+    return zscore_xs(-(b - b.shift(window)), eligible)

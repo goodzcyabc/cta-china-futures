@@ -59,13 +59,19 @@ def carry_signal(carry_ann: Frame, scale: float = 0.20) -> Frame:
     return out
 
 
-def combine(signals: dict[str, Frame], weights: dict[str, float] | None = None) -> Frame:
-    """等权(或给定权重)合成,缺失的信号不参与分母。"""
+def combine(signals: dict[str, Frame], weights: dict[str, float] | None = None, sqrt_n: bool = True) -> Frame:
+    """等权(或给定权重)合成,缺失的信号不参与分母。
+    sqrt_n:按活跃因子数归一 —— k 个弱相关标准化信号的平均值幅度约为单个的 1/√k,若不归一,因子少的品种会被机械放大
+    (design_log 12.5 记录的缺陷,13.2 修正)。合成 = mean(s_f) × √(n_active / n_max),n_max = 因子总数;全因子可用的品种不受影响。"""
     names = list(signals)
     w = {k: 1.0 for k in names} if weights is None else weights
     num = reduce(lambda a, b: a + b, [signals[k].fillna(0.0) * w[k] for k in names])
     den = reduce(lambda a, b: a + b, [signals[k].notna().astype(float) * w[k] for k in names])
-    out: Frame = (num / den.where(den > 0)).clip(-1, 1)
+    mean: Frame = num / den.where(den > 0)
+    if sqrt_n and len(names) > 1:
+        n_active = reduce(lambda a, b: a + b, [signals[k].notna().astype(float) for k in names])
+        mean = mean * np.sqrt(n_active / float(len(names)))
+    out: Frame = mean.clip(-1, 1)
     return out
 
 

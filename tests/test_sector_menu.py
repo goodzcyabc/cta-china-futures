@@ -29,7 +29,7 @@ def test_masked_factor_leaves_denominator() -> None:
     cr = pd.DataFrame(-0.5, index=idx, columns=["AU", "CU"])
     cr["AU"] = np.nan  # 贵金属不用 carry
     comb = combine({"tsmom": ts, "carry": cr})
-    assert (comb["AU"] == 0.5).all() and (comb["CU"] == 0.0).all()
+    assert np.allclose(comb["AU"], 0.5 * np.sqrt(0.5)) and (comb["CU"] == 0.0).all()  # 单因子品种 × √(1/2)
 
 
 def test_inverse_vol_weights_causal_and_normalised() -> None:
@@ -83,8 +83,9 @@ def test_compute_signals_applies_menu_on_synthetic_panels() -> None:
     )
     s = compute_signals(panels, cfg)
     tail = s.combined.iloc[-50:]
-    assert np.allclose(tail["AU"].to_numpy(), s.tsmom.iloc[-50:]["AU"].to_numpy())  # 贵金属:仅 tsmom
-    assert np.allclose(tail["C"].to_numpy(), s.tsmom.iloc[-50:]["C"].to_numpy())  # 品种覆盖:仅 tsmom
+    k = np.sqrt(0.5)  # 两因子配置里只剩一个因子 → × √(1/2)
+    assert np.allclose(tail["AU"].to_numpy(), k * s.tsmom.iloc[-50:]["AU"].to_numpy())  # 贵金属:仅 tsmom
+    assert np.allclose(tail["C"].to_numpy(), k * s.tsmom.iloc[-50:]["C"].to_numpy())  # 品种覆盖:仅 tsmom
     assert not np.allclose(
         tail["CU"].to_numpy(), s.tsmom.iloc[-50:]["CU"].to_numpy()
     )  # 有色:tsmom+carry 平均

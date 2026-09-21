@@ -50,7 +50,9 @@ def test_combine_and_vol_target() -> None:
     a = pd.DataFrame({"X": [1, 1, 1, 1, 1.0], "Y": [np.nan] * 5}, index=idx)
     b = pd.DataFrame({"X": [-1, -1, -1, -1, -1.0], "Y": [0.5] * 5}, index=idx)
     c = combine({"a": a, "b": b})
-    assert (c["X"] == 0).all() and (c["Y"] == 0.5).all()  # Y 只有 b 有值 -> 不被 NaN 拉低
+    # Y 只有 b 有值:不被 NaN 拉低,但按活跃因子数归一 × √(1/2)(design_log 13.2)
+    assert (c["X"] == 0).all() and np.allclose(c["Y"], 0.5 * np.sqrt(0.5))
+    assert (combine({"a": a, "b": b}, sqrt_n=False)["Y"] == 0.5).all()
     # 事前波动缩放:两只不相关、日波动 1% 的品种,等权做多,目标年化 10% -> 组合年化波动应≈10%
     rng = np.random.default_rng(1)
     n = 300

@@ -150,6 +150,9 @@ class ExchangeSource:
     def shibor(self) -> pd.DataFrame:
         return pd.DataFrame()
 
+    def spot_basis(self) -> pd.DataFrame:
+        return pd.DataFrame()  # 交易所不发布现货价格
+
     def receipts(self) -> pd.DataFrame:
         """注册仓单合计(非合计行之和,四所拼接);index=date, columns=symbol。"""
         parts = []
@@ -235,6 +238,10 @@ class StitchedSource:
     def receipts(self) -> pd.DataFrame:
         """仓单只有交易所直连源有;拼接源直接用 secondary 的全历史(它从 2016 起已回填)。"""
         return self.secondary.receipts()
+
+    def spot_basis(self) -> pd.DataFrame:
+        """现货基差目前只有米筐导出有(止于 2026-06-03);之后为空 → 相关因子在纸面上会 stale,见 design_log 十三。"""
+        return self.primary.spot_basis()
 
     def manifest(self) -> dict[str, str]:
         mp, ms = self.primary.manifest(), self.secondary.manifest()

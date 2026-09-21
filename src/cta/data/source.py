@@ -66,6 +66,11 @@ class DataSource(Protocol):
         """index: date; columns: symbol —— 交易所注册仓单合计(当日收盘后公布)。没有该数据的源返回空表。"""
         ...
 
+    def spot_basis(self) -> pd.DataFrame:
+        """columns: date, symbol, spot_price, dominant_contract, dominant_contract_price, dom_basis, dom_basis_rate
+        (dom_basis = 主力期货 − 现货;rate = dom_basis / spot)。没有该数据的源返回空表。"""
+        ...
+
     def manifest(self) -> dict[str, str]:
         """数据指纹,写入每次运行的结果。"""
         ...
@@ -149,6 +154,24 @@ class RicequantParquetSource:
 
     def receipts(self) -> pd.DataFrame:
         return pd.DataFrame()
+
+    def spot_basis(self) -> pd.DataFrame:
+        files = sorted((self.root / "spot_basis").glob("spot_basis_*.parquet"))
+        if not files:
+            return pd.DataFrame()
+        df = pd.concat([pd.read_parquet(f) for f in files], ignore_index=True)
+        df["date"] = pd.to_datetime(df["date"].astype(str))
+        df["symbol"] = df["symbol"].str.upper()
+        cols = [
+            "date",
+            "symbol",
+            "spot_price",
+            "dominant_contract",
+            "dominant_contract_price",
+            "dom_basis",
+            "dom_basis_rate",
+        ]
+        return df[cols].sort_values(["symbol", "date"]).reset_index(drop=True)
 
     def shibor(self) -> pd.DataFrame:
         df = pd.read_parquet(self.root / "shibor" / "shibor.parquet")
