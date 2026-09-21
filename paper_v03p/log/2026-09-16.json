@@ -1,0 +1,12 @@
+{
+ "date": "2026-09-16",
+ "orders": {
+  "n_symbols": 17,
+  "n_trades": 14,
+  "n_rolls": 0,
+  "est_margin_usage": 0.1133882,
+  "stale_symbols": {}
+ },
+ "equity": 3000000.0,
+ "positions": {}
+}
