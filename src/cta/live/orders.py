@@ -51,7 +51,7 @@ def generate_orders(
         raise RuntimeError(f"refusing to generate orders for unverified instruments: {unverified}")
     last_dates = {s: p.frame.index.max() for s, p in panels.items()}
     stale = {s: str(d.date()) for s, d in last_dates.items() if d < asof_ts - pd.Timedelta(days=7)}
-    signals = compute_signals(panels, cfg, receipts=_receipts_of(src))
+    signals = compute_signals(panels, cfg, receipts=_receipts_of(src), specs=specs)
     if asof_ts not in signals.target.index:
         raise RuntimeError(
             f"as-of {asof} is not a trading day in data (last: {signals.target.index.max().date()})"

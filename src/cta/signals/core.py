@@ -169,3 +169,53 @@ def large_tick_mask(
         flag.reindex(rho.index.union(flag.index)).ffill().reindex(rho.index).fillna(False).astype(bool)
     )
     return out
+
+
+def menu_masks(
+    factors: list[str],
+    symbols: list[str],
+    sector_of: dict[str, str],
+    sector_menu: dict[str, list[str]],
+    symbol_menu: dict[str, list[str]],
+) -> dict[str, pd.Series[bool]]:
+    """每个因子一条 品种 → 是否允许 的布尔序列。品种级覆盖优先;板块未列出 = 全部允许(design_log 十二 12.2)。"""
+    out: dict[str, pd.Series[bool]] = {}
+    for f in factors:
+        allowed = []
+        for s in symbols:
+            if s in symbol_menu:
+                allowed.append(f in symbol_menu[s])
+            elif sector_of.get(s) in sector_menu:
+                allowed.append(f in sector_menu[sector_of[s]])
+            else:
+                allowed.append(True)
+        out[f] = pd.Series(allowed, index=symbols, dtype=bool)
+    return out
+
+
+def inverse_vol_weights(
+    signals: dict[str, Frame], window: int = 252, min_periods: int = 126
+) -> dict[str, pd.Series[float]]:
+    """因子权重 w_f(t) ∝ 1/σ_f(t),σ_f = 该因子信号在全部品种上池化的滚动均方根(信号本身近似零均值),取 t−1 及之前。
+    只用信号的离散度,不用收益,因此不可能拟合历史收益(design_log 十二 12.3)。"""
+    inv: dict[str, pd.Series[float]] = {}
+    for f, s in signals.items():
+        ms = (s**2).mean(axis=1)  # 每日横截面均方
+        sigma = np.sqrt(ms.rolling(window, min_periods=min_periods).mean()).shift(1)
+        inv[f] = 1.0 / sigma.replace(0, np.nan)
+    total = reduce(lambda a, b: a.fillna(0.0) + b.fillna(0.0), inv.values())
+    return {f: (w / total.where(total > 0)) for f, w in inv.items()}
+
+
+def combine_tv(signals: dict[str, Frame], weights: dict[str, pd.Series[float]]) -> Frame:
+    """时变权重合成:Σ w_f(t)·s_f / Σ w_f(t)·1[s_f 非空];某日权重缺失时该因子不参与。"""
+    names = list(signals)
+    num = reduce(
+        lambda a, b: a + b, [signals[k].fillna(0.0).mul(weights[k].fillna(0.0), axis=0) for k in names]
+    )
+    den = reduce(
+        lambda a, b: a + b,
+        [signals[k].notna().astype(float).mul(weights[k].fillna(0.0), axis=0) for k in names],
+    )
+    out: Frame = (num / den.where(den > 0)).clip(-1, 1)
+    return out

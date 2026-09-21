@@ -37,6 +37,11 @@ class SignalCfg(BaseModel):
     carry_scale: float = Field(gt=0)
     weights: dict[str, float]
     tick_filter: TickFilterCfg = Field(default_factory=TickFilterCfg)
+    # 板块因子菜单(design_log 十二):asset_class → 允许的因子名;未列出的板块 = 全部因子。symbol_menu 为品种级覆盖(如 JD)。
+    sector_menu: dict[str, list[str]] = Field(default_factory=dict)
+    symbol_menu: dict[str, list[str]] = Field(default_factory=dict)
+    # 因子加权规则:equal = 菜单内等权;inverse_vol = 按各因子信号的池化滚动波动率倒数加权(不含收益信息)
+    factor_weighting: Literal["equal", "inverse_vol"] = "equal"
 
 
 class PortfolioCfg(BaseModel):

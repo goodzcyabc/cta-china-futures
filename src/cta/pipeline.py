@@ -15,7 +15,7 @@ from cta.backtest.engine import BacktestResult, run_backtest
 from cta.config import StrategyConfig
 from cta.continuous.roll import SymbolPanel, build_symbol_panel
 from cta.data.source import DataSource
-from cta.instruments.specs import InstrumentTable
+from cta.instruments.specs import InstrumentTable, load_instruments
 from cta.risk.metrics import perf_stats, yearly
 from cta.signals import core as sig
 
@@ -27,6 +27,7 @@ class Signals:
     tsmom: pd.DataFrame
     carry: pd.DataFrame
     receipts_level: pd.DataFrame | None
+    factor_weights: pd.DataFrame | None  # 时变因子权重(inverse_vol 时);equal 为 None
     combined: pd.DataFrame
     eligible: pd.DataFrame
     target: pd.DataFrame  # 目标名义暴露/权益(已应用交易缓冲)
@@ -89,9 +90,13 @@ def eligible_mask(panels: dict[str, SymbolPanel], cfg: StrategyConfig) -> pd.Dat
 
 
 def compute_signals(
-    panels: dict[str, SymbolPanel], cfg: StrategyConfig, receipts: pd.DataFrame | None = None
+    panels: dict[str, SymbolPanel],
+    cfg: StrategyConfig,
+    receipts: pd.DataFrame | None = None,
+    specs: InstrumentTable | None = None,
 ) -> Signals:
-    """信号集合。cfg.signals.weights 里出现 receipts_level 时需要传入仓单表(交易所直连源 `src.receipts()`)。"""
+    """信号集合。cfg.signals.weights 里出现 receipts_level 时需要传入仓单表(交易所直连源 `src.receipts()`);
+    配置了板块菜单时需要 specs(取 asset_class),缺省读默认参数表。"""
     adj = _wide(panels, "adj_close")
     close, nxt, days = _wide(panels, "close"), _wide(panels, "next_close"), _wide(panels, "days_to_next")
     vol = sig.realized_vol(adj, cfg.signals.vol_window)
@@ -114,7 +119,23 @@ def compute_signals(
             raise ValueError("config weights include receipts_level but no receipts data was provided")
         rl = sig.receipts_level(receipts, pd.DatetimeIndex(adj.index), list(adj.columns), eligible)
         parts["receipts_level"] = rl
-    comb = sig.combine(parts, cfg.signals.weights)
+    # 板块因子菜单(design_log 十二):不允许的因子在该品种上置 NaN,由 nan-aware 合成自动退出分母
+    sc = cfg.signals
+    if sc.sector_menu or sc.symbol_menu:
+        specs = specs or load_instruments()
+        sector_of = {s: specs[s].asset_class for s in adj.columns if s in specs.specs}
+        masks = sig.menu_masks(list(parts), list(adj.columns), sector_of, sc.sector_menu, sc.symbol_menu)
+        for f, frame in list(parts.items()):
+            keep = masks[f].reindex(frame.columns).fillna(True).astype(bool)
+            # 不允许的品种整列置 NaN(DataFrame.where 不接受按列广播的 Series,故用乘法广播)
+            parts[f] = frame.mul(keep.map({True: 1.0, False: np.nan}), axis=1)
+    fw: pd.DataFrame | None = None
+    if sc.factor_weighting == "inverse_vol":
+        tv = sig.inverse_vol_weights(parts)
+        fw = pd.DataFrame(tv)
+        comb = sig.combine_tv(parts, tv)
+    else:
+        comb = sig.combine(parts, sc.weights)
     raw_target = sig.vol_target_positions(
         comb.where(eligible),
         vol,
@@ -133,7 +154,7 @@ def compute_signals(
         buffered = sig.trade_buffer(row, prev, cfg.portfolio.trade_buffer)
         tgt.loc[d] = buffered
         prev = buffered
-    return Signals(adj, vol, ts, cr, rl, comb, eligible, tgt)
+    return Signals(adj, vol, ts, cr, rl, fw, comb, eligible, tgt)
 
 
 def _receipts_of(src: DataSource) -> pd.DataFrame | None:
@@ -155,7 +176,7 @@ def run_research(
     cfg: StrategyConfig, src: DataSource, specs: InstrumentTable, out_dir: Path
 ) -> dict[str, Any]:
     panels = build_panels(src, cfg, specs)
-    signals = compute_signals(panels, cfg, receipts=_receipts_of(src))
+    signals = compute_signals(panels, cfg, receipts=_receipts_of(src), specs=specs)
     start, end = pd.Timestamp(cfg.backtest.start), pd.Timestamp(cfg.backtest.end)
     idx = signals.target.index
     target = signals.target.loc[(idx >= start) & (idx <= end)]
@@ -198,6 +219,8 @@ def run_research(
     signals.carry.to_csv(out_dir / "signal_carry.csv")
     if signals.receipts_level is not None:
         signals.receipts_level.to_csv(out_dir / "signal_receipts_level.csv")
+    if signals.factor_weights is not None:
+        signals.factor_weights.to_csv(out_dir / "factor_weights.csv")
     signals.eligible.to_csv(out_dir / "eligible.csv")
     yearly(res.equity).to_csv(out_dir / "yearly.csv")
     meta = {

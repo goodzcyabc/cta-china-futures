@@ -1,0 +1,39 @@
+# 策略参数(预注册于 docs/design_log.md;任何改动需记入设计日志并递增 version)
+version: "0.4.0-iv"
+universe:
+  asset_classes: [agri, chem, energy, ferrous, metal, precious]   # 不含 rates(TF)
+  min_history_days: 250
+  min_dominant_turnover_cny: 50000000
+  symbols: [AG, AL, AU, C, CF, CU, I, J, JD, M, MA, NI, P, RB, RU, SA, SC, SN, SR, TA, V, Y]   # 预注册的 22 个品种(design_log 一);参数表扩到 57 后品种池必须显式固定
+signals:
+  tsmom_lookbacks: [21, 63, 126, 252]
+  vol_window: 40
+  carry_scale: 0.20
+  weights: {tsmom: 1.0, carry: 1.0, receipts_level: 1.0}   # v0.3:仓单水平(design_log 九/十,IS 选入,等权)
+  # 板块因子菜单(design_log 十二 12.2):asset_class → 允许的因子;未列出的板块用全部因子
+  sector_menu:
+    precious: [tsmom]
+    metal: [tsmom, carry, receipts_level]
+    ferrous: [tsmom, carry]
+    energy: [tsmom, carry, receipts_level]
+    chem: [tsmom, carry, receipts_level]
+    agri: [tsmom, carry, receipts_level]
+  symbol_menu:
+    JD: [tsmom]   # 鸡蛋不可储存:无展期风险溢价、无仓单
+  factor_weighting: inverse_vol
+portfolio:
+  target_vol: 0.10
+  max_leverage_per_symbol: 1.0
+  max_gross_exposure: 3.0      # Σ|名义暴露| 上限(倍权益);超出时整体等比缩减
+  max_margin_usage: 0.40
+  trade_buffer: 0.30
+  vol_scale_update: daily      # daily | weekly:事前组合波动缩放系数的更新频率
+execution:
+  fill: next_open
+  slippage_ticks: 1
+  roll_confirm_days: 3
+backtest:
+  start: "2016-01-04"
+  end: "2026-06-05"
+  initial_capital_cny: 3000000     # 目标规模 100–500 万(2026-09-11 需求),默认取区间中点;扫描见 scripts/capital_scan.py
+  cash_rate: none          # none | shibor_on
