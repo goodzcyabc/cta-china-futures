@@ -43,7 +43,7 @@ def net_by_symbol(pnl: pd.DataFrame, trades: pd.DataFrame) -> pd.Series:
     fees = pd.Series(0.0, index=pnl.columns)
     if len(trades):
         f = pd.Series(
-            [specs[s].fee(p, l) for s, p, l in zip(trades["symbol"], trades["price"], trades["lots"])]
+            [specs[s].fee(p, q) for s, p, q in zip(trades["symbol"], trades["price"], trades["lots"])]
         )
         fees = fees.add(f.groupby(trades["symbol"].to_numpy()).sum(), fill_value=0.0)
     return pnl.sum() - fees.reindex(pnl.columns).fillna(0.0)
