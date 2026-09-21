@@ -45,8 +45,9 @@ cols = list(adj.columns)
 ev = pd.read_csv(args.events, dtype=str).fillna("")
 ev["announce_date"] = pd.to_datetime(ev["announce_date"], errors="coerce")
 ev["effective_date"] = pd.to_datetime(ev["effective_date"], errors="coerce")
-# 事件日 = 公告日(公告日为空的推导记录用生效日前一交易日);T 日收盘后可知 → 从下一交易日起生效
-ev["event_date"] = ev["announce_date"].fillna(ev["effective_date"] - pd.Timedelta(days=1))
+# 事件日 = 公告日(T 日收盘后可知 → 从下一交易日起生效)。推导记录(无公告日)只能在生效日 D 的结算参数里被观察到,
+# 事件日 = 生效日 D → 从 D+1 起生效。这是实盘可复现的最保守口径(此前用 D−1 对推导行偏乐观一天,已修)。
+ev["event_date"] = ev["announce_date"].fillna(ev["effective_date"])
 sel = ev[
     ev["param"].isin(["margin", "fee"])
     & (ev["direction"] == "up")
