@@ -153,6 +153,23 @@ class ExchangeSource:
     def spot_basis(self) -> pd.DataFrame:
         return pd.DataFrame()  # 交易所不发布现货价格
 
+    def reg_events(self) -> pd.DataFrame:
+        """上调事件:对每个有 params 数据的交易所机械推导(require_restore=False,实盘口径);DCE 无 params 时为空。"""
+        from cta.data.exchanges.params import derive_events
+
+        parts = []
+        for e in self.exchanges:
+            if not self.store.days(e, "params"):
+                continue
+            ev = derive_events(self.store, e, require_restore=False)
+            if len(ev):
+                parts.append(ev)
+        if not parts:
+            return pd.DataFrame()
+        out = pd.concat(parts, ignore_index=True)
+        out["event_date"] = pd.to_datetime(out["effective_date"])
+        return out
+
     def receipts(self) -> pd.DataFrame:
         """注册仓单合计(非合计行之和,四所拼接);index=date, columns=symbol。"""
         parts = []
@@ -242,6 +259,9 @@ class StitchedSource:
     def spot_basis(self) -> pd.DataFrame:
         """现货基差目前只有米筐导出有(止于 2026-06-03);之后为空 → 相关因子在纸面上会 stale,见 design_log 十三。"""
         return self.primary.spot_basis()
+
+    def reg_events(self) -> pd.DataFrame:
+        return self.secondary.reg_events()
 
     def manifest(self) -> dict[str, str]:
         mp, ms = self.primary.manifest(), self.secondary.manifest()

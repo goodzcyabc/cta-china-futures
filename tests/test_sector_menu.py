@@ -96,3 +96,25 @@ def test_compute_signals_applies_menu_on_synthetic_panels() -> None:
         ),
     )
     assert s_iv.factor_weights is not None and set(s_iv.factor_weights.columns) == {"tsmom", "carry"}
+
+
+def test_reg_overlay_mask_window_and_filters() -> None:
+    from cta.signals.core import reg_overlay_mask
+
+    idx = pd.bdate_range("2021-01-01", periods=60)
+    ev = pd.DataFrame(
+        {
+            "event_date": ["2021-01-11", "2021-01-11", "2021-02-01", "2021-02-01"],
+            "symbol": ["CU", "AL", "CU", "ZZ"],
+            "param": ["margin", "margin", "fee", "margin"],
+            "direction": ["up", "up", "down", "up"],
+            "reason": ["derived", "holiday", "derived", "derived"],
+        }
+    )
+    m = reg_overlay_mask(ev, idx, ["CU", "AL"], window=5, scale=0.5)
+    d = pd.Timestamp("2021-01-11")
+    i = idx.get_loc(d)
+    assert m.loc[d, "CU"] == 1.0  # 事件日当天不生效(收盘后才可见)
+    assert (m.iloc[i + 1 : i + 6]["CU"] == 0.5).all() and m.iloc[i + 6]["CU"] == 1.0
+    assert (m["AL"] == 1.0).all()  # 节假日事件不算
+    assert (m.loc["2021-02":, "CU"] == 1.0).all()  # 下调不算;未知品种忽略

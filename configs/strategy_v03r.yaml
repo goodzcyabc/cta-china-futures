@@ -1,0 +1,29 @@
+# 策略参数(预注册于 docs/design_log.md;任何改动需记入设计日志并递增 version)
+version: "0.3.0-r"
+universe:
+  asset_classes: [agri, chem, energy, ferrous, metal, precious]   # 不含 rates(TF)
+  min_history_days: 250
+  min_dominant_turnover_cny: 50000000
+  symbols: [AG, AL, AU, C, CF, CU, I, J, JD, M, MA, NI, P, RB, RU, SA, SC, SN, SR, TA, V, Y]   # 预注册的 22 个品种(design_log 一);参数表扩到 57 后品种池必须显式固定
+signals:
+  tsmom_lookbacks: [21, 63, 126, 252]
+  vol_window: 40
+  carry_scale: 0.20
+  weights: {tsmom: 1.0, carry: 1.0, receipts_level: 1.0}   # v0.3:仓单水平(design_log 九/十,IS 选入,等权)
+  reg_overlay: {enabled: true, window: 21, scale: 0.5}   # design_log 13.6:上调保证金/手续费后 21 日 tsmom×0.5;事件由数据层 params 每日推导
+portfolio:
+  target_vol: 0.10
+  max_leverage_per_symbol: 1.0
+  max_gross_exposure: 3.0      # Σ|名义暴露| 上限(倍权益);超出时整体等比缩减
+  max_margin_usage: 0.40
+  trade_buffer: 0.30
+  vol_scale_update: daily      # daily | weekly:事前组合波动缩放系数的更新频率
+execution:
+  fill: next_open
+  slippage_ticks: 1
+  roll_confirm_days: 3
+backtest:
+  start: "2016-01-04"
+  end: "2026-06-05"
+  initial_capital_cny: 3000000     # 目标规模 100–500 万(2026-09-11 需求),默认取区间中点;扫描见 scripts/capital_scan.py
+  cash_rate: none          # none | shibor_on

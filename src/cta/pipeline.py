@@ -94,6 +94,7 @@ def compute_signals(
     cfg: StrategyConfig,
     receipts: pd.DataFrame | None = None,
     specs: InstrumentTable | None = None,
+    reg_events: pd.DataFrame | None = None,
 ) -> Signals:
     """信号集合。cfg.signals.weights 里出现 receipts_level 时需要传入仓单表(交易所直连源 `src.receipts()`);
     配置了板块菜单时需要 specs(取 asset_class),缺省读默认参数表。"""
@@ -111,6 +112,15 @@ def compute_signals(
         large = sig.large_tick_mask(close, _wide(panels, "roll"), ticks, eligible, tf.window, tf.top_quantile)
         ts_slow = sig.tsmom(adj, tuple(tf.slow_lookbacks), vol=vol)
         ts = ts_slow.where(large, ts)
+    ro = cfg.signals.reg_overlay
+    if ro.enabled:
+        if reg_events is None:
+            raise ValueError(
+                "config enables reg_overlay but no reg_events were provided (need exchange params data)"
+            )
+        ts = ts * sig.reg_overlay_mask(
+            reg_events, pd.DatetimeIndex(adj.index), list(adj.columns), ro.window, ro.scale
+        )
     cr = sig.carry_signal(sig.carry(close, nxt, days), cfg.signals.carry_scale)
     parts: dict[str, pd.DataFrame] = {"tsmom": ts, "carry": cr}
     rl: pd.DataFrame | None = None
@@ -157,6 +167,16 @@ def compute_signals(
     return Signals(adj, vol, ts, cr, rl, fw, comb, eligible, tgt)
 
 
+def _reg_events_of(src: DataSource, cfg: StrategyConfig) -> pd.DataFrame | None:
+    if not cfg.signals.reg_overlay.enabled:
+        return None
+    fn = getattr(src, "reg_events", None)
+    if fn is None:
+        return None
+    df: pd.DataFrame = fn()
+    return None if df.empty else df
+
+
 def _receipts_of(src: DataSource) -> pd.DataFrame | None:
     fn = getattr(src, "receipts", None)
     if fn is None:
@@ -176,7 +196,9 @@ def run_research(
     cfg: StrategyConfig, src: DataSource, specs: InstrumentTable, out_dir: Path
 ) -> dict[str, Any]:
     panels = build_panels(src, cfg, specs)
-    signals = compute_signals(panels, cfg, receipts=_receipts_of(src), specs=specs)
+    signals = compute_signals(
+        panels, cfg, receipts=_receipts_of(src), specs=specs, reg_events=_reg_events_of(src, cfg)
+    )
     start, end = pd.Timestamp(cfg.backtest.start), pd.Timestamp(cfg.backtest.end)
     idx = signals.target.index
     target = signals.target.loc[(idx >= start) & (idx <= end)]

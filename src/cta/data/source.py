@@ -71,6 +71,11 @@ class DataSource(Protocol):
         (dom_basis = 主力期货 − 现货;rate = dom_basis / spot)。没有该数据的源返回空表。"""
         ...
 
+    def reg_events(self) -> pd.DataFrame:
+        """交易所上调保证金/手续费的事件(design_log 13.6):columns 含 event_date, symbol, param, reason;
+        由每日结算参数机械推导。没有该数据的源返回空表。"""
+        ...
+
     def manifest(self) -> dict[str, str]:
         """数据指纹,写入每次运行的结果。"""
         ...
@@ -153,6 +158,9 @@ class RicequantParquetSource:
         return df.set_index("date")[DOM_DAILY_COLS].sort_index()
 
     def receipts(self) -> pd.DataFrame:
+        return pd.DataFrame()
+
+    def reg_events(self) -> pd.DataFrame:
         return pd.DataFrame()
 
     def spot_basis(self) -> pd.DataFrame:

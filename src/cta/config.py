@@ -31,6 +31,15 @@ class TickFilterCfg(BaseModel):
     slow_lookbacks: list[int] = Field(default_factory=lambda: [126, 252])
 
 
+class RegOverlayCfg(BaseModel):
+    """监管事件覆盖层(design_log 13.6):交易所上调保证金/手续费(非节假日)后 window 个交易日,该品种 tsmom × scale。
+    事件每日由数据层 params 机械推导(require_restore=False:实盘不能等 10 日看是否恢复,节前上调用休市日历判定)。"""
+
+    enabled: bool = False
+    window: int = Field(default=21, gt=0)
+    scale: float = Field(default=0.5, ge=0, le=1)
+
+
 class SignalCfg(BaseModel):
     tsmom_lookbacks: list[int]
     vol_window: int = Field(gt=1)
@@ -42,6 +51,7 @@ class SignalCfg(BaseModel):
     symbol_menu: dict[str, list[str]] = Field(default_factory=dict)
     # 因子加权规则:equal = 菜单内等权;inverse_vol = 按各因子信号的池化滚动波动率倒数加权(不含收益信息)
     factor_weighting: Literal["equal", "inverse_vol"] = "equal"
+    reg_overlay: RegOverlayCfg = Field(default_factory=RegOverlayCfg)
 
 
 class PortfolioCfg(BaseModel):

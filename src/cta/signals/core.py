@@ -225,3 +225,23 @@ def combine_tv(signals: dict[str, Frame], weights: dict[str, pd.Series[float]]) 
     )
     out: Frame = (num / den.where(den > 0)).clip(-1, 1)
     return out
+
+
+def reg_overlay_mask(
+    events: Frame, index: pd.DatetimeIndex, columns: list[str], window: int = 21, scale: float = 0.5
+) -> Frame:
+    """监管事件覆盖层的乘数矩阵(design_log 13.6):事件日 D(D 收盘后可见)之后的 window 个交易日,该品种为 scale,其余为 1。
+    只用 param ∈ {margin, fee}、direction == up、reason != holiday 的事件。"""
+    mask = pd.DataFrame(1.0, index=index, columns=columns)
+    if events is None or events.empty:
+        return mask
+    ev = events.copy()
+    ev = ev[ev["param"].isin(["margin", "fee"]) & (ev["direction"] == "up") & (ev["reason"] != "holiday")]
+    ev["event_date"] = pd.to_datetime(ev["event_date"])
+    for _, r in ev.iterrows():
+        if r["symbol"] not in columns:
+            continue
+        i = int(index.searchsorted(r["event_date"], side="right"))
+        if i < len(index):
+            mask.iloc[i : i + window, columns.index(str(r["symbol"]))] = scale
+    return mask
