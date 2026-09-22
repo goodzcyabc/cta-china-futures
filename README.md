@@ -6,7 +6,7 @@
 - 架构与约定:`docs/architecture.md`
 - 预注册与设计日志(任何看过结果后的改动都在这里):`docs/design_log.md`
 - 数据:`data/ricecta/data`(米筐导出的合约级日线、主力映射、合约元数据;不随仓库分发)
-- **完整报告(v0.3 主线,2026-09-22):`report/report_v0.3.md`**(系统、数据、策略、五个版本回测、44 次试验、板块与执行层诊断、前视审计、五本纸面账、诚实结论)
+- **完整报告(v0.4,2026-09-23):`report/report_v0.4.md`**(统一执行语义 + 官方结算价的新基线、旧口径逐级分解、五本纸面账 champion/challenger 规则、44 次试验、前视与路径一致性审计);`report/report_v0.3.md` 为 2026-09-22 前口径的 legacy 对照,原样保留
 - 早期回测报告(v0.1.2):`report/report_v0.1.2.md`
 - 资金规模扫描(100–500 万):`scripts/capital_scan.py` → `report/capital_scan.md`
 - 行业基线对照(洛书拾壹号、南华商品指数):`docs/baselines.md`

@@ -276,5 +276,6 @@ def summarize_result(res: BacktestResult, specs: InstrumentTable) -> tuple[dict[
     stats["平均总名义暴露"] = float(res.exposure.loc[first_active:].abs().sum(axis=1).mean())
     stats["平均保证金占用"] = float(res.margin_usage.mean())
     stats["未成交腿数"] = float(res.unfilled.sum())
-    stats["未盯市持仓日数"] = float(res.unmarked.sum()) if len(res.unmarked) else 0.0
+    unmarked = getattr(res, "unmarked", None)  # 冻结的旧引擎结果没有这一列
+    stats["未盯市持仓日数"] = float(unmarked.sum()) if unmarked is not None and len(unmarked) else 0.0
     return stats, pd.Timestamp(first_active)
