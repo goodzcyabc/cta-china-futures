@@ -50,7 +50,7 @@ for cap in CAPITALS:
         cap,
         max_margin_usage=cfg.portfolio.max_margin_usage,
         slippage_ticks=cfg.execution.slippage_ticks,
-        lot_band=cfg.portfolio.trade_buffer,
+        lot_band=cfg.portfolio.lot_band,
     )
     active = r.positions.abs().sum(axis=1) > 0
     eq = r.equity.loc[active[active].index.min() :]

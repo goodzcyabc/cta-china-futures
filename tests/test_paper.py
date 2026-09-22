@@ -38,7 +38,7 @@ def test_fill_mark_and_roll_reconcile(tmp_path: Path) -> None:
     fills = book.fill_orders(orders, q1, specs, d1, slippage_ticks=1.0)
     assert fills.iloc[0]["status"] == "filled" and fills.iloc[0]["price"] == 70000.0 + cu.tick
     pnl = book.mark_to_market(q1, specs, d1)
-    fee = cu.fee(70000.0, 2)
+    fee = cu.fee(70000.0 + cu.tick, 2)  # 手续费按含滑点的成交价(与引擎同口径)
     expected = 1_000_000.0 - fee + 2 * (70500.0 - (70000.0 + cu.tick)) * cu.multiplier
     assert np.isclose(book.state.equity, expected) and np.isclose(pnl["CU"], 2 * (70500.0 - 70010.0) * 5)
     # 次日换月:平 CU2610、开 CU2611 各 2 手;开盘价与结算价不同
@@ -63,7 +63,7 @@ def test_fill_mark_and_roll_reconcile(tmp_path: Path) -> None:
     book.mark_to_market(q2, specs, d2)
     close_pnl = 2 * ((70600.0 - cu.tick) - 70500.0) * 5  # 平旧合约:开盘价−1跳 相对上日结算
     open_pnl = 2 * (70800.0 - (70900.0 + cu.tick)) * 5  # 新合约:结算 相对 成交价
-    fees = cu.fee(70600.0, 2) + cu.fee(70900.0, 2)
+    fees = cu.fee(70600.0 - cu.tick, 2) + cu.fee(70900.0 + cu.tick, 2)
     assert np.isclose(book.state.equity, expected + close_pnl + open_pnl - fees)
     assert book.state.positions["CU"].contract == "CU2611" and book.state.positions["CU"].lots == 2.0
     assert eq_before_mark == expected + close_pnl - fees  # 盯市前:平仓盈亏已实现,新仓未盯市

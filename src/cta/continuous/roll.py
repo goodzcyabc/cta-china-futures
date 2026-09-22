@@ -41,6 +41,7 @@ PANEL_COLS = [
     "oi_total",
     "volume_total",
     "tick",
+    "sched_next",
 ]
 
 
@@ -48,6 +49,9 @@ PANEL_COLS = [
 class SymbolPanel:
     symbol: str
     frame: pd.DataFrame  # index: date; columns: PANEL_COLS
+    contracts: pd.DataFrame | None = (
+        None  # 合约级行情(index: contract, date):引擎与出单按合约成交、盯市、定手数
+    )
 
 
 def confirmed_dominant(cands: pd.Series[Any], maturity: pd.Series[Any], confirm_days: int) -> pd.Series[Any]:
@@ -71,6 +75,29 @@ def confirmed_dominant(cands: pd.Series[Any], maturity: pd.Series[Any], confirm_
     return pd.Series(held, index=cands.index, name="contract")
 
 
+def _with_next_candidate(
+    dm: pd.Series[Any], dm_raw: pd.Series[Any], contracts: pd.DataFrame
+) -> pd.Series[Any]:
+    """在候选序列末尾追加 T+1 的候选:主力地图里最后一日之后的第一条(数据商 / 交易所地图由 ≤T 的持仓量决定,无前视);
+    地图没有(实盘 as-of 当天)时按交易所规则取 T 日持仓量最大的合约。"""
+    if len(dm) == 0:
+        return dm
+    last = dm.index[-1]
+    future = dm_raw[dm_raw.index > last].dropna()
+    if len(future):
+        cand = str(future.iloc[0])
+    else:
+        dates_lv = contracts.index.get_level_values("date")
+        oi = (
+            contracts["open_interest"].xs(last, level="date").dropna()
+            if last in dates_lv
+            else pd.Series(dtype=float)
+        )
+        cand = str(oi.idxmax()) if len(oi) else str(dm.iloc[-1])
+    out: pd.Series[Any] = pd.concat([dm, pd.Series([cand], index=[last + pd.Timedelta(days=1)])])
+    return out
+
+
 def build_symbol_panel(
     symbol: str,
     contracts: pd.DataFrame,
@@ -81,11 +108,14 @@ def build_symbol_panel(
     margin_rate: float | None = None,
     tick: float = float("nan"),
 ) -> SymbolPanel:
-    dm = dominant_map[dominant_map["symbol"] == symbol].set_index("date")["contract"]
+    dm_raw = dominant_map[dominant_map["symbol"] == symbol].set_index("date")["contract"]
     maturity = meta.loc[meta["symbol"] == symbol, "maturity_date"]
     dates = contracts.index.get_level_values("date").unique().sort_values()
-    dm = dm.reindex(dates).ffill().dropna()
-    held = confirmed_dominant(dm, maturity, confirm_days)
+    dm = dm_raw.reindex(dates).ffill().dropna()
+    # 持有序列多算一天:最后一行的 sched_next = T+1 将持有的合约(出单与引擎共用,换月时点两条路径一致)
+    held_ext = confirmed_dominant(_with_next_candidate(dm, dm_raw, contracts), maturity, confirm_days)
+    held = held_ext.iloc[:-1] if len(held_ext) else held_ext
+    sched_next = held_ext.shift(-1).iloc[:-1] if len(held_ext) else held_ext
     dates = held.index
 
     close = contracts["close"].unstack("contract").reindex(dates)
@@ -174,4 +204,5 @@ def build_symbol_panel(
     f["oi_total"] = oi.sum(axis=1, min_count=1).to_numpy(dtype=float)
     f["tick"] = tick
     f["volume_total"] = vol_all.sum(axis=1, min_count=1).to_numpy(dtype=float)
+    f["sched_next"] = sched_next.to_numpy()
     return SymbolPanel(symbol, f[PANEL_COLS])

@@ -35,7 +35,7 @@ def run(
         cfg.backtest.initial_capital_cny,
         max_margin_usage=cfg.portfolio.max_margin_usage,
         slippage_ticks=cfg.execution.slippage_ticks,
-        lot_band=cfg.portfolio.trade_buffer,
+        lot_band=cfg.portfolio.lot_band,
     )
     return res.equity, res.pnl_by_symbol, res.trades
 

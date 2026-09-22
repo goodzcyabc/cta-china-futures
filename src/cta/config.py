@@ -59,7 +59,12 @@ class PortfolioCfg(BaseModel):
     max_leverage_per_symbol: float = Field(gt=0)
     max_gross_exposure: float = Field(gt=0)
     max_margin_usage: float = Field(gt=0, le=1)
-    trade_buffer: float = Field(ge=0, le=1)
+    exposure_buffer: float = Field(
+        ge=0, le=1, description="信号层暴露缓冲:|新目标−旧目标| ≤ band×|新目标| 时目标不变"
+    )
+    lot_band: float = Field(
+        ge=0, le=1, description="执行层手数带:|目标手数−持仓| < band×max(1,|持仓|) 时不交易(清仓除外)"
+    )
     vol_scale_update: Literal["daily", "weekly"] = "daily"
 
 

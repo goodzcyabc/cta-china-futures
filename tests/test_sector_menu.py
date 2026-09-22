@@ -70,6 +70,7 @@ def test_compute_signals_applies_menu_on_synthetic_panels() -> None:
         f["adj_close"] = px
         f["next_contract"], f["next_close"], f["days_to_next"] = f"{sym}2102", px * 1.02, 30.0
         f["oi_total"], f["volume_total"], f["tick"] = 200000.0, 60000.0, 1.0
+        f["sched_next"] = f["contract"]
         return SymbolPanel(sym, f[PANEL_COLS])
 
     panels = {"AU": panel("AU", 1000.0, 0.0008), "CU": panel("CU", 5.0, -0.0005), "C": panel("C", 10.0, 0.0)}

@@ -56,21 +56,20 @@ def build_panels(
         c = src.contracts(s)
         if end is not None:
             c = c[c.index.get_level_values("date") <= end]
-            dm_s = dm[dm["date"] <= end]
-        else:
-            dm_s = dm
         if len(c) == 0:
             continue
-        out[s] = build_symbol_panel(
+        # 主力地图不按 end 截断:面板只用 ≤ end 的候选,外加 end 之后的第一条作 T+1 排程(由 ≤ end 的持仓量决定,无前视)
+        panel = build_symbol_panel(
             s,
             c,
-            dm_s,
+            dm,
             meta,
             limit_pct=specs[s].limit_pct,
             confirm_days=cfg.execution.roll_confirm_days,
             margin_rate=specs[s].margin_rate,
             tick=specs[s].tick,
         )
+        out[s] = SymbolPanel(s, panel.frame, contracts=c)
     return out
 
 
@@ -161,7 +160,7 @@ def compute_signals(
     prev = pd.Series(0.0, index=tgt.columns)
     for d in tgt.index:
         row = tgt.loc[d].fillna(0.0)
-        buffered = sig.trade_buffer(row, prev, cfg.portfolio.trade_buffer)
+        buffered = sig.trade_buffer(row, prev, cfg.portfolio.exposure_buffer)
         tgt.loc[d] = buffered
         prev = buffered
     return Signals(adj, vol, ts, cr, rl, fw, comb, eligible, tgt)
@@ -209,7 +208,7 @@ def run_research(
         cfg.backtest.initial_capital_cny,
         max_margin_usage=cfg.portfolio.max_margin_usage,
         slippage_ticks=cfg.execution.slippage_ticks,
-        lot_band=cfg.portfolio.trade_buffer,
+        lot_band=cfg.portfolio.lot_band,
     )
     active = res.positions.abs().sum(axis=1) > 0
     first_active = active[active].index.min() if active.any() else res.equity.index[0]

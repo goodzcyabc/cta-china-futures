@@ -32,7 +32,7 @@ def bt(target, **kw):
         cfg.backtest.initial_capital_cny,
         max_margin_usage=cfg.portfolio.max_margin_usage,
         slippage_ticks=kw.pop("slip", cfg.execution.slippage_ticks),
-        lot_band=cfg.portfolio.trade_buffer,
+        lot_band=cfg.portfolio.lot_band,
     )
     st = perf_stats(r.equity)
     yrs = (r.equity.index[-1] - r.equity.index[0]).days / 365.25
@@ -59,7 +59,7 @@ def targets_from(comb):
     tgt = raw.copy()
     prev = pd.Series(0.0, index=tgt.columns)
     for d in tgt.index:
-        b = sig.trade_buffer(tgt.loc[d].fillna(0.0), prev, cfg.portfolio.trade_buffer)
+        b = sig.trade_buffer(tgt.loc[d].fillna(0.0), prev, cfg.portfolio.exposure_buffer)
         tgt.loc[d] = b
         prev = b
     return tgt
@@ -100,7 +100,7 @@ for cap in (5e7, 2e8):
         cap,
         max_margin_usage=cfg.portfolio.max_margin_usage,
         slippage_ticks=cfg.execution.slippage_ticks,
-        lot_band=cfg.portfolio.trade_buffer,
+        lot_band=cfg.portfolio.lot_band,
     )
     st = perf_stats(r.equity)
     y = (r.equity.index[-1] - r.equity.index[0]).days / 365.25

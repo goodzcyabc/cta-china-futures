@@ -16,9 +16,9 @@ specs = load_instruments()
 src = RicequantParquetSource(Path("data/ricecta/data"))
 variants = {
     "主方案": {},
-    "a 缓冲带0.3": {"portfolio": {"trade_buffer": 0.30}},
+    "a 缓冲带0.3": {"portfolio": {"exposure_buffer": 0.30, "lot_band": 0.30}},
     "b 缩放按周": {"portfolio": {"vol_scale_update": "weekly"}},
-    "c a+b": {"portfolio": {"trade_buffer": 0.30, "vol_scale_update": "weekly"}},
+    "c a+b": {"portfolio": {"exposure_buffer": 0.30, "lot_band": 0.30, "vol_scale_update": "weekly"}},
     "d 单品种上限0.25": {"portfolio": {"max_leverage_per_symbol": 0.25}},
 }
 rows = {}

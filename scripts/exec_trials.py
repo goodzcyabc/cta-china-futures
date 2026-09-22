@@ -72,7 +72,7 @@ def run(
         cfg.backtest.initial_capital_cny,
         max_margin_usage=cfg.portfolio.max_margin_usage,
         slippage_ticks=slippage,
-        lot_band=cfg.portfolio.trade_buffer,
+        lot_band=cfg.portfolio.lot_band,
     )
     eq = res.equity
     active = eq[eq.index >= t.index[(t.abs().sum(axis=1) > 0).to_numpy().argmax()]]

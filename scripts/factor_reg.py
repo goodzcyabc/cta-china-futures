@@ -96,7 +96,7 @@ tgt = raw.copy()
 prev = pd.Series(0.0, index=tgt.columns)
 for d in tgt.index:
     row = tgt.loc[d].fillna(0.0)
-    new = sig.trade_buffer(row, prev, cfg.portfolio.trade_buffer)
+    new = sig.trade_buffer(row, prev, cfg.portfolio.exposure_buffer)
     tgt.loc[d] = new
     prev = new
 
@@ -110,7 +110,7 @@ def run(target: pd.DataFrame) -> pd.Series:
         cfg.backtest.initial_capital_cny,
         max_margin_usage=cfg.portfolio.max_margin_usage,
         slippage_ticks=cfg.execution.slippage_ticks,
-        lot_band=cfg.portfolio.trade_buffer,
+        lot_band=cfg.portfolio.lot_band,
     )
     return res.equity
 

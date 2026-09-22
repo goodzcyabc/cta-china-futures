@@ -14,7 +14,9 @@ import numpy as np
 import pandas as pd
 
 from cta.config import StrategyConfig
+from cta.continuous.roll import SymbolPanel
 from cta.data.source import DataSource
+from cta.execution.plan import SymbolInputs, plan_lots
 from cta.instruments.specs import InstrumentTable
 from cta.pipeline import _receipts_of, _reg_events_of, build_panels, compute_signals, git_sha
 
@@ -24,6 +26,22 @@ def _num(v: object) -> float:
     if isinstance(v, (int, float, np.integer, np.floating)):
         return float(v)
     raise TypeError(f"expected number, got {type(v).__name__}")
+
+
+def sched_next(row: pd.Series[Any]) -> str:
+    """T+1 将持有的合约(面板 sched_next;缺时退化为当日合约)。"""
+    v = row["sched_next"] if "sched_next" in row.index else None
+    return str(v) if isinstance(v, str) and v else str(row["contract"])
+
+
+def ref_close(panel: SymbolPanel, contract: str, asof: pd.Timestamp) -> float:
+    """定手数的参考价:T 日该合约自身的收盘价;缺则用面板收盘(当日持有合约)。"""
+    c = panel.contracts
+    if c is not None and (contract, asof) in c.index:
+        px = float(c.at[(contract, asof), "close"])
+        if np.isfinite(px) and px > 0:
+            return px
+    return _num(panel.frame.at[asof, "close"])
 
 
 def _load_positions(path: Path | None) -> pd.DataFrame:
@@ -62,52 +80,71 @@ def generate_orders(
         )
     tgt_exp = signals.target.loc[asof_ts].fillna(0.0)
     cur = positions if positions is not None else _load_positions(positions_csv)
-    rows = []
+    inputs: dict[str, SymbolInputs] = {}
+    info: dict[str, dict[str, Any]] = {}
     for s_, exp in tgt_exp.items():
         s = str(s_)
         f = panels[s].frame
-        row = f.loc[asof_ts] if asof_ts in f.index else None
-        if row is None:
+        if asof_ts not in f.index:
             continue
-        ref_px = _num(row["close"])
-        mult = _num(row["multiplier"])
-        want = float(np.round(exp * equity / (ref_px * mult))) if ref_px > 0 else 0.0
+        row = f.loc[asof_ts]
+        assert isinstance(row, pd.Series)
         held_lots = float(cur.at[s, "lots"]) if s in cur.index else 0.0
         held_c = str(cur.at[s, "contract"]) if s in cur.index else None
-        target_c = str(row["contract"])
-        roll = held_c is not None and held_lots != 0 and held_c != target_c
+        target_c = sched_next(row)
+        ref_px = ref_close(panels[s], target_c, asof_ts)
+        inputs[s] = SymbolInputs(
+            float(exp), ref_px, _num(row["multiplier"]), _num(row["margin_rate"]), held_lots
+        )
+        info[s] = {
+            "held_contract": held_c,
+            "target_contract": target_c,
+            "signal_tsmom": float(signals.tsmom.at[asof_ts, s])
+            if not np.isnan(signals.tsmom.at[asof_ts, s])
+            else None,
+            "signal_carry": float(signals.carry.at[asof_ts, s])
+            if not np.isnan(signals.carry.at[asof_ts, s])
+            else None,
+            "signal_receipts_level": (
+                float(signals.receipts_level.at[asof_ts, s])
+                if signals.receipts_level is not None and not np.isnan(signals.receipts_level.at[asof_ts, s])
+                else None
+            ),
+            "eligible": bool(signals.eligible.at[asof_ts, s]),
+        }
+    # 唯一的手数规划函数(与引擎共用):T 收盘价定手数 → 保证金上限缩减 → 手数带
+    plan = plan_lots(inputs, equity, cfg.portfolio.lot_band, cfg.portfolio.max_margin_usage)
+    rows = []
+    for s, x in inputs.items():
+        want = plan.lots[s]
+        i = info[s]
+        roll = (
+            i["held_contract"] is not None and x.held_lots != 0 and i["held_contract"] != i["target_contract"]
+        )
         rows.append(
             {
                 "symbol": s,
-                "target_contract": target_c,
+                "target_contract": i["target_contract"],
                 "target_lots": want,
-                "target_exposure": float(exp),
-                "held_contract": held_c,
-                "held_lots": held_lots,
+                "target_exposure": float(x.exposure),
+                "held_contract": i["held_contract"],
+                "held_lots": x.held_lots,
                 "roll_required": roll,
-                "delta_lots": want - (0.0 if roll else held_lots),
-                "ref_close": ref_px,
-                "multiplier": mult,
-                "margin_rate": _num(row["margin_rate"]),
-                "est_margin_cny": abs(want) * ref_px * mult * _num(row["margin_rate"]),
-                "signal_tsmom": float(signals.tsmom.at[asof_ts, s])
-                if not np.isnan(signals.tsmom.at[asof_ts, s])
-                else None,
-                "signal_carry": float(signals.carry.at[asof_ts, s])
-                if not np.isnan(signals.carry.at[asof_ts, s])
-                else None,
-                "signal_receipts_level": (
-                    float(signals.receipts_level.at[asof_ts, s])
-                    if signals.receipts_level is not None
-                    and not np.isnan(signals.receipts_level.at[asof_ts, s])
-                    else None
-                ),
-                "eligible": bool(signals.eligible.at[asof_ts, s]),
+                "delta_lots": want - (0.0 if roll else x.held_lots),
+                "ref_close": x.ref_price,
+                "multiplier": x.multiplier,
+                "margin_rate": x.margin_rate,
+                "est_margin_cny": abs(want) * x.ref_price * x.multiplier * x.margin_rate
+                if np.isfinite(x.ref_price)
+                else 0.0,
+                "signal_tsmom": i["signal_tsmom"],
+                "signal_carry": i["signal_carry"],
+                "signal_receipts_level": i["signal_receipts_level"],
+                "eligible": i["eligible"],
             }
         )
     orders = pd.DataFrame(rows).set_index("symbol")
-    est_margin = float(orders["est_margin_cny"].sum())
-    emu: float | None = est_margin / equity if equity > 0 else None
+    est_margin = plan.margin_after
     out = out_dir / asof
     out.mkdir(parents=True, exist_ok=True)
     orders.to_csv(out / "orders.csv")
@@ -122,8 +159,11 @@ def generate_orders(
         "est_margin_usage": est_margin / equity if equity > 0 else None,
         "orders_sha256": hashlib.sha256(orders.to_csv().encode()).hexdigest()[:16],
     }
-    if emu is not None and emu > cfg.portfolio.max_margin_usage:
-        snap["warning"] = "预计保证金占用超上限,引擎会按比例缩减;请人工复核"
+    if plan.scaled and equity > 0:
+        snap["warning"] = (
+            f"预计保证金占用 {plan.margin_before / equity:.1%} 超上限 {cfg.portfolio.max_margin_usage:.0%},"
+            f"已按比例缩减到 {plan.margin_after / equity:.1%};请人工复核"
+        )
     (out / "snapshot.json").write_text(
         json.dumps(snap, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
     )
