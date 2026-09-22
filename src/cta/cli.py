@@ -103,19 +103,25 @@ def paper(
 
     d = pd.Timestamp(date) if date else pd.Timestamp.today().normalize()
     cfg = load_config(config)
-    if action == "step":
-        typer.echo(
-            json.dumps(
-                runner.step(d, cfg=cfg, paper_dir=book, do_ingest=not no_ingest),
-                ensure_ascii=False,
-                indent=1,
-                default=str,
+    try:
+        if action == "step":
+            typer.echo(
+                json.dumps(
+                    runner.step(d, cfg=cfg, paper_dir=book, do_ingest=not no_ingest),
+                    ensure_ascii=False,
+                    indent=1,
+                    default=str,
+                )
             )
-        )
-    elif action == "catchup":
-        for log in runner.catchup(d, cfg=cfg, paper_dir=book, do_ingest=not no_ingest):
-            typer.echo(json.dumps(log, ensure_ascii=False, default=str))
-    elif action == "status":
+            return
+        if action == "catchup":
+            for log in runner.catchup(d, cfg=cfg, paper_dir=book, do_ingest=not no_ingest):
+                typer.echo(json.dumps(log, ensure_ascii=False, default=str))
+            return
+    except runner.PaperStepError as e:  # 日步失败:状态未推进,非零退出让 launchd/脚本可见
+        typer.echo(f"PAPER STEP FAILED: {e}", err=True)
+        raise typer.Exit(1) from e
+    if action == "status":
         typer.echo(PaperBook(book, initial_capital=cfg.backtest.initial_capital_cny).state.to_json())
     else:
         raise typer.BadParameter(action)

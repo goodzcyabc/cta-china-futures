@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from cta.instruments.specs import load_instruments
-from cta.paper.book import PaperBook
+from cta.paper.book import PaperBook, Position
 
 
 def _dq(rows: dict[str, tuple[float, float, float]]) -> pd.DataFrame:
@@ -129,3 +129,139 @@ def test_intraday_snapshot_is_rejected() -> None:
         r["SETTLEMENTPRICE"] = ""  # 模拟盘中快照:结算价全空
     with pytest.raises(NotFinalError):
         shfe.parse_quotes(json.dumps(data).encode("utf-8"), pd.Timestamp("2026-09-11"))
+
+
+# ---- 2026-09-22 防线:有限值、换月原子性、盯市完整性、幂等落盘、日步全有或全无 ----
+
+
+def test_nan_open_is_not_filled(tmp_path: Path) -> None:
+    """当日零成交/停牌(交易所 open 为空):不成交、记 no_quote、权益不变。此前会按 NaN 价成交并把权益污染成 NaN。"""
+    specs = load_instruments()
+    book = PaperBook(tmp_path, initial_capital=3_000_000.0)
+    orders = pd.DataFrame([{"symbol": "NI", "target_contract": "NI2204", "target_lots": 2.0}])
+    dq = _dq({"NI2204": (np.nan, 267700.0, 267700.0)})  # 2022-03-10 上期所镍停牌
+    f = book.fill_orders(orders, dq, specs, pd.Timestamp("2022-03-10"), slippage_ticks=1.0)
+    assert f.iloc[0]["status"] == "no_quote" and "NI" not in book.state.positions
+    assert book.state.equity == 3_000_000.0
+
+
+def test_roll_is_atomic(tmp_path: Path) -> None:
+    """换月两腿同进退:旧腿撞停或新腿缺行情时两腿都不动,不抛异常、不留空仓。"""
+    specs = load_instruments()
+    cu = specs["CU"]
+    book = PaperBook(tmp_path, initial_capital=1_000_000.0)
+    book.state.positions["CU"] = Position("CU2610", 2.0, 70000.0)
+    orders = pd.DataFrame([{"symbol": "CU", "target_contract": "CU2611", "target_lots": 2.0}])
+    # 旧腿(平多 = 卖)开盘跌停:此前旧腿 continue 后新腿走到 _apply_fill 抛 RuntimeError
+    q_old_locked = _dq(
+        {"CU2610": (70000.0 * (1 - cu.limit_pct), 69000.0, 70000.0), "CU2611": (70900.0, 70800.0, 70700.0)}
+    )
+    f = book.fill_orders(orders, q_old_locked, specs, pd.Timestamp("2026-09-11"), slippage_ticks=1.0)
+    assert len(f) == 2 and set(f["status"]) == {"roll_blocked"}
+    assert book.state.positions["CU"].contract == "CU2610" and book.state.positions["CU"].lots == 2.0
+    # 新腿缺行情:此前会平掉旧腿、把账本留在空仓
+    q_new_missing = _dq({"CU2610": (70600.0, 70400.0, 70500.0)})
+    f2 = book.fill_orders(orders, q_new_missing, specs, pd.Timestamp("2026-09-12"), slippage_ticks=1.0)
+    assert set(f2["status"]) == {"roll_blocked"} and book.state.positions["CU"].contract == "CU2610"
+    assert book.state.equity == 1_000_000.0
+
+
+def test_mark_to_market_requires_finite_settle(tmp_path: Path) -> None:
+    import pytest
+
+    from cta.paper.book import BookIntegrityError
+
+    specs = load_instruments()
+    book = PaperBook(tmp_path, initial_capital=1_000_000.0)
+    book.state.positions["CU"] = Position("CU2610", 2.0, 70000.0)
+    d = pd.Timestamp("2026-09-11")
+    with pytest.raises(BookIntegrityError):  # 持仓合约当日无行情:此前静默跳过 = 当天零盈亏
+        book.mark_to_market(_dq({"CU2611": (1.0, 1.0, 1.0)}), specs, d)
+    with pytest.raises(BookIntegrityError):  # 结算价非有限
+        book.mark_to_market(_dq({"CU2610": (70000.0, np.nan, 70000.0)}), specs, d)
+    assert book.state.equity == 1_000_000.0 and book.state.positions["CU"].ref_price == 70000.0
+
+
+def test_equity_csv_is_idempotent_per_date(tmp_path: Path) -> None:
+    book = PaperBook(tmp_path, initial_capital=1_000_000.0)
+    d = pd.Timestamp("2026-09-11")
+    book.append_equity(d, {"CU": 1.0}, 0.0)
+    book.state.equity = 999.0
+    book.append_equity(d, {"CU": 2.0}, 0.0)  # 重跑同一日:替换而不是追加
+    eq = pd.read_csv(tmp_path / "equity.csv")
+    assert len(eq) == 1 and eq.iloc[0]["equity"] == 999.0
+
+
+def test_save_refuses_non_finite_state(tmp_path: Path) -> None:
+    import pytest
+
+    from cta.paper.book import BookIntegrityError
+
+    book = PaperBook(tmp_path, initial_capital=1_000_000.0)
+    book.state.equity = float("nan")
+    with pytest.raises(BookIntegrityError):
+        book.save()
+    assert PaperBook(tmp_path).state.equity == 1_000_000.0  # 磁盘上的状态没被污染
+
+
+def test_step_is_all_or_nothing(tmp_path: Path, monkeypatch: object) -> None:
+    """出单失败 → 当日不落盘、写 FAILED.json、抛 PaperStepError;修复后重跑同一日成功且 equity.csv 无重复行。"""
+    import pytest
+
+    from cta.config import load_config
+    from cta.paper import runner
+
+    specs = load_instruments()
+    cfg = load_config(Path("configs/strategy.yaml"))
+    d0, d1 = pd.Timestamp("2026-09-10"), pd.Timestamp("2026-09-11")
+    book = PaperBook(tmp_path, initial_capital=cfg.backtest.initial_capital_cny)
+    book.state.positions["CU"] = Position("CU2610", 2.0, 70000.0)
+    book.state.last_settled, book.state.pending_orders_date = str(d0.date()), str(d0.date())
+    book.save()
+    od = tmp_path / "orders" / str(d0.date())
+    od.mkdir(parents=True)
+    pd.DataFrame(
+        [
+            {
+                "symbol": "CU",
+                "target_contract": "CU2610",
+                "target_lots": 3.0,
+                "held_contract": "CU2610",
+                "held_lots": 2.0,
+                "roll_required": False,
+                "delta_lots": 1.0,
+            }
+        ]
+    ).to_csv(od / "orders.csv", index=False)
+    quotes = pd.DataFrame(
+        [{"date": d1, "contract": "CU2610", "open": 70000.0, "settle": 70500.0, "prev_settle": 69800.0}]
+    )
+
+    class _Ex:
+        def quotes(self) -> pd.DataFrame:
+            return quotes
+
+    kw = dict(cfg=cfg, specs=specs, src=object(), ex=_Ex(), paper_dir=tmp_path, do_ingest=False)
+    kw["holidays"] = pd.DatetimeIndex([])
+
+    def boom(*a: object, **k: object) -> dict[str, object]:
+        raise RuntimeError("as-of 2026-09-11 is not a trading day in data")
+
+    monkeypatch.setattr(runner, "generate_orders", boom)  # type: ignore[attr-defined]
+    with pytest.raises(runner.PaperStepError):
+        runner.step(d1, **kw)  # type: ignore[arg-type]
+    st = PaperBook(tmp_path).state
+    assert st.last_settled == str(d0.date()) and st.positions["CU"].lots == 2.0  # 状态未推进
+    assert (tmp_path / "FAILED.json").exists() and not (tmp_path / "equity.csv").exists()
+    assert (tmp_path / "log" / f"{d1.date()}.json").exists()
+    # 修复后重跑同一日
+    monkeypatch.setattr(  # type: ignore[attr-defined]
+        runner, "generate_orders", lambda *a, **k: {"summary": {"n_trades": 0, "warning": None}}
+    )
+    log = runner.step(d1, **kw)  # type: ignore[arg-type]
+    st = PaperBook(tmp_path).state
+    assert st.last_settled == str(d1.date()) and st.positions["CU"].lots == 3.0
+    assert st.pending_orders_date == str(d1.date()) and not (tmp_path / "FAILED.json").exists()
+    eq = pd.read_csv(tmp_path / "equity.csv")
+    assert len(eq) == 1 and str(eq.iloc[0]["date"]) == str(d1.date()) and "failed" not in log
+    assert (tmp_path / "fills" / f"{d1.date()}.csv").exists()

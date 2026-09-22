@@ -120,14 +120,15 @@ def generate_orders(
         "est_margin_usage": est_margin / equity if equity > 0 else None,
         "orders_sha256": hashlib.sha256(orders.to_csv().encode()).hexdigest()[:16],
     }
+    if emu is not None and emu > cfg.portfolio.max_margin_usage:
+        snap["warning"] = "预计保证金占用超上限,引擎会按比例缩减;请人工复核"
     (out / "snapshot.json").write_text(
         json.dumps(snap, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
     )
-    if emu is not None and emu > cfg.portfolio.max_margin_usage:
-        snap["warning"] = "预计保证金占用超上限,引擎会按比例缩减;请人工复核"
     return {
         "summary": {
             "asof": asof,
+            "warning": snap.get("warning"),
             "n_symbols": int(len(orders)),
             "n_trades": int((orders["delta_lots"] != 0).sum()),
             "n_rolls": int(orders["roll_required"].sum()),

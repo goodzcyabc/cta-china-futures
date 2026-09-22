@@ -9,7 +9,7 @@
   <array>
     <string>/bin/bash</string>
     <string>-lc</string>
-    <string>cd /Users/mac/code/cta-china-futures && ./scripts/paper_daily.sh >> paper/log/cron.log 2>&1</string>
+    <string>cd /Users/mac/code/cta-china-futures &amp;&amp; ./scripts/paper_daily.sh &gt;&gt; paper/log/cron.log 2&gt;&amp;1</string>
   </array>
   <key>StartCalendarInterval</key>
   <array>
