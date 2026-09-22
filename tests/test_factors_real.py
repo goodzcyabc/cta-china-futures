@@ -12,14 +12,14 @@ pytestmark = pytest.mark.skipif(not DATA.exists(), reason="需要米筐导出数
 
 
 def test_factors_identical_when_future_removed() -> None:
-    from cta.config import load_config
+    from cta.config import DataCfg, load_config
     from cta.data.source import RicequantParquetSource
     from cta.factors.base import FactorInputs
     from cta.factors.library import ALL_FACTORS
     from cta.instruments.specs import load_instruments
     from cta.pipeline import build_panels
 
-    cfg = load_config()
+    cfg = load_config().model_copy(update={"data": DataCfg(settle="vendor_close")})  # 纯米筐源无官方结算价
     specs = load_instruments()
     src = RicequantParquetSource(DATA)
     cut = pd.Timestamp("2021-06-30")

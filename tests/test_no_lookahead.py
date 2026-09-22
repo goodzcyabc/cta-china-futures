@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from cta.config import load_config
+from cta.config import DataCfg, load_config
 from cta.data.source import RicequantParquetSource
 from cta.instruments.specs import load_instruments
 from cta.pipeline import build_panels, compute_signals
@@ -17,7 +17,7 @@ DATA = Path(__file__).resolve().parents[1] / "data" / "ricecta" / "data"
 
 @pytest.mark.skipif(not DATA.exists(), reason="no market data")
 def test_targets_identical_when_future_removed() -> None:
-    cfg = load_config()
+    cfg = load_config().model_copy(update={"data": DataCfg(settle="vendor_close")})  # 纯米筐源无官方结算价
     specs = load_instruments()
     src = RicequantParquetSource(DATA)
     t = pd.Timestamp("2021-06-30")

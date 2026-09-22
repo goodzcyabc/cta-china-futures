@@ -3,7 +3,7 @@
 规则(预注册):
 1. 候选主力 = 数据商每日主力;实际持有合约在候选**连续 confirm_days 天**不变后才切换,且只向更晚到期切换(不回滚)。
 2. 切换日同时平旧开新,两笔都记成本(引擎负责);本模块只标记 roll 日与新旧合约。
-3. 结算价用收盘价近似、涨跌停按前收盘自算(数据商的 dominant_daily 是复权后的连续价,不能与原始合约价混用)。
+3. 结算价:交易所官方逐合约结算价(米筐历史段由交易所数据覆盖,data.settle=official 时缺失即报错);涨跌停按合约自身前结算自算。
 4. 回溯复权连续价(adj_close)只用于信号:在 roll 日用 新合约收盘/旧合约收盘 的比率把历史整体缩放。
 5. 次主力 = 到期晚于持有合约、当日持仓量最大的合约;展期收益需要 (持有 − 次主力)/次主力 与两者到期间隔天数。
 """
@@ -42,6 +42,7 @@ PANEL_COLS = [
     "volume_total",
     "tick",
     "sched_next",
+    "settle_official",
 ]
 
 
@@ -146,6 +147,13 @@ def build_symbol_panel(
         f["settle"] = f["close"].to_numpy(dtype=float)
         own_prev = f["settle"].shift(1).to_numpy(dtype=float)
     f["prev_settle"] = f["settle"].shift(1).to_numpy(dtype=float)
+    # 持有合约当日的结算价是否为交易所官方值(1/0;NaN = 该合约当日无行情行)
+    if "settle_source" in contracts.columns:
+        f["settle_official"] = pick(
+            (contracts["settle_source"] == "official").astype(float).unstack("contract").reindex(dates), held
+        )
+    else:
+        f["settle_official"] = 1.0 if "settle" in contracts.columns else 0.0
     limit_base = np.where(np.isnan(own_prev), f["prev_settle"].to_numpy(dtype=float), own_prev)
     f["limit_up"] = limit_base * (1 + limit_pct)
     f["limit_down"] = limit_base * (1 - limit_pct)

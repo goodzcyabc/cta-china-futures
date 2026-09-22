@@ -134,8 +134,8 @@ def test_stitched_source_concats_on_cutover(tmp_path: Path) -> None:
             return {"root": "prim"}
 
     src = StitchedSource(
-        Prim(), ex, pd.Timestamp("2026-06-08")
-    )  # 6-08 及之前用 primary(6-08 在 primary 无数据)
+        Prim(), ex, pd.Timestamp("2026-06-08"), official_settle=False
+    )  # 6-08 及之前用 primary(6-08 在 primary 无数据);本测试只看拼接,结算价覆盖见 test_settle_overlay
     c = src.contracts("CU")
     dates = c.index.get_level_values("date")
     assert (
@@ -144,7 +144,9 @@ def test_stitched_source_concats_on_cutover(tmp_path: Path) -> None:
     )
     assert (dates <= pd.Timestamp("2026-06-08")).sum() == 6 and "settle" in c.columns  # 列取并集
     prim_part = c[dates <= pd.Timestamp("2026-06-08")]
-    assert (prim_part["settle"] == prim_part["close"]).all()  # 米筐段:结算价用收盘价近似
+    assert (
+        prim_part["settle"] == prim_part["close"]
+    ).all()  # legacy 口径(official_settle=False):米筐段用收盘价代结算
     sec_part = c[dates > pd.Timestamp("2026-06-08")]
     assert (sec_part["settle"] != sec_part["close"]).any()  # 交易所段:官方结算价保留
     meta = src.contract_meta()

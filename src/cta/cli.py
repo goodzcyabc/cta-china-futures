@@ -14,8 +14,8 @@ from cta.instruments.specs import load_instruments
 app = typer.Typer(add_completion=False, help="商品期货 CTA:研究回测与实盘出单")
 
 
-def _make_source(source: str, data: Path) -> DataSource:
-    """ricequant:米筐导出;exchange:交易所直连;stitched:米筐历史 + 交易所增量(默认)。"""
+def _make_source(source: str, data: Path, official_settle: bool = True) -> DataSource:
+    """ricequant:米筐导出;exchange:交易所直连;stitched:米筐历史 + 交易所增量(默认;official_settle 时米筐段结算价用官方值覆盖)。"""
     if source == "ricequant":
         return RicequantParquetSource(data)
     if source == "exchange":
@@ -25,7 +25,7 @@ def _make_source(source: str, data: Path) -> DataSource:
     if source == "stitched":
         from cta.data.exchanges.source import default_stitched
 
-        return default_stitched(data)
+        return default_stitched(data, official_settle=official_settle)
     raise typer.BadParameter(f"unknown source {source}")
 
 
@@ -42,7 +42,7 @@ def research(
 
     cfg = load_config(config)
     specs = load_instruments()
-    src = _make_source(source, data)
+    src = _make_source(source, data, cfg.data.settle == "official")
     if end:
         cfg = cfg.model_copy(update={"backtest": cfg.backtest.model_copy(update={"end": end})})
     suffix = "" if source == "ricequant" else f"_{source}"
@@ -74,7 +74,7 @@ def live(
 
     cfg = load_config(config)
     specs = load_instruments()
-    src = _make_source(source, data)
+    src = _make_source(source, data, cfg.data.settle == "official")
     report = generate_orders(cfg, src, specs, asof=asof, equity=equity, positions_csv=positions, out_dir=out)
     typer.echo(json.dumps(report["summary"], ensure_ascii=False, indent=2))
 

@@ -69,6 +69,14 @@ def build_panels(
             margin_rate=specs[s].margin_rate,
             tick=specs[s].tick,
         )
+        if cfg.data.settle == "official":
+            off = panel.frame["settle_official"]
+            bad = off[~(off >= 1.0)]
+            if len(bad):
+                raise ValueError(
+                    f"{s}: {len(bad)} 个持有合约-日没有交易所官方结算价(首个 {bad.index[0].date()});"
+                    "data.settle=official 不允许回退收盘价,请补数据或改用 vendor_close(仅 legacy 对照)"
+                )
         out[s] = SymbolPanel(s, panel.frame, contracts=c)
     return out
 
@@ -210,22 +218,8 @@ def run_research(
         slippage_ticks=cfg.execution.slippage_ticks,
         lot_band=cfg.portfolio.lot_band,
     )
-    active = res.positions.abs().sum(axis=1) > 0
-    first_active = active[active].index.min() if active.any() else res.equity.index[0]
-    eq_active = res.equity.loc[first_active:]
-    stats = perf_stats(eq_active)
-    yrs = (eq_active.index[-1] - eq_active.index[0]).days / 365.25
-    gross_traded = (
-        res.trades["lots"].abs()
-        * res.trades["price"]
-        * res.trades["symbol"].map(lambda s: specs[s].multiplier)
-    ).sum()
-    stats["年化名义换手(倍)"] = float(gross_traded / eq_active.mean() / yrs)
-    stats["年化手续费占权益"] = float(res.costs.sum() / eq_active.mean() / yrs)
-    stats["年化滑点占权益"] = float(res.slippage.sum() / eq_active.mean() / yrs)
-    stats["平均总名义暴露"] = float(res.exposure.loc[first_active:].abs().sum(axis=1).mean())
-    stats["平均保证金占用"] = float(res.margin_usage.mean())
-    stats["未成交顺延次数"] = float(res.unfilled.sum())
+    stats, _first_active = summarize_result(res, specs)
+    settle_coverage = {s: float(p.frame["settle_official"].mean()) for s, p in panels.items()}
     out_dir.mkdir(parents=True, exist_ok=True)
     res.equity.to_csv(out_dir / "equity.csv")
     res.positions.to_csv(out_dir / "positions.csv")
@@ -244,6 +238,7 @@ def run_research(
         signals.factor_weights.to_csv(out_dir / "factor_weights.csv")
     signals.eligible.to_csv(out_dir / "eligible.csv")
     yearly(res.equity).to_csv(out_dir / "yearly.csv")
+    pd.Series(settle_coverage, name="official_settle_coverage").to_csv(out_dir / "settle_coverage.csv")
     meta = {
         "config_digest": cfg.digest(),
         "instruments_digest": specs.digest(),
@@ -253,9 +248,33 @@ def run_research(
         "git_sha": git_sha(),
         "n_symbols": len(panels),
         "period": [str(res.equity.index[0].date()), str(res.equity.index[-1].date())],
+        "settle": cfg.data.settle,
+        "settle_coverage_min": min(settle_coverage.values()) if settle_coverage else None,
         "stats": {k: (None if isinstance(v, float) and np.isnan(v) else v) for k, v in stats.items()},
     }
     (out_dir / "run.json").write_text(
         json.dumps(meta, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
     )
     return meta
+
+
+def summarize_result(res: BacktestResult, specs: InstrumentTable) -> tuple[dict[str, float], pd.Timestamp]:
+    """回测结果 → 报告口径统计(从首个持仓日起算);返回 (stats, first_active)。"""
+    active = res.positions.abs().sum(axis=1) > 0
+    first_active = active[active].index.min() if active.any() else res.equity.index[0]
+    eq_active = res.equity.loc[first_active:]
+    stats = perf_stats(eq_active)
+    yrs = max((eq_active.index[-1] - eq_active.index[0]).days / 365.25, 1e-9)
+    gross_traded = (
+        res.trades["lots"].abs()
+        * res.trades["price"]
+        * res.trades["symbol"].map(lambda s: specs[s].multiplier)
+    ).sum()
+    stats["年化名义换手(倍)"] = float(gross_traded / eq_active.mean() / yrs)
+    stats["年化手续费占权益"] = float(res.costs.sum() / eq_active.mean() / yrs)
+    stats["年化滑点占权益"] = float(res.slippage.sum() / eq_active.mean() / yrs)
+    stats["平均总名义暴露"] = float(res.exposure.loc[first_active:].abs().sum(axis=1).mean())
+    stats["平均保证金占用"] = float(res.margin_usage.mean())
+    stats["未成交腿数"] = float(res.unfilled.sum())
+    stats["未盯市持仓日数"] = float(res.unmarked.sum()) if len(res.unmarked) else 0.0
+    return stats, pd.Timestamp(first_active)

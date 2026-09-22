@@ -34,6 +34,7 @@ def _panel(dates, opens, settles, roll_day=None, limit_up=None):
     f["oi_total"] = f["open_interest"]
     f["volume_total"] = f["volume"]
     f["tick"] = 10.0
+    f["settle_official"] = 1.0
     f["sched_next"] = f["contract"]
     if roll_day is not None:
         f.loc[roll_day, "roll"] = True

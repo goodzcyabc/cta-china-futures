@@ -92,8 +92,9 @@ class ExchangeSource:
             raise KeyError(f"no exchange quotes for {symbol}")
         for c in ["open", "high", "low", "close"]:
             q[c] = q[c].fillna(q["settle"])
-        out = q.set_index(["contract", "date"])[[*CONTRACT_COLS, "settle", "prev_settle"]].sort_index()
-        return validate_contracts(out)
+        q["settle_source"] = "official"
+        out = q.set_index(["contract", "date"])[[*CONTRACT_COLS, "settle", "prev_settle", "settle_source"]]
+        return validate_contracts(out.sort_index())
 
     def dominant_map(self) -> pd.DataFrame:
         q = self.quotes()
@@ -198,8 +199,20 @@ class ExchangeSource:
 class StitchedSource:
     """cutover(含)之前用 primary(米筐历史导出),之后用 secondary(交易所直连)。品种与合约代码口径必须一致。"""
 
-    def __init__(self, primary: DataSource, secondary: DataSource, cutover: pd.Timestamp):
+    def __init__(
+        self, primary: DataSource, secondary: DataSource, cutover: pd.Timestamp, official_settle: bool = True
+    ):
         self.primary, self.secondary, self.cutover = primary, secondary, pd.Timestamp(cutover)
+        self.official_settle = official_settle
+        self._settle_tbl: pd.DataFrame | None = None
+
+    def _settle_table(self) -> pd.DataFrame:
+        """交易所官方逐合约结算价 (contract, date) → settle/prev_settle,用于覆盖米筐历史段。"""
+        if self._settle_tbl is None:
+            q: pd.DataFrame = self.secondary.quotes()  # type: ignore[attr-defined]
+            tbl = q.set_index(["contract", "date"])[["settle", "prev_settle"]].sort_index()
+            self._settle_tbl = tbl[~tbl.index.duplicated(keep="last")]
+        return self._settle_tbl
 
     def symbols(self) -> list[str]:
         return sorted(set(self.primary.symbols()) | set(self.secondary.symbols()))
@@ -216,13 +229,21 @@ class StitchedSource:
             parts.append(b[b.index.get_level_values("date") > self.cutover] if in_primary else b)
         if not parts:
             raise KeyError(symbol)
-        # 列取并集:米筐段没有官方结算价,用收盘价近似(settle=close, prev_settle=前一日 settle);交易所段保留官方值
+        # 米筐段没有结算价:official → 用交易所逐合约官方结算价覆盖(缺失保留 NaN 并标记,绝不回退收盘价);
+        # vendor_close(旧口径)→ settle=close、prev_settle=前一日 settle。交易所段本来就是官方值。
         filled = []
         for raw_part in parts:
             part = raw_part.copy()
             if "settle" not in part.columns:
-                part["settle"] = part["close"]
-                part["prev_settle"] = part.groupby(level="contract")["settle"].shift(1)
+                if self.official_settle:
+                    part = part.join(self._settle_table(), how="left")
+                    part["settle_source"] = np.where(part["settle"].notna(), "official", "missing")
+                else:
+                    part["settle"] = part["close"]
+                    part["prev_settle"] = part.groupby(level="contract")["settle"].shift(1)
+                    part["settle_source"] = "close_proxy"
+            elif "settle_source" not in part.columns:
+                part["settle_source"] = "official"
             filled.append(part)
         out = pd.concat(filled).sort_index()
         return validate_contracts(out)
@@ -269,12 +290,15 @@ class StitchedSource:
             "primary": str(mp),
             "secondary": str(ms),
             "cutover": str(self.cutover.date()),
+            "settle": "official" if self.official_settle else "close_proxy",
             "sha256": hashlib.sha256((str(mp) + str(ms)).encode()).hexdigest()[:16],
         }
 
 
-def default_stitched(rq_root: Path, cutover: pd.Timestamp | None = None) -> StitchedSource:
-    """米筐导出(到其最后一日)+ 交易所直连(之后)。"""
+def default_stitched(
+    rq_root: Path, cutover: pd.Timestamp | None = None, official_settle: bool = True
+) -> StitchedSource:
+    """米筐导出(到其最后一日)+ 交易所直连(之后);official_settle 时米筐段结算价用交易所官方值覆盖。"""
     from cta.data.source import RicequantParquetSource
 
     rq = RicequantParquetSource(rq_root)
@@ -282,4 +306,4 @@ def default_stitched(rq_root: Path, cutover: pd.Timestamp | None = None) -> Stit
     if cutover is None:
         cu = rq.contracts(rq.symbols()[0]).index.get_level_values("date").max()
         cutover = pd.Timestamp(cu)
-    return StitchedSource(rq, ex, cutover)
+    return StitchedSource(rq, ex, cutover, official_settle=official_settle)

@@ -81,8 +81,15 @@ class BacktestCfg(BaseModel):
     cash_rate: Literal["none", "shibor_on"]
 
 
+class DataCfg(BaseModel):
+    settle: Literal["official", "vendor_close"] = "official"
+    """official:结算价一律用交易所官方值(米筐历史段用交易所逐合约结算价覆盖;任一持有合约-日缺失即报错,不回退收盘价);
+    vendor_close:2026-09-22 前的口径,米筐段用收盘价代结算(只用于复现旧报告 / legacy 对照)。"""
+
+
 class StrategyConfig(BaseModel):
     version: str
+    data: DataCfg = Field(default_factory=DataCfg)
     universe: UniverseCfg
     signals: SignalCfg
     portfolio: PortfolioCfg
