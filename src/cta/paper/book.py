@@ -90,21 +90,29 @@ class PaperBook:
             self.state = BookState(equity=initial_capital, cash_start=initial_capital)
             self.save()
 
-    def save(self) -> None:
-        """原子写入:先校验有限值,再写临时文件并 rename;进程中途退出不会留下半个或被污染的 state.json。"""
+    def write_state(self, path: Path) -> None:
+        """校验有限值后写到 path(原子:临时文件 + rename)。"""
         self.state.assert_finite()
-        tmp = self.state_path.with_suffix(".json.tmp")
+        tmp = path.with_suffix(path.suffix + ".tmp")
         tmp.write_text(self.state.to_json(), encoding="utf-8")
-        os.replace(tmp, self.state_path)
+        os.replace(tmp, path)
 
-    def positions_csv(self) -> Path:
-        """给 generate_orders 用的当前持仓文件。"""
-        p = self.root / "positions.csv"
+    def save(self) -> None:
+        """原子写入正式 state.json;进程中途退出不会留下半个或被污染的文件。"""
+        self.write_state(self.state_path)
+
+    def positions_frame(self) -> pd.DataFrame:
+        """当前持仓(index=symbol,列 contract/lots),给 generate_orders 直接用。"""
         rows = [
             {"symbol": s, "contract": pos.contract, "lots": pos.lots}
             for s, pos in self.state.positions.items()
         ]
-        pd.DataFrame(rows, columns=["symbol", "contract", "lots"]).to_csv(p, index=False)
+        return pd.DataFrame(rows, columns=["symbol", "contract", "lots"]).set_index("symbol")
+
+    def positions_csv(self, path: Path | None = None) -> Path:
+        """把当前持仓写成 CSV(默认正式 positions.csv;事务里传 .txn 下的路径)。"""
+        p = path or (self.root / "positions.csv")
+        self.positions_frame().reset_index().to_csv(p, index=False)
         return p
 
     # ---- 成交与盯市 ----
@@ -249,8 +257,10 @@ class PaperBook:
                 tot += specs[s].margin(_num(day_quotes.loc[pos.contract, "settle"]), abs(pos.lots))
         return tot
 
-    def append_equity(self, date: pd.Timestamp, pnl_by_symbol: dict[str, float], margin: float) -> None:
-        """追加当日权益行;同一日期重跑时替换旧行(幂等),不会出现重复行。"""
+    def equity_frame(
+        self, date: pd.Timestamp, pnl_by_symbol: dict[str, float], margin: float
+    ) -> pd.DataFrame:
+        """正式 equity.csv 加上当日行之后的完整内容;同一日期重跑时替换旧行(幂等),不会出现重复行。"""
         p = self.root / "equity.csv"
         day = str(pd.Timestamp(date).date())
         row = pd.DataFrame(
@@ -274,4 +284,11 @@ class PaperBook:
             old = old[old["date"] != day]
             if not old.empty:
                 row = pd.concat([old, row.astype(str)], ignore_index=True)
-        row.to_csv(p, index=False)
+        return row
+
+    def append_equity(self, date: pd.Timestamp, pnl_by_symbol: dict[str, float], margin: float) -> None:
+        """写正式 equity.csv(临时文件 + 原子替换)。"""
+        p = self.root / "equity.csv"
+        tmp = p.with_suffix(".csv.tmp")
+        self.equity_frame(date, pnl_by_symbol, margin).to_csv(tmp, index=False)
+        os.replace(tmp, p)

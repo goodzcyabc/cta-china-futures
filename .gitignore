@@ -8,3 +8,5 @@ __pycache__/
 results/
 *.log
 .DS_Store
+# 纸面账日步事务目录(失败时留作取证,不进 git)
+paper*/.txn/

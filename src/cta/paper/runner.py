@@ -1,12 +1,15 @@
 """纸面交易日步:拉当日交易所数据 → 成交昨日订单并盯市 → 以今日为 as-of 生成新订单。可补跑漏掉的交易日(catchup)。
 
-日步是"全有或全无"的:成交、盯市、出单全部成功才写 fills/equity/state;任一步失败则抛 PaperStepError、
-写 <book>/FAILED.json(阶段 + 原因)、state.json 不变。修复后重跑同一日幂等(fills 覆盖、equity 按日去重)。
+日步是"全有或全无"的:当日全部产物(订单、快照、成交、权益、持仓、状态)先写 <book>/.txn/<日>/,成交、盯市、出单都成功后
+再逐个替换正式文件,state.json 最后替换;任一步失败则抛 PaperStepError、写 <book>/FAILED.json(阶段 + 原因),正式文件一个不动,
+.txn/<日>/ 留作取证(不进 git)。修复后重跑同一日幂等。
 交易日判定只看"周一至周五 ∧ 不在 configs/holidays.csv":真实休市但未登记的日子会失败而不是静默跳过,提醒补日历。"""
 
 from __future__ import annotations
 
 import json
+import os
+import shutil
 import traceback
 from pathlib import Path
 from typing import Any
@@ -108,6 +111,21 @@ def _write_json(path: Path, obj: dict[str, Any]) -> None:
     path.write_text(json.dumps(obj, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
 
 
+def _promote_file(src: Path, dst: Path) -> None:
+    """事务提交:把 .txn 下的产物原子替换到正式位置(同一文件系统,rename)。"""
+    if src.exists():
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        os.replace(src, dst)
+
+
+def _promote_dir(src: Path, dst: Path) -> None:
+    if src.exists():
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if dst.exists():
+            shutil.rmtree(dst)
+        os.replace(src, dst)
+
+
 def step(
     date: pd.Timestamp,
     cfg: StrategyConfig | None = None,
@@ -136,6 +154,9 @@ def step(
     if book.state.last_settled is not None and pd.Timestamp(book.state.last_settled) >= date:
         log["skipped"] = f"already settled {book.state.last_settled}"
         return log
+    txn = book.root / ".txn" / str(date.date())
+    shutil.rmtree(txn, ignore_errors=True)
+    txn.mkdir(parents=True)
     stage = "quotes"
     try:
         dq = _day_quotes(ex, date)
@@ -163,11 +184,12 @@ def step(
         if not np.isfinite(margin):
             raise BookIntegrityError(f"{date.date()}: non-finite margin {margin}")
         book.state.assert_finite()
-        # 3) 生成今日订单(as-of = date);失败即整日失败,不再吞掉
+        # 3) 生成今日订单(as-of = date)到 .txn;失败即整日失败,不再吞掉,正式 orders/ 不会出现半个文件
         stage = "orders"
         src = src or default_stitched(rq_root)
+        positions = book.positions_frame()
         meta = generate_orders(
-            cfg, src, specs, str(date.date()), book.state.equity, book.positions_csv(), book.root / "orders"
+            cfg, src, specs, str(date.date()), book.state.equity, None, txn / "orders", positions=positions
         )
         summary = meta.get("summary", meta)
         log["orders"] = {
@@ -175,15 +197,21 @@ def step(
             for k in ("n_symbols", "n_trades", "n_rolls", "est_margin_usage", "stale_symbols", "warning")
             if k in summary and summary[k] is not None
         }
-        # 4) 全部成功后才落盘:fills(覆盖)→ equity(按日去重)→ state(原子)
+        # 4) 全部成功后:先把剩余产物写进 .txn,再依次替换正式文件,state.json 最后
         stage = "save"
         if fills is not None:
-            fdir = book.root / "fills"
-            fdir.mkdir(exist_ok=True)
-            fills.to_csv(fdir / f"{date.date()}.csv", index=False)
-        book.append_equity(date, pnl, margin)
+            fills.to_csv(txn / "fills.csv", index=False)
+        book.equity_frame(date, pnl, margin).to_csv(txn / "equity.csv", index=False)
+        book.positions_csv(txn / "positions.csv")
         book.state.pending_orders_date = str(date.date())
-        book.save()
+        book.write_state(txn / "state.json")
+        stage = "commit"
+        _promote_dir(txn / "orders" / str(date.date()), book.root / "orders" / str(date.date()))
+        _promote_file(txn / "fills.csv", book.root / "fills" / f"{date.date()}.csv")
+        _promote_file(txn / "equity.csv", book.root / "equity.csv")
+        _promote_file(txn / "positions.csv", book.root / "positions.csv")
+        _promote_file(txn / "state.json", book.state_path)
+        shutil.rmtree(txn, ignore_errors=True)
         marker = book.root / FAILED_MARKER
         if marker.exists():
             marker.unlink()

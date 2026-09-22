@@ -41,7 +41,9 @@ def generate_orders(
     equity: float,
     positions_csv: Path | None,
     out_dir: Path,
+    positions: pd.DataFrame | None = None,
 ) -> dict[str, Any]:
+    """positions(index=symbol,列 contract/lots)优先于 positions_csv;纸面路径直接传 DataFrame,不经过正式文件。"""
     asof_ts = pd.Timestamp(asof)
     panels = build_panels(src, cfg, specs, end=asof_ts)
     if not panels:
@@ -59,7 +61,7 @@ def generate_orders(
             f"as-of {asof} is not a trading day in data (last: {signals.target.index.max().date()})"
         )
     tgt_exp = signals.target.loc[asof_ts].fillna(0.0)
-    cur = _load_positions(positions_csv)
+    cur = positions if positions is not None else _load_positions(positions_csv)
     rows = []
     for s_, exp in tgt_exp.items():
         s = str(s_)

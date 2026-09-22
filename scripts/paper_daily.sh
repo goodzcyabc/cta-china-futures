@@ -21,8 +21,11 @@ run_book paper_v05  --no-ingest --config configs/strategy_v05.yaml   # 工业品
 run_book paper_v03p --no-ingest --config configs/strategy_v03p.yaml  # P1 剔除 5 品种(十四)
 # 每日结果入库(含 FAILED.json),形成不可篡改的时间戳(git 提交时间)
 MSG="paper: $TODAY"; [ -n "$FAILED" ] && MSG="$MSG (FAILED:$FAILED)"
-git add paper paper_v03 paper_v03p paper_v01r paper_v05 && git -c user.name=paper-bot -c user.email=paper@local commit -q -m "$MSG" || true
-git push -q origin HEAD || true
+git add paper paper_v03 paper_v03p paper_v01r paper_v05 || FAILED="$FAILED git-add"
+if ! git diff --cached --quiet; then  # 有改动才提交;提交失败与推送失败都进告警链
+  git -c user.name=paper-bot -c user.email=paper@local commit -q -m "$MSG" || FAILED="$FAILED git-commit"
+fi
+git push -q origin HEAD || FAILED="$FAILED git-push"
 if [ -n "$FAILED" ]; then
   osascript -e "display notification \"$FAILED\" with title \"CTA 纸面账失败 $TODAY\"" 2>/dev/null || true
   echo "=== FAILED:$FAILED"

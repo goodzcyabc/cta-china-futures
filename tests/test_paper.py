@@ -265,3 +265,81 @@ def test_step_is_all_or_nothing(tmp_path: Path, monkeypatch: object) -> None:
     eq = pd.read_csv(tmp_path / "equity.csv")
     assert len(eq) == 1 and str(eq.iloc[0]["date"]) == str(d1.date()) and "failed" not in log
     assert (tmp_path / "fills" / f"{d1.date()}.csv").exists()
+
+
+def test_step_leaves_no_partial_artifacts_when_order_writing_fails(
+    tmp_path: Path, monkeypatch: object
+) -> None:
+    """出单函数写出一半文件后失败:正式 orders/、positions.csv、equity.csv、state.json 一个不动;修复后重跑全部就位。"""
+    import pytest
+
+    from cta.config import load_config
+    from cta.paper import runner
+
+    specs = load_instruments()
+    cfg = load_config(Path("configs/strategy.yaml"))
+    d0, d1 = pd.Timestamp("2026-09-10"), pd.Timestamp("2026-09-11")
+    book = PaperBook(tmp_path, initial_capital=cfg.backtest.initial_capital_cny)
+    book.state.positions["CU"] = Position("CU2610", 2.0, 70000.0)
+    book.state.last_settled, book.state.pending_orders_date = str(d0.date()), str(d0.date())
+    book.save()
+    book.positions_csv()  # 正式 positions.csv 记录旧持仓 2 手
+    od = tmp_path / "orders" / str(d0.date())
+    od.mkdir(parents=True)
+    pd.DataFrame([{"symbol": "CU", "target_contract": "CU2610", "target_lots": 3.0}]).to_csv(
+        od / "orders.csv", index=False
+    )
+    quotes = pd.DataFrame(
+        [{"date": d1, "contract": "CU2610", "open": 70000.0, "settle": 70500.0, "prev_settle": 69800.0}]
+    )
+
+    class _Ex:
+        def quotes(self) -> pd.DataFrame:
+            return quotes
+
+    kw = dict(cfg=cfg, specs=specs, src=object(), ex=_Ex(), paper_dir=tmp_path, do_ingest=False)
+    kw["holidays"] = pd.DatetimeIndex([])
+
+    def half_written(
+        cfg: object, src: object, specs: object, asof: str, *a: object, **k: object
+    ) -> dict[str, object]:
+        out = (
+            Path(str(k.get("out_dir", a[2] if len(a) > 2 else "")))
+            if k.get("out_dir") or len(a) > 2
+            else None
+        )
+        assert out is not None
+        (out / asof).mkdir(parents=True, exist_ok=True)
+        (out / asof / "orders.csv").write_text(
+            "symbol,target_contract,target_lots\nCU,CU2610,", encoding="utf-8"
+        )
+        raise RuntimeError("disk full while writing snapshot")
+
+    monkeypatch.setattr(runner, "generate_orders", half_written)  # type: ignore[attr-defined]
+    with pytest.raises(runner.PaperStepError):
+        runner.step(d1, **kw)  # type: ignore[arg-type]
+    assert not (tmp_path / "orders" / str(d1.date())).exists()  # 半个订单文件没有进正式目录
+    pos = pd.read_csv(tmp_path / "positions.csv")
+    assert pos.iloc[0]["lots"] == 2.0  # 正式持仓文件仍是旧持仓
+    assert not (tmp_path / "equity.csv").exists() and PaperBook(tmp_path).state.positions["CU"].lots == 2.0
+    assert (
+        tmp_path / ".txn" / str(d1.date()) / "orders" / str(d1.date()) / "orders.csv"
+    ).exists()  # 取证留在 .txn
+
+    def good(
+        cfg: object, src: object, specs: object, asof: str, *a: object, **k: object
+    ) -> dict[str, object]:
+        out = Path(str(k["out_dir"]))
+        (out / asof).mkdir(parents=True, exist_ok=True)
+        pd.DataFrame([{"symbol": "CU", "target_contract": "CU2610", "target_lots": 3.0}]).to_csv(
+            out / asof / "orders.csv", index=False
+        )
+        return {"summary": {"n_trades": 0}}
+
+    monkeypatch.setattr(runner, "generate_orders", good)  # type: ignore[attr-defined]
+    runner.step(d1, **kw)  # type: ignore[arg-type]
+    assert (tmp_path / "orders" / str(d1.date()) / "orders.csv").exists()
+    assert pd.read_csv(tmp_path / "positions.csv").iloc[0]["lots"] == 3.0
+    assert PaperBook(tmp_path).state.positions["CU"].lots == 3.0
+    assert not (tmp_path / ".txn" / str(d1.date())).exists() and not (tmp_path / "FAILED.json").exists()
+    assert len(pd.read_csv(tmp_path / "equity.csv")) == 1
