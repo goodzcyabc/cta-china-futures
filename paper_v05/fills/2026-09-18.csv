@@ -1,0 +1,4 @@
+date,symbol,contract,lots,status,price,fee,slippage
+2026-09-18,AL,AL2610,-1.0,filled,24250.0,3.0,25.0
+2026-09-18,AL,AL2611,2.0,filled,24265.0,6.0,50.0
+2026-09-18,MA,MA2701,1.0,filled,2971.0,2.97,10.0

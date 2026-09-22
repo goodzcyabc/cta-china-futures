@@ -10,8 +10,10 @@ PYTHONPATH=src python3 -m cta.cli paper catchup --date "$TODAY"
 PYTHONPATH=src python3 -m cta.cli paper catchup --date "$TODAY" --no-ingest --config configs/strategy_v03.yaml --book paper_v03
 # 并行账本 v0.1r(v0.1 + 监管事件覆盖层;design_log 13.6/13.7):事件由当日 params 机械推导
 PYTHONPATH=src python3 -m cta.cli paper catchup --date "$TODAY" --no-ingest --config configs/strategy_v01r.yaml --book paper_v01r
+# 并行账本 v0.5(工业品 12 品种;design_log 十五):事后假设,证据只从纸面算
+PYTHONPATH=src python3 -m cta.cli paper catchup --date "$TODAY" --no-ingest --config configs/strategy_v05.yaml --book paper_v05
 # 并行账本 v0.3p(P1 剔除 5 品种;design_log 十四):作为"剔除亏钱品种"做法的前向检验
 PYTHONPATH=src python3 -m cta.cli paper catchup --date "$TODAY" --no-ingest --config configs/strategy_v03p.yaml --book paper_v03p
 # 每日结果入库,形成不可篡改的时间戳(git 提交时间)
-git add paper paper_v03 paper_v03p paper_v01r && git -c user.name=paper-bot -c user.email=paper@local commit -q -m "paper: $TODAY" || true
+git add paper paper_v03 paper_v03p paper_v01r paper_v05 && git -c user.name=paper-bot -c user.email=paper@local commit -q -m "paper: $TODAY" || true
 git push -q origin HEAD || true
