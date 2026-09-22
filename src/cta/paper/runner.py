@@ -37,29 +37,43 @@ def settlement_published(date: pd.Timestamp, now: pd.Timestamp | None = None) ->
 
 
 def ingest_all(
-    date: pd.Timestamp, kinds: tuple[Kind, ...] = ("quotes", "positions", "receipts"), force: bool = False
+    date: pd.Timestamp,
+    kinds: tuple[Kind, ...] = ("quotes", "positions", "receipts", "params"),
+    force: bool = False,
 ) -> dict[str, str]:
     """拉四家交易所某日数据。北京 16:30 前不拉当天(盘中快照);盘中快照即使拉到也会被 NotFinalError 拒绝。
-    单个交易所失败只记录不中断:该所品种当日无数据 → 出单时视为 stale、持仓保持不动。"""
+    单个交易所失败只记录不中断:该所品种当日无数据 → 出单时视为 stale、持仓保持不动。
+    "params"(每日风控参数,监管事件覆盖层的事件源)由 params 模块三所直连;大商所需浏览器,跳过并记录。"""
     status: dict[str, str] = {}
     if not force and not settlement_published(date):
         return dict.fromkeys(("SHFE", "INE", "CZCE", "DCE"), "not_settled_yet")
     from cta.data.exchanges import czce, dce, ine, shfe
+    from cta.data.exchanges import params as exparams
     from cta.data.exchanges.base import NotFinalError
 
+    base_kinds = tuple(k for k in kinds if k != "params")
     for exch, fn in (("SHFE", shfe.ingest_day), ("INE", ine.ingest_day), ("CZCE", czce.ingest_day)):
         try:
-            status[exch] = ",".join(f"{k}:{v}" for k, v in fn(date, kinds).items())
+            status[exch] = ",".join(f"{k}:{v}" for k, v in fn(date, base_kinds).items())
         except NotFinalError as e:
             status[exch] = f"not_final: {e}"[:200]
         except Exception as e:  # noqa: BLE001
             status[exch] = f"error: {type(e).__name__}: {e}"[:200]
-    try:
-        with dce.CdpSession() as sess:  # 大商所需要浏览器会话(web-access CDP proxy)
-            parts = [f"{k}:{dce.ingest_day(date, k, sess)}" for k in kinds]
-        status["DCE"] = ",".join(parts)
-    except Exception as e:  # noqa: BLE001
-        status["DCE"] = f"error: {type(e).__name__}: {e}"[:200]
+    if base_kinds:
+        try:
+            with dce.CdpSession() as sess:  # 大商所需要浏览器会话(web-access CDP proxy)
+                parts = [f"{k}:{dce.ingest_day(date, k, sess)}" for k in base_kinds]
+            status["DCE"] = ",".join(parts)
+        except Exception as e:  # noqa: BLE001
+            status["DCE"] = f"error: {type(e).__name__}: {e}"[:200]
+    if "params" in kinds:
+        try:
+            res = exparams.ingest_day(date, exparams.EXCHANGES)
+        except Exception as e:  # noqa: BLE001
+            res = dict.fromkeys(exparams.EXCHANGES, f"error: {type(e).__name__}: {e}"[:200])
+        res["DCE"] = "skipped_needs_browser"
+        for exch, v in res.items():
+            status[exch] = ",".join(x for x in (status.get(exch, ""), f"params:{v}") if x)
     return status
 
 

@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 Exchange = Literal["SHFE", "INE", "DCE", "CZCE", "CFFEX", "GFEX"]
-Kind = Literal["quotes", "positions", "receipts"]
+Kind = Literal["quotes", "positions", "receipts", "params"]
 EXCHANGES: tuple[Exchange, ...] = ("SHFE", "INE", "DCE", "CZCE", "CFFEX", "GFEX")
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[4] / "data" / "exchanges"
@@ -54,13 +54,35 @@ POSITION_COLS = [
 ]
 # 仓单:一行 = 某品种某仓库(或合计)的注册仓单数量与当日增减。
 RECEIPT_COLS = ["date", "exchange", "symbol", "warehouse", "is_total", "receipts", "change"]
+# 每日风控参数:一行一个合约。保证金/涨跌停为小数(0.09 = 9%);手续费按 *_unit 计("bp" = 成交金额的万分之几,
+# "CNY_per_lot" = 元/手);margin_spec 为该日结算起适用的投机保证金,limit_pct 为该日盘中生效的涨跌停幅度;
+# 交易所文件没有的字段填 NaN(如郑商所无套保保证金)。
+PARAM_COLS = [
+    "date",
+    "exchange",
+    "symbol",
+    "contract",
+    "margin_spec",
+    "margin_hedge",
+    "fee_open",
+    "fee_open_unit",
+    "fee_close_today",
+    "fee_close_today_unit",
+    "limit_pct",
+]
+FEE_UNITS: frozenset[str] = frozenset({"bp", "CNY_per_lot"})
 
 
 class NotFinalError(RuntimeError):
     """交易所文件是盘中快照(结算价未出),不得落盘;调用方应删除已缓存的 raw 并稍后重试。"""
 
 
-_COLS: dict[str, list[str]] = {"quotes": QUOTE_COLS, "positions": POSITION_COLS, "receipts": RECEIPT_COLS}
+_COLS: dict[str, list[str]] = {
+    "quotes": QUOTE_COLS,
+    "positions": POSITION_COLS,
+    "receipts": RECEIPT_COLS,
+    "params": PARAM_COLS,
+}
 _CODE_RE = re.compile(r"^([A-Za-z]{1,2})(\d{3,4})$")
 
 
@@ -200,8 +222,35 @@ def validate(kind: str, df: pd.DataFrame) -> pd.DataFrame:
         out["is_total"] = out["is_total"].astype(bool)
         for c in ["vol", "vol_chg", "long_oi", "long_chg", "short_oi", "short_chg"]:
             out[c] = pd.to_numeric(out[c], errors="coerce").astype(float)
+    elif kind == "params":
+        _validate_params(out)
     else:
         out["is_total"] = out["is_total"].astype(bool)
         for c in ["receipts", "change"]:
             out[c] = pd.to_numeric(out[c], errors="coerce").astype(float)
     return out.reset_index(drop=True)
+
+
+def _validate_params(out: pd.DataFrame) -> None:
+    """params 就地校验:合约代码规范、合约不重复、保证金 ∈ (0,1]、涨跌停 ∈ (0,1] 或 NaN、手续费 ≥ 0 或 NaN、单位取值合法。"""
+    bad_code = out["contract"].map(lambda c: _CODE_RE.match(str(c)) is None)
+    if bad_code.any():
+        raise ValueError(f"params: bad contract codes {list(out.loc[bad_code, 'contract'].head())}")
+    if out["contract"].duplicated().any():
+        raise ValueError("params: duplicated contract rows")
+    for c in ["margin_spec", "margin_hedge", "fee_open", "fee_close_today", "limit_pct"]:
+        out[c] = pd.to_numeric(out[c], errors="coerce").astype(float)
+    if not ((out["margin_spec"] > 0) & (out["margin_spec"] <= 1)).all():
+        raise ValueError("params: margin_spec must be in (0, 1] for every contract")
+    for c in ["margin_hedge", "limit_pct"]:
+        v = out[c].dropna()
+        if not ((v > 0) & (v <= 1)).all():
+            raise ValueError(f"params: {c} must be in (0, 1] or NaN")
+    for c in ["fee_open", "fee_close_today"]:
+        if (out[c].dropna() < 0).any():
+            raise ValueError(f"params: negative {c}")
+    for c in ["fee_open_unit", "fee_close_today_unit"]:
+        out[c] = out[c].where(out[c].notna(), None).astype(object)
+        units = set(out[c].dropna().unique())
+        if not units <= FEE_UNITS:
+            raise ValueError(f"params: {c} has unknown units {sorted(units - FEE_UNITS)}")

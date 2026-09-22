@@ -3,6 +3,7 @@
 文件:`data/external/exchange_events/events.csv`(不进 git;同目录 `README.md` 为简版说明)。生成日 2026-09-21。
 用途:研究"监管事件"因子——交易所对**期货**品种的保证金、涨跌停板、手续费、平今手续费、持仓限额、交易限额的调整,一行 = 一次公告(或一次参数文件变动)中对一个品种的一项调整。
 覆盖 2016-01-01 至 2026-09-21;上期所(SHFE)、上期能源(INE)为公告正文抽取,郑商所(CZCE)为交易所日参数文件推导(见"抽取方法"与"已知遗漏"),大商所(DCE)本次未覆盖。
+本表是一次性生成的历史表;每日可复现的"参数文件推导"事件源已接入数据层(`kind="params"`,`src/cta/data/exchanges/params.py`,文档 `docs/data_exchange_params.md`,输出 `events_derived.csv` 同 14 列),与本表 `DERIVED` 行同口径。
 
 ## 1. 总览
 

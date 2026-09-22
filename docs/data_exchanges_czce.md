@@ -18,7 +18,8 @@ PYTHONPATH=src python3 -m cta.data.exchanges.czce reparse --kinds receipts      
 | 日行情 | `https://www.czce.com.cn/cn/DFSStaticFiles/Future/{YYYY}/{YYYYMMDD}/FutureDataDaily.txt` | 竖线分隔文本 |
 | 持仓排名 | `…/{YYYY}/{YYYYMMDD}/FutureDataHolding.txt` | 品种榜 + 合约榜,前 20 名 |
 | 仓单日报 | `…/{YYYY}/{YYYYMMDD}/FutureDataWhsheet.txt` | 品种 × 仓库 × (年度/等级/品牌)明细 |
-| 结算参数 | `…/{YYYY}/{YYYYMMDD}/FutureDataClearParams.txt` | 未接入,URL 已验证可用 |
+| 结算参数 | `…/{YYYY}/{YYYYMMDD}/FutureDataClearParams.txt` | 已接入为 `params`(保证金/手续费/涨跌停),见 `docs/data_exchange_params.md` |
+| 交易参数 | `…/{YYYY}/{YYYYMMDD}/FutureTradeParam.txt` | 2025-08-18 起;当日涨跌停/持仓限额,`params` 的 limit_pct 来源 |
 | 年度行情打包 | `…/Future/{YYYY}/ALLFUTURES{YYYY}.zip`(2020–)、`…/Future/{YYYY}/FutureDataHistory.zip`(2015–2019)、`/cn/exchange/datahistory{YYYY}.zip`(2010–2014) | 仅行情;入口页 `/cn/jysj/lshqxz/H077003019index_1.htm` |
 
 反爬(瑞数 JS 挑战):同目录的 `.htm` 与年度 `.zip` 直连一律 `412 Precondition Failed`(返回一段混淆 JS,需要浏览器执行后写 cookie)。
