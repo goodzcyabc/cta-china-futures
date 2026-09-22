@@ -303,12 +303,7 @@ def test_step_leaves_no_partial_artifacts_when_order_writing_fails(
     def half_written(
         cfg: object, src: object, specs: object, asof: str, *a: object, **k: object
     ) -> dict[str, object]:
-        out = (
-            Path(str(k.get("out_dir", a[2] if len(a) > 2 else "")))
-            if k.get("out_dir") or len(a) > 2
-            else None
-        )
-        assert out is not None
+        out = Path(str(a[2]))  # 第 7 个位置参数 out_dir(runner 传的是 .txn/<日>/orders)
         (out / asof).mkdir(parents=True, exist_ok=True)
         (out / asof / "orders.csv").write_text(
             "symbol,target_contract,target_lots\nCU,CU2610,", encoding="utf-8"
@@ -329,7 +324,7 @@ def test_step_leaves_no_partial_artifacts_when_order_writing_fails(
     def good(
         cfg: object, src: object, specs: object, asof: str, *a: object, **k: object
     ) -> dict[str, object]:
-        out = Path(str(k["out_dir"]))
+        out = Path(str(a[2]))
         (out / asof).mkdir(parents=True, exist_ok=True)
         pd.DataFrame([{"symbol": "CU", "target_contract": "CU2610", "target_lots": 3.0}]).to_csv(
             out / asof / "orders.csv", index=False
