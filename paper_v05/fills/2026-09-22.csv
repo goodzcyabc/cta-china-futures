@@ -1,0 +1,3 @@
+date,symbol,contract,lots,status,price,fee,slippage
+2026-09-22,NI,NI2610,3.0,filled,123700.0,9.0,30.0
+2026-09-22,NI,NI2611,-3.0,filled,123760.0,9.0,30.0
