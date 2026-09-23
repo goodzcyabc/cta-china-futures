@@ -671,3 +671,8 @@ IS 里 F1/F2 只高 0.04(门槛 0.05),且 5 年里仅 1 年不劣;OOS 里所有�
 配对差标准误降到 ±0.65 需要 12 个月(17.5),因此 **2027-09 之前不做版本采用决定**;届时若要做,须先另行预注册判读规则与样本量。
 ### 18.6 声明
 本节写在验收数据被看过之前。09-16 → 09-22 的纸面权益虽已见过(五本账 296–301 万),不用于任何选择。试验计数仍为 44。
+
+### 18.7 验收与诊断工具落地(2026-09-23 北京;只读工具,不改策略、参数、品种池、账本)
+- `scripts/portfolio_diagnostics.py`(核心在 `src/cta/analysis/attribution.py`、`loo.py`):正式基线(v0.3、统一引擎、官方结算价、300 万)从 2016-01-04 连续运行到 2026-09-18 再切 IS/OOS/FULL;逐品种净贡献 = pnl_by_symbol(盯市 + 已实现,滑点已在成交价)− 逐笔按品种归属的手续费(引擎 `trades` 新增 fee/slippage 列),**任一区间 Σ净贡献 ≠ 权益变化(容差 1 分)即中止**;输出广度、IS→OOS 符号迁移、板块、集中度(share_of_positive 主口径 ≤100%;share_of_total 可 >100%,总净贡献 ≤0 时不定义)、分年/滚动两年广度、长期负贡献清单(只列不用)、leave-one-out(目标暴露置 0 后完整重跑,不是相减;依赖阈值:FULL 月夏普降 ≥0.10 或 OOS 年化降 ≥2pp)。"OOS 空仓独立起跑"单列为敏感性。
+- `scripts/paper_acceptance.py`(核心 `src/cta/analysis/paper_acceptance.py`、`stats.py`):按 18.2/18.3 实现完整率、按腿成交率、逐日/每周权益对账(Δ权益 = Δ已实现 + 盯市 − Δ手续费,并用 fills 交叉核对手续费;--strict 不一致退出 1)、FAILED/日志汇总、基于订单快照 config_digest/instruments_digest/git_sha/data_manifest 的漂移分类(协议清单 `configs/paper_protocol.yaml` 声明的切换视为合法)、五本账共同日期、故障演练证据(`docs/drills/*.json`,无则 PENDING)、配对差(各自前一日权益为分母、共同相邻日期;NW lag 5;块 bootstrap 块长 10、2000 次、种子 20260923;n<60 显著标"样本量不足";停账条件只报告"是否触及",并写明触及 ≠ champion 更优)。验收期未结束 → PRELIMINARY。
+- 测试 17 项(手续费归属、滑点不重复扣、严格对账、符号迁移、含负贡献的集中度、板块聚合、LOO 真重跑、配对收益用各自前一日权益、NW 手算核对、bootstrap 固定种子、缺失/blocked/FAILED、注入错误被对账发现、摘要漂移、PRELIMINARY、PENDING)。首次实跑:组合诊断三区间对账通过;验收报告 PRELIMINARY(验收期 09-23 起尚无数据);记录期 09-16→09-22 五本账逐日对账全部一致、成交率 100%,paper*/ 111 个文件校验和运行前后一致。

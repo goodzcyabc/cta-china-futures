@@ -31,7 +31,7 @@ class BacktestResult:
     exposure: pd.DataFrame  # date x symbol, 名义/权益
     margin_usage: pd.Series[Any]
     costs: pd.Series[Any]  # 每日手续费(元)
-    trades: pd.DataFrame  # date, symbol, contract, lots, price, reason
+    trades: pd.DataFrame  # date, symbol, contract, lots, price, reason, fee, slippage(逐笔,按品种归属)
     unfilled: pd.Series[Any] = field(default_factory=lambda: pd.Series(dtype=int))  # 每日被挡的腿数
     slippage: pd.Series[Any] = field(
         default_factory=lambda: pd.Series(dtype=float)
@@ -123,7 +123,7 @@ def run_backtest(
     slip_hist: dict[pd.Timestamp, float] = {}
     unm_hist: dict[pd.Timestamp, int] = {}
     pnl_hist: dict[pd.Timestamp, dict[str, float]] = {}
-    trades: list[tuple[pd.Timestamp, str, str, float, float, str]] = []
+    trades: list[tuple[pd.Timestamp, str, str, float, float, str, float, float]] = []
 
     for i, d in enumerate(dates):
         rows = {s: frames[s].loc[d] for s in symbols if d in frames[s].index}
@@ -146,7 +146,16 @@ def run_backtest(
                 day_cost += float(f["fee"])
                 day_slip += float(f["slippage"])
                 trades.append(
-                    (d, f["symbol"], f["contract"], float(f["lots"]), float(f["price"]), str(f["leg"]))
+                    (
+                        d,
+                        f["symbol"],
+                        f["contract"],
+                        float(f["lots"]),
+                        float(f["price"]),
+                        str(f["leg"]),
+                        float(f["fee"]),
+                        float(f["slippage"]),
+                    )
                 )
             else:
                 unfilled += 1
@@ -212,7 +221,9 @@ def run_backtest(
         exposure=pd.DataFrame(exp_hist).T,
         margin_usage=pd.Series(mu_hist, name="margin_usage"),
         costs=pd.Series(cost_hist, name="costs"),
-        trades=pd.DataFrame(trades, columns=["date", "symbol", "contract", "lots", "price", "reason"]),
+        trades=pd.DataFrame(
+            trades, columns=["date", "symbol", "contract", "lots", "price", "reason", "fee", "slippage"]
+        ),
         unfilled=pd.Series(unf_hist, name="unfilled", dtype=int),
         slippage=pd.Series(slip_hist, name="slippage"),
         pnl_by_symbol=pd.DataFrame(pnl_hist).T,

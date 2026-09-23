@@ -53,3 +53,7 @@
 - 配对差:各 challenger 相对 champion(v0.3)的日收益差,报告年化均值、Newey–West SE、t、块 bootstrap 95% 区间;**不采用、不淘汰**;t < −3 且回撤差 > 10pp 连续两月可停账止损。
 - 版本采用决定不早于 2027-09(配对差 SE 降到 ±0.65 需要 12 个月)。
 - 语义断点:2026-09-22 前的订单为旧口径,09-23 起为统一口径(手数带、T 收盘定手数、保证金真缩减、目标合约 = T+1 排程)。
+
+## 验收与诊断命令(只读)
+- 纸面验收(设计日志十八):`PYTHONPATH=src python3 scripts/paper_acceptance.py --start 2026-09-23 --end 2026-12-15 [--strict]` → `results/paper_acceptance/*.csv`、`report/paper_acceptance_2026-12-15.md`(期末前为 PRELIMINARY)。故障演练证据放 `docs/drills/*.json`(格式见 `docs/drills/README.md`),否则报告显示 PENDING。协议清单 `configs/paper_protocol.yaml` 记录 champion/challenger、预期摘要与已声明的切换。
+- 组合诊断:`PYTHONPATH=src python3 scripts/portfolio_diagnostics.py [--skip-loo]` → `results/portfolio_diagnostics/*.csv`、`docs/portfolio_diagnostics.md`(逐品种净归因对账不过即失败)。

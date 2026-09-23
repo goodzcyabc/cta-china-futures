@@ -1,0 +1,20 @@
+# 纸面期协议清单(只读;design_log 十八)。验收程序据此区分"合法的统一口径切换"与"未声明的变化"。
+# 只检测和报告,不阻止每日作业。摘要字段与订单快照 snapshot.json 完全一致(config_digest / instruments_digest / git_sha / data_manifest)。
+version: 1
+champion: paper_v03
+challengers: [paper, paper_v03p, paper_v01r, paper_v05]
+acceptance:
+  start: "2026-09-23"     # 统一执行口径起算日(09-16 → 09-22 只作记录)
+  end: "2026-12-15"
+  report_date: "2026-12-16"
+books:                    # 验收期内应保持不变的策略配置摘要(cfg.digest(),2026-09-23 口径)
+  paper:      {config: configs/strategy.yaml,      expected_config_digest: 2061059f500b}
+  paper_v03:  {config: configs/strategy_v03.yaml,  expected_config_digest: 5b010148a71e}
+  paper_v03p: {config: configs/strategy_v03p.yaml, expected_config_digest: 854e88a275e7}
+  paper_v01r: {config: configs/strategy_v01r.yaml, expected_config_digest: de2edea33b5d}
+  paper_v05:  {config: configs/strategy_v05.yaml,  expected_config_digest: 764ae2e20153}
+expected_instruments_digest: d023ab35
+declared_transitions:     # 已说明的切换:同日、同字段的快照变化视为合法
+  - effective: "2026-09-23"
+    fields: [config_digest, git_sha]
+    note: "统一执行口径(design_log 17.7):trade_buffer 拆成 exposure_buffer/lot_band、新增 data.settle=official;代码 dd215f5 → f898e7b 及之后"
