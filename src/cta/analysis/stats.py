@@ -41,8 +41,10 @@ def daily_returns(equity: pd.Series[Any]) -> pd.Series[Any]:
     return out.dropna()
 
 
-def paired_differences(champion: pd.Series[Any], challenger: pd.Series[Any]) -> pd.DataFrame:
-    """共同有效日期上的 (r_champion, r_challenger, d)。"""
+def paired_differences(
+    champion: pd.Series[Any], challenger: pd.Series[Any], start: pd.Timestamp | None = None
+) -> pd.DataFrame:
+    """共同有效日期上的 (r_champion, r_challenger, d);start 给定时只保留配对日期 ≥ start(其前一日仍可作分母)。"""
     a = champion.dropna().astype(float)
     b = challenger.dropna().astype(float)
     a.index, b.index = pd.DatetimeIndex(a.index), pd.DatetimeIndex(b.index)
@@ -56,6 +58,8 @@ def paired_differences(champion: pd.Series[Any], challenger: pd.Series[Any]) -> 
         if (
             a.index[ia - 1] != p or b.index[ib - 1] != p
         ):  # 任一本在 (p, t] 之间多了一天 → 两边的"日收益"跨度不同,跳过
+            continue
+        if start is not None and t < start:
             continue
         ra, rb = float(a.loc[t] / a.loc[p] - 1.0), float(b.loc[t] / b.loc[p] - 1.0)
         rows.append({"date": t, "r_champion": ra, "r_challenger": rb, "d": rb - ra})
@@ -127,9 +131,10 @@ def paired_summary(
     n_boot: int = 2000,
     seed: int = 20260923,
     min_days: int = 60,
+    start: pd.Timestamp | None = None,
 ) -> dict[str, Any]:
     """配对差的年化均值、NW 标准误与 t、块 bootstrap 95% 区间;各账净夏普(日频年化)与最大回撤;回撤差;样本量标记。"""
-    pdf = paired_differences(champion, challenger)
+    pdf = paired_differences(champion, challenger, start)
     d = pdf["d"].to_numpy(dtype=float)
     nw = newey_west_mean(d, lags)
     bt = block_bootstrap_mean(d, block, n_boot, seed)

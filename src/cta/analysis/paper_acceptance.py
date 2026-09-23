@@ -439,10 +439,10 @@ def drill_evidence(evidence_dir: Path) -> tuple[str, list[dict[str, Any]]]:
 
 # ---------- 汇总 ----------
 def _stop_condition(
-    champion: pd.Series[Any], challenger: pd.Series[Any], lags: int, seed: int
+    champion: pd.Series[Any], challenger: pd.Series[Any], lags: int, seed: int, start: pd.Timestamp
 ) -> dict[str, Any]:
     """预注册停账条件:配对差 t < −3 且 challenger 回撤差 < −10pp,连续两个月末成立。触及 ≠ champion 更优。"""
-    pdf = paired_differences(champion, challenger)
+    pdf = paired_differences(champion, challenger, start)
     if pdf.empty:
         return {"evaluable": False, "months_evaluated": 0, "triggered": False, "detail": "无共同日期"}
     dates = pd.Series(pd.DatetimeIndex(pdf.index), index=pdf.index)
@@ -452,7 +452,7 @@ def _stop_condition(
         me_ts = pd.Timestamp(me)
         ca = champion[pd.DatetimeIndex(champion.index) <= me_ts]
         cb = challenger[pd.DatetimeIndex(challenger.index) <= me_ts]
-        s = paired_summary(ca, cb, lags=lags, n_boot=200, seed=seed)
+        s = paired_summary(ca, cb, lags=lags, n_boot=200, seed=seed, start=start)
         flags.append(bool(np.isfinite(s["t"]) and s["t"] < -3 and s["dd_diff"] < -0.10))
     if len(flags) < 2:
         return {
@@ -529,10 +529,10 @@ def run_acceptance(
                 (b.equity.index >= start - pd.Timedelta(days=10)) & (b.equity.index <= asof_ts)
             ]
             # 起算点:第一条配对差用 start 当日相对其前一交易日的收益,所以取 start 之前一条权益作基
-            s = paired_summary(ce, be, lags=lags, block=block, n_boot=n_boot, seed=seed)
+            s = paired_summary(ce, be, lags=lags, block=block, n_boot=n_boot, seed=seed, start=start)
             s["challenger"] = b.name
             paired_rows.append(s)
-            sc = _stop_condition(ce, be, lags, seed)
+            sc = _stop_condition(ce, be, lags, seed, start)
             sc["challenger"] = b.name
             stop_rows.append(sc)
     paired_df = pd.DataFrame(paired_rows)
@@ -772,7 +772,7 @@ def _render_report(
             )
         )
     lines += ["", "## 7. champion / challenger 配对差(预注册 18.3;只报告,不选择)", ""]
-    if len(paired_df):
+    if len(paired_df) and int(paired_df["n_days"].max()) > 0:
         insufficient = paired_df[~paired_df["sample_sufficient"]]
         if len(insufficient):
             lines += [
@@ -802,7 +802,7 @@ def _render_report(
                 f"| {r['challenger']} | {'是' if r['evaluable'] else '否'} | {r['months_evaluated']} | {'**触及**' if r['triggered'] else '未触及'} | {r['detail']} |"
             )
     else:
-        lines.append("(无共同日期,无法计算)")
+        lines.append("(验收期内尚无配对日期,无法计算)")
     lines += [
         "",
         "## 8. 方法与参数",
