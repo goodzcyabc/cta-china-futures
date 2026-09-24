@@ -1,33 +1,33 @@
 {
- "equity": 2989210.323,
+ "equity": 2981580.323,
  "cash_start": 3000000.0,
- "last_settled": "2026-09-22",
- "pending_orders_date": "2026-09-22",
+ "last_settled": "2026-09-24",
+ "pending_orders_date": "2026-09-24",
  "positions": {
   "CU": {
    "contract": "CU2610",
    "lots": 1.0,
-   "ref_price": 111220.0
+   "ref_price": 110780.0
   },
   "MA": {
    "contract": "MA2701",
    "lots": 10.0,
-   "ref_price": 2929.0
+   "ref_price": 2892.0
   },
   "SA": {
    "contract": "SA2701",
    "lots": -9.0,
-   "ref_price": 1020.0
+   "ref_price": 1008.0
   },
   "TA": {
    "contract": "TA2701",
    "lots": 10.0,
-   "ref_price": 6262.0
+   "ref_price": 6270.0
   },
   "V": {
    "contract": "V2701",
    "lots": -12.0,
-   "ref_price": 4760.0
+   "ref_price": 4787.0
   },
   "AL": {
    "contract": "AL2611",
@@ -37,7 +37,7 @@
   "NI": {
    "contract": "NI2611",
    "lots": -3.0,
-   "ref_price": 124460.0
+   "ref_price": 125350.0
   }
  },
  "realized_pnl": -280.0,

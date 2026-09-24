@@ -1,18 +1,24 @@
 {
- "date": "2026-09-23",
+ "date": "2026-09-24",
+ "ingest": {
+  "SHFE": "quotes:written,positions:written,receipts:written,params:written",
+  "INE": "quotes:written,positions:written,receipts:written,params:written",
+  "CZCE": "quotes:ok,positions:missing,receipts:ok,params:written",
+  "DCE": "quotes:written,positions:written,receipts:written,params:skipped_needs_browser"
+ },
  "fills": {
-  "n": 4,
-  "filled": 4,
+  "n": 2,
+  "filled": 2,
   "blocked": 0
  },
  "orders": {
   "n_symbols": 22,
-  "n_trades": 2,
-  "n_rolls": 0,
-  "est_margin_usage": 0.14352315798254695,
+  "n_trades": 1,
+  "n_rolls": 1,
+  "est_margin_usage": 0.14386171884573126,
   "stale_symbols": {}
  },
- "equity": 2953001.1459999993,
+ "equity": 2960158.917999999,
  "positions": {
   "C": [
    "C2611",
@@ -36,7 +42,7 @@
   ],
   "RB": [
    "RB2701",
-   -4.0
+   -6.0
   ],
   "SA": [
    "SA2701",
@@ -44,7 +50,7 @@
   ],
   "SR": [
    "SR2701",
-   -8.0
+   -5.0
   ],
   "TA": [
    "TA2701",
