@@ -380,7 +380,7 @@ OOS 相关 {'tsmom': {'tsmom': 1.0, 'carry': 0.19, 'receipts_level': -0.058}, 'c
 ## 8. 文件、提交、测试、未改动范围
 
 **新增文件**:`docs/adaptive_quarterly_v1_prereg.md`(预注册,提交 97f525c,第 1–12 节未改,第 13 节只追加结果)、`src/cta/analysis/adaptive_quarterly.py`(M1/A1/A2 权重估计,常数写死、无搜索接口)、`scripts/adaptive_quarterly_v1.py`(`--mode smoke|full`)、`tests/test_adaptive_quarterly.py`、`results/adaptive_quarterly_v1/`(weights/quarters/symbol_contrib/sector_contrib/paired × 3 模型、equity × 3、sleeve_returns、summary、criteria、tsmom_speed、run.json、smoke.log、full.log)、本文件。
-**提交**:预注册 97f525c;实现 + 结果、报告与设计日志 二十 见 git log(本节末尾列出)。
+**提交**:预注册 97f525c(运行前);实现 + 测试 + 本报告 + 预注册第 13 节 + 设计日志 二十 = 27a039a;本行补记提交哈希 = 其后一次小提交。`results/` 按仓库 .gitignore 不入库,全部 CSV 可由 `PYTHONPATH=src python3 scripts/adaptive_quarterly_v1.py --mode full` 在 40 s 内逐字节重建。
 **测试**:pytest 全套 154 项(含真实数据测试)全部通过,退出码 0;本模块 7 项(5 项合成数据 + 2 项真实数据)通过;`ruff format --check`、`ruff check`、`mypy src --strict`(50 个源文件)通过。
 **门槛**(smoke,`results/adaptive_quarterly_v1/smoke.log`):等权走 拼接→目标暴露→引擎 路径与生产目标暴露(全历史)及已有静态臂(2020 起)逐位一致;2022Q1/Q2 用截断到 cutoff 的面板重算,M1/A1/A2 权重不变;cutoff 之后注入噪声权重不变;仓单自 2016-01-04 可得;full 重跑两次结果逐字节相同(种子固定)。
 **未改动**:`configs/strategy*`、生产 signals/pipeline/execution、paper/live 代码、五本纸面账、champion(静态 v0.3)、正式报告基线数字;不新增因子,候选因子未进入主结果;试验计数 46 → 49。
