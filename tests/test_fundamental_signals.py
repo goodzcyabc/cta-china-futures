@@ -263,7 +263,11 @@ def test_real_predictors_are_point_in_time() -> None:
     assert np.allclose(
         g.loc[common, "growth"].to_numpy(dtype=float), g_t["growth"].to_numpy(dtype=float), equal_nan=True
     )
-    assert (oi.contracts.loc[oi.contracts.index < fs.OI_SINGLE_SIDE_FROM].isna().sum().sum()) == 0
+    # 缺失只出现在品种上市之前(SA 2019-12、SC 2018-03),上市后没有静默补 0 也没有空洞
+    for sym in oi.contracts.columns:
+        col = oi.contracts[sym]
+        first = col.first_valid_index()
+        assert first is not None and col.loc[first:].isna().sum() == 0 and (col.loc[first:] > 0).all()
     no = fs.load_macro(str(DATA / "macro_factors/制造业采购经理指数PMI_新订单.parquet"))
     fg = fs.load_macro(str(DATA / "macro_factors/制造业采购经理指数PMI_产成品库存.parquet"))
     rel = fs.pmi_ratio_releases(no, fg)
@@ -273,4 +277,5 @@ def test_real_predictors_are_point_in_time() -> None:
         if t is None:
             continue
         exec_day = dates[dates > r.info_date][0]
-        assert t <= r.info_date < exec_day and r.period_end <= r.info_date
+        # 统计局可在月末前几天公布(春节等:2022-01-30、2025-01-27),数据仍属该月;可得性只由公布日决定
+        assert t <= r.info_date < exec_day and r.period_end <= r.info_date + pd.Timedelta(days=7)

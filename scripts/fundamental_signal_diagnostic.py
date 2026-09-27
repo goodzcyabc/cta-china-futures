@@ -714,7 +714,7 @@ def write_doc(
     lines: list[str] = [
         "# 独立信息两条:全市场持仓兴趣与 PMI 订单/库存(回顾性诊断;预注册 `docs/fundamental_signal_prereg.md`)",
         "",
-        "> 第 0 节(结论)与第 6 节以后由人撰写、保留在 HTML 标记之间;第 1–5 节表格由脚本生成,重跑只刷新表格;预注册第 1–9 节未改。",
+        "> 第 0 节(结论)与第 6 节以后由人撰写、保留在 HTML 标记之间;第 1–5 节表格由脚本生成,重跑只刷新表格;预注册第 1–10 节未改。",
         "",
         f"git `{log['git_sha']}`;预注册提交 `{log['prereg_commit']}`;配置 `{log['config']}`(摘要 {log['config_digest']});窗口 {log['window'][0]} → {log['window'][1]};OOS 自 {log['oos_start']};种子 {log['seed']}。",
         "",
@@ -784,7 +784,7 @@ def write_doc(
         )
     lines += [
         "",
-        "### 5.1 预注册第 7 节的机械判读",
+        "### 5.1 预注册第 6 节的机械判读",
         "",
         pd.DataFrame({k: v["checks"] for k, v in verdicts.items()}).to_markdown(),
         "",
