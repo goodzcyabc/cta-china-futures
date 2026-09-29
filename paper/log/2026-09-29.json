@@ -1,0 +1,88 @@
+{
+ "date": "2026-09-29",
+ "ingest": {
+  "SHFE": "quotes:written,positions:written,receipts:written,params:written",
+  "INE": "quotes:written,positions:written,receipts:written,params:written",
+  "CZCE": "quotes:ok,positions:ok,receipts:ok,params:written",
+  "DCE": "quotes:written,positions:written,receipts:written,params:skipped_needs_browser"
+ },
+ "fills": {
+  "n": 1,
+  "filled": 1,
+  "blocked": 0
+ },
+ "orders": {
+  "n_symbols": 22,
+  "n_trades": 3,
+  "n_rolls": 0,
+  "est_margin_usage": 0.14153716100666622,
+  "stale_symbols": {}
+ },
+ "equity": 2934155.927999999,
+ "positions": {
+  "C": [
+   "C2611",
+   -24.0
+  ],
+  "JD": [
+   "JD2611",
+   6.0
+  ],
+  "M": [
+   "M2701",
+   24.0
+  ],
+  "MA": [
+   "MA2701",
+   10.0
+  ],
+  "P": [
+   "P2701",
+   -4.0
+  ],
+  "RB": [
+   "RB2701",
+   -6.0
+  ],
+  "SA": [
+   "SA2701",
+   -19.0
+  ],
+  "SR": [
+   "SR2701",
+   -5.0
+  ],
+  "TA": [
+   "TA2701",
+   9.0
+  ],
+  "V": [
+   "V2701",
+   -8.0
+  ],
+  "Y": [
+   "Y2701",
+   5.0
+  ],
+  "AL": [
+   "AL2611",
+   2.0
+  ],
+  "CF": [
+   "CF2701",
+   -1.0
+  ],
+  "NI": [
+   "NI2611",
+   -1.0
+  ],
+  "RU": [
+   "RU2701",
+   1.0
+  ],
+  "CU": [
+   "CU2611",
+   1.0
+  ]
+ }
+}

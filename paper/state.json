@@ -1,91 +1,91 @@
 {
- "equity": 2951738.927999999,
+ "equity": 2934155.927999999,
  "cash_start": 3000000.0,
- "last_settled": "2026-09-28",
- "pending_orders_date": "2026-09-28",
+ "last_settled": "2026-09-29",
+ "pending_orders_date": "2026-09-29",
  "positions": {
   "C": {
    "contract": "C2611",
    "lots": -24.0,
-   "ref_price": 2180.0
+   "ref_price": 2185.0
   },
   "JD": {
    "contract": "JD2611",
    "lots": 6.0,
-   "ref_price": 3805.0
+   "ref_price": 3717.0
   },
   "M": {
    "contract": "M2701",
    "lots": 24.0,
-   "ref_price": 3386.0
+   "ref_price": 3347.0
   },
   "MA": {
    "contract": "MA2701",
    "lots": 10.0,
-   "ref_price": 2934.0
+   "ref_price": 2947.0
   },
   "P": {
    "contract": "P2701",
    "lots": -4.0,
-   "ref_price": 9675.0
+   "ref_price": 9571.0
   },
   "RB": {
    "contract": "RB2701",
    "lots": -6.0,
-   "ref_price": 3100.0
+   "ref_price": 3109.0
   },
   "SA": {
    "contract": "SA2701",
    "lots": -19.0,
-   "ref_price": 1007.0
+   "ref_price": 1013.0
   },
   "SR": {
    "contract": "SR2701",
    "lots": -5.0,
-   "ref_price": 5374.0
+   "ref_price": 5344.0
   },
   "TA": {
    "contract": "TA2701",
    "lots": 9.0,
-   "ref_price": 6250.0
+   "ref_price": 6254.0
   },
   "V": {
    "contract": "V2701",
    "lots": -8.0,
-   "ref_price": 4781.0
+   "ref_price": 4793.0
   },
   "Y": {
    "contract": "Y2701",
    "lots": 5.0,
-   "ref_price": 8883.0
+   "ref_price": 8855.0
   },
   "AL": {
    "contract": "AL2611",
-   "lots": 3.0,
-   "ref_price": 24080.0
+   "lots": 2.0,
+   "ref_price": 24020.0
   },
   "CF": {
    "contract": "CF2701",
    "lots": -1.0,
-   "ref_price": 16035.0
+   "ref_price": 15840.0
   },
   "NI": {
    "contract": "NI2611",
    "lots": -1.0,
-   "ref_price": 123730.0
+   "ref_price": 123060.0
   },
   "RU": {
    "contract": "RU2701",
    "lots": 1.0,
-   "ref_price": 19455.0
+   "ref_price": 19040.0
   },
   "CU": {
    "contract": "CU2611",
    "lots": 1.0,
-   "ref_price": 109430.0
+   "ref_price": 109300.0
   }
  },
- "realized_pnl": -7730.0,
- "fees_paid": 471.072,
- "slippage_paid": 2180.0
+ "realized_pnl": -8155.0,
+ "fees_paid": 474.072,
+ "slippage_paid": 2205.0
 }
