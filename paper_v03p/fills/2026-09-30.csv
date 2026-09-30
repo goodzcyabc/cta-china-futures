@@ -1,0 +1,5 @@
+date,symbol,contract,lots,status,reason,leg,price,fee,slippage,realized_pnl
+2026-09-30,CF,CF2701,-1.0,filled,,rebalance,15715.0,4.3,25.0,-625.0
+2026-09-30,I,I2701,7.0,filled,,rebalance,702.5,49.175,350.0,-400.0
+2026-09-30,JD,JD2611,-3.0,filled,,rebalance,3687.0,16.5915,30.0,0.0
+2026-09-30,Y,Y2701,-1.0,filled,,rebalance,8888.0,2.5,10.0,330.0
