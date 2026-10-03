@@ -171,7 +171,7 @@ def audit_candidate(c: Candidate) -> tuple[bool, Frame]:
         pd.to_datetime(a["info_date"]),
         pd.to_datetime(a["exec_day"]),
     )
-    has = tgt.notna()
+    has = tgt.notna() & ex.notna()  # 窗口末日的目标没有建仓日,不产生成交,不参与判定
     ok = (tgt <= info) & (info < ex)
     a["ok"] = ok.astype(object)
     a.loc[~has, "ok"] = pd.NA

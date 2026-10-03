@@ -307,9 +307,27 @@ def build_s(obs: Frame, dates: pd.DatetimeIndex, columns: list[str]) -> Candidat
 
 
 # ---------- Q:河北钢城 PM2.5 ----------
+Q_MIGRATION_STAMP_END = pd.Timestamp(
+    "2020-04-07"
+)  # 此前文件只带服务器迁移时间戳(2020-04-05/06),不是真实写入时间
+
+
+def q_conservative_availability(o: Frame) -> tuple[Frame, int]:
+    """保守处理(预注册第 8 节停止规则的精神;只会推迟、不会提前):2020-04-07 之后带真实 Last-Modified 的文件,
+    若写入时间晚于 D+1,则可得日取写入时间所在的北京日(UTC 07:00 之后 → 次日)。返回 (表, 受影响行数)。"""
+    out = o.copy()
+    lm = pd.to_datetime(out["last_modified_utc"], utc=True, errors="coerce").dt.tz_convert(None)
+    real = lm.notna() & (lm > Q_MIGRATION_STAMP_END)
+    lm_day = lm.dt.normalize() + pd.to_timedelta((lm.dt.hour >= 7).astype(int), unit="D")
+    later = real & (lm_day > out["available_day"])
+    out.loc[later, "available_day"] = lm_day[later]
+    return out, int(later.sum())
+
+
 def build_q(obs: Frame, dates: pd.DatetimeIndex, columns: list[str]) -> Candidate:
     check_min_lag(obs, "Q")
     o = obs[obs["key"] == "Q-HEBEI4"].copy()
+    o, n_late = q_conservative_availability(o)
     roll = rolling_feature(o, Q_WINDOW, Q_MIN_DAYS, "mean")
     keep = roll.value > 0
     feat = Feature(roll.obs_date[keep], roll.available_day[keep], np.log(roll.value[keep]))
@@ -318,4 +336,4 @@ def build_q(obs: Frame, dates: pd.DatetimeIndex, columns: list[str]) -> Candidat
     for sym, sign in Q_LEGS.items():
         sig[sym] = s * sign
     a["key"] = "Q-HEBEI4"
-    return Candidate("Q", "河北四钢城 PM2.5 7 日均值", sig, a)
+    return Candidate("Q", "河北四钢城 PM2.5 7 日均值", sig, a, notes=f"late_written_files_delayed={n_late}")
