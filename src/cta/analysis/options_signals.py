@@ -137,6 +137,8 @@ def product_daily_features(
 ) -> DailyFeatures:
     """一个品种的逐日原始特征。opts:该品种全部期权行;settles:index=(date, contract) 的期货结算价;adj_close:复权连续价。"""
     o = opts[opts["product"] == product].copy()
+    if "is_serial" in o.columns:  # 郑商所系列期权(到期更早)不属于常规系列,预注册的系列定义不含
+        o = o[~o["is_serial"].fillna(False).astype(bool)]
     o["date"] = pd.to_datetime(o["date"])
     use_exch = bool((o["exchange"] == "CZCE").all()) if len(o) else False
     px = adj_close.astype(float)
@@ -162,6 +164,10 @@ def product_daily_features(
                 fval = float(rec["F"])
                 # O1:成交的 0.10–0.40 delta 看涨 / 看跌
                 traded = ser[ser["volume"] > 0]
+                if (
+                    "has_ohlc" in traded.columns
+                ):  # 上期所:成交全部按结算价(无开高低)的合约不含偏度信息,视为未成交(预注册第 7 节)
+                    traded = traded[traded["has_ohlc"].fillna(True).astype(bool)]
                 calls = traded[
                     (traded["cp"] == "C") & (traded["delta"] >= DELTA_LO) & (traded["delta"] <= DELTA_HI)
                 ]
