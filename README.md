@@ -6,7 +6,9 @@
 - 架构与约定:`docs/architecture.md`
 - 预注册与设计日志(任何看过结果后的改动都在这里):`docs/design_log.md`
 - 数据:`data/ricecta/data`(米筐导出的合约级日线、主力映射、合约元数据;不随仓库分发)
-- **完整报告(v0.4,2026-09-23):`report/report_v0.4.md`**(统一执行语义 + 官方结算价的新基线、旧口径逐级分解、五本纸面账 champion/challenger 规则、44 次试验、前视与路径一致性审计);`report/report_v0.3.md` 为 2026-09-22 前口径的 legacy 对照,原样保留
+- **完整报告(v0.5,2026-10-06):`report/report_v0.5.md`**(PDF 同名):在 v0.4 基础上新增**非量价因子**一节(仓单水平说明书 + 多源基本面合成因子 MSF 演示)与二十至二十五轮研究(试验 47–60);基线数字、champion、纸面账不变。`report/report_v0.4.md`(2026-09-23)、`report/report_v0.3.md`(legacy)原样保留
+- **非量价因子**:生产中的仓单水平 `docs/non_pv_factor_card.md`;多源合成因子(12 个非量价来源等权,默认关闭)`src/cta/factors/composite.py`、配置 `configs/strategy_v06_msf.yaml`、预注册 `docs/msf_prereg.md`、结果 `docs/msf_demo.md`;试跑 `cta research --config configs/strategy_v06_msf.yaml`(需要 `data/external/alt/` 下的另类数据,见 `docs/altdata_sources.md`)
+- 另类数据与期权管道(点时、带原始文件与时间戳):`src/cta/data/alt/`;结果 `docs/altdata_diagnostic.md`、`docs/options_diagnostic.md`、`docs/fundamental_signal_diagnostic.md`
 - 早期回测报告(v0.1.2):`report/report_v0.1.2.md`
 - 资金规模扫描(100–500 万):`scripts/capital_scan.py` → `report/capital_scan.md`
 - 行业基线对照(洛书拾壹号、南华商品指数):`docs/baselines.md`
