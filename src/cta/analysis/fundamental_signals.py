@@ -196,10 +196,11 @@ def pmi_ratio_releases(new_orders: list[Release], fg_inventory: list[Release]) -
 
 def effective_target_day(info_date: pd.Timestamp, dates: pd.DatetimeIndex) -> pd.Timestamp | None:
     """公布日 D → 之后第一个交易日开盘建仓 → 目标暴露记在该交易日的前一个交易日(≤ D)。日历外 → None。
-    D 恰为日历最后一个交易日(实盘 as-of 当天公布)→ 目标日 = D,与完整日历下的结果一致。"""
+    (试验 51 的规则,保留以便复现。D 为周末时目标日是之前的周五,夜盘品种会在周五 21:00 成交、早于公布;
+    MSF 用 first_session_on_or_after,见 docs/msf_prereg.md 第 8 节。)"""
     after = dates[dates > info_date]
     if len(after) == 0:
-        return pd.Timestamp(dates[-1]) if len(dates) and info_date == dates[-1] else None
+        return None
     exec_day = after[0]
     pos = dates.get_loc(exec_day)
     if not isinstance(pos, (int, np.integer)) or pos == 0:
@@ -207,14 +208,28 @@ def effective_target_day(info_date: pd.Timestamp, dates: pd.DatetimeIndex) -> pd
     return pd.Timestamp(dates[int(pos) - 1])
 
 
+def first_session_on_or_after(info_date: pd.Timestamp, dates: pd.DatetimeIndex) -> pd.Timestamp | None:
+    """公布日 D(09:30 公布)→ 目标日 = D 当天或之后第一个交易日;T 日目标在 T 日夜盘(21:00)或 T+1 日盘成交,
+    都晚于公布。周末/节假日公布 → 下一个交易日。只依赖 ≤ 目标日的日历,实盘 as-of 与回测一致。日历外 → None。"""
+    on = dates[dates >= pd.Timestamp(info_date).normalize()]
+    return pd.Timestamp(on[0]) if len(on) else None
+
+
 def releases_to_daily(
-    releases: list[Release], dates: pd.DatetimeIndex, stale_days: int = STALE_DAYS
+    releases: list[Release],
+    dates: pd.DatetimeIndex,
+    stale_days: int = STALE_DAYS,
+    target_rule: str = "legacy",
 ) -> pd.Series[Any]:
-    """按公布顺序把值铺到交易日:每条记录从其目标日(见 effective_target_day)起生效,直到下一条记录的目标日;
-    同一期末的修订值只从修订公布日起覆盖,不回填;超过 stale_days 无新公布 → NaN。返回 date → value。"""
+    """按公布顺序把值铺到交易日:每条记录从其目标日起生效,直到下一条记录的目标日;
+    同一期末的修订值只从修订公布日起覆盖,不回填;超过 stale_days 无新公布 → NaN。返回 date → value。
+    target_rule:"legacy" = effective_target_day(试验 50/51);"on_or_after" = first_session_on_or_after(MSF)。"""
+    if target_rule not in ("legacy", "on_or_after"):
+        raise ValueError(f"unknown target_rule {target_rule!r}")
+    target_of = effective_target_day if target_rule == "legacy" else first_session_on_or_after
     out = pd.Series(np.nan, index=dates, dtype=float)
     for r in releases:
-        t = effective_target_day(r.info_date, dates)
+        t = target_of(r.info_date, dates)
         if t is None:
             continue
         out[out.index >= t] = r.value

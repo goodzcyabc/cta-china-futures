@@ -1,7 +1,8 @@
 """多源基本面合成因子 MSF 的演示评估(预注册 docs/msf_prereg.md;试验 60;样本内演示,不构成证据)。
 
 步骤:
-1. 12 个成分(cta.factors.composite)各自点时审计 + 整体截断不变性(只给截止日前的数据,截止日前的 MSF 不变);
+1. 12 个成分(cta.factors.composite)各自点时审计 + 发布类成分公布日 ≤ 目标日 + 截断不变性(交易日历与面板截到 cut 重算,
+   cut 及之前的信号须不变;原始数据的点时由各成分的可得日规则与审计保证,截断检查验证的是日历/面板这一层);
 2. 生产接线核对:`pipeline._extra_factors_of` 走出来的 MSF 与本脚本逐位一致,v0.6 目标暴露可由同一路径复现;
 3. 三臂(MSF 单独 / 静态基线 / 50-50 混合),基线分别为 v0.3(champion)与 v0.1(纯量价);
 4. 系统级:v0.6(时序动量 + 展期收益 + MSF)全流程回测对 v0.3、v0.1;
@@ -45,7 +46,8 @@ DOC = Path("docs/msf_demo.md")
 DATA = Path("data/ricecta/data")
 SEED = 20261005
 V01_REF = "results/settle_baseline/equity_v0.1_full_D_unified_official.csv"
-TRUNC_CUTS = ("2019-06-28", "2023-03-15")
+# 周日 PMI 前的周五、春节前月末、普通周三、周六 PPI 前的周五、周日 PMI 前的周五
+TRUNC_CUTS = ("2019-06-28", "2020-01-23", "2023-03-15", "2024-03-08", "2024-03-29")
 HUMAN_START, HUMAN_END = "<!-- human:start -->", "<!-- human:end -->"
 
 
@@ -74,7 +76,7 @@ def msf_candidate(cands: dict[str, ce.Candidate]) -> ce.Candidate:
 
 
 def truncation_check(src: Any, cfg: Any, specs: Any, full: dict[str, pd.DataFrame]) -> dict[str, Any]:
-    """只用截止日之前的数据(面板截断到 cut)重算全部成分;截止日及之前的信号须与完整数据下相同。"""
+    """交易日历与面板截断到 cut(实盘 as-of 的样子)重算全部成分;cut 及之前的信号须与完整日历下相同。"""
     out: dict[str, Any] = {}
     msf_full = cp.combine_msf(full)
     for cut in TRUNC_CUTS:
@@ -257,8 +259,9 @@ def main() -> int:
         a.to_csv(OUT / f"point_in_time_audit_{k}.csv", index=False)
     msf = msf_candidate(cands)
     ok_msf, _ = ce.audit_candidate(msf)
-    print(f"点时审计:{audits};MSF {ok_msf}", flush=True)
-    if not (all(audits.values()) and ok_msf):
+    timing = {k: cp.release_timing_ok(cands[k].audit) for k in ("A", "B", "P")}
+    print(f"点时审计:{audits};MSF {ok_msf};发布类公布日 ≤ 目标日 {timing}", flush=True)
+    if not (all(audits.values()) and ok_msf and all(timing.values())):
         print("STOP: 点时审计失败", file=sys.stderr)
         return 3
     trunc = truncation_check(src, ctx3.cfg, ctx3.specs, {k: c.signal for k, c in cands.items()})
@@ -295,6 +298,7 @@ def main() -> int:
             "v0.1": ctx1.baseline_matches_reference,
         },
         "point_in_time_ok": {**audits, "MSF": ok_msf},
+        "release_timing_ok": timing,
         "truncation": trunc,
         "truncation_ok": trunc_ok,
         "evals": {
@@ -368,7 +372,8 @@ def write_doc(log: dict[str, Any], ev3: ce.CandidateEval, ev1: ce.CandidateEval)
         "",
         "## 1. 点时与接线核对",
         "",
-        f"- 12 个成分各自点时审计(目标日 ≤ 公布日 < 建仓日):{log['point_in_time_ok']}",
+        f"- 12 个成分各自点时审计(决策日 ≤ 信息日 < 建仓日):{log['point_in_time_ok']}",
+        f"- 发布类成分(A 月末持仓、B PMI、P PPI−PPIRM)实际公布日 ≤ 目标日(目标日 T 的成交在 T 日 21:00 夜盘或 T+1 日盘,均晚于 09:30 公布):{log['release_timing_ok']}",
         f"- 截断不变性(面板与数据截到 {', '.join(TRUNC_CUTS)} 重算,截止日及之前的信号与完整数据下的最大差异):"
         + "; ".join(
             f"{cut}: " + ", ".join(f"{k} {v:.1e}" for k, v in r.items() if not k.endswith("mismatch"))

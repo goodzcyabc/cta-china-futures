@@ -238,10 +238,12 @@ def _stats_excluding(eq: pd.Series[Any], drop: np.ndarray[Any, Any]) -> dict[str
 
 
 def signal_weighted_returns(ctx: Context, c: Candidate) -> pd.Series[Any]:
-    """信号加权的等风险毛收益(信号 T → T+1 收盘到收盘;每品种按 1/σ 缩放后在有信号的品种间平均)。只用于 R0 与事件描述。"""
+    """信号加权的等风险毛收益(信号 T → T+1 收盘到收盘;每品种按 1/σ 缩放后在有信号的品种间平均)。只用于 R0 与事件描述。
+    口径说明:分母是 T+1 的 40 日波动率(含 T+1 当日收益),会轻微压缩大波动日;试验 52–60 的 R0 均为此口径,
+    为可复现不改(2026-10-05 独立复核指出;不影响引擎回测)。"""
     r = log_returns(ctx.sig.adj_close)
     s = c.signal.reindex(index=r.index, columns=r.columns)
-    scaled = (r / ctx.sig.vol.replace(0, np.nan)).shift(-1)  # T+1 的收益,按 T 的波动率缩放
+    scaled = (r / ctx.sig.vol.replace(0, np.nan)).shift(-1)  # T+1 的收益 / T+1 的波动率(见上方口径说明)
     contrib = s * scaled
     out: pd.Series[Any] = contrib.mean(axis=1, skipna=True)
     idx = pd.DatetimeIndex(out.index)

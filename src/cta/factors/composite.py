@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
@@ -40,12 +40,27 @@ PPI_FILE, PPIRM_FILE = (
 P_CHANGE_MONTHS = 3
 
 
-def completed_month_ends(dates: pd.DatetimeIndex) -> pd.DatetimeIndex:
-    """每个日历月的最后一个交易日;日历最后一天若不是月末(下一个工作日仍在同月)则不算(避免实盘用"月初至今"的半个月)。"""
+def _exchange_next_session(d: pd.Timestamp) -> pd.Timestamp:
+    """交易所日历(历史 = 有行情文件的日期;未来 = 工作日 − configs/holidays.csv 已公告休市)上 ≥ d 的第一个交易日。
+    休市安排都提前公告,不是前视。日历不可用时退回工作日(只会把节前月末当作未完成,晚一天,不会前视)。"""
+    try:
+        from cta.data.exchanges.calendar import TradingCalendar
+
+        return TradingCalendar().next_session_on_or_after(d)
+    except (OSError, ValueError, IndexError):
+        return pd.Timestamp(d) + pd.offsets.BDay(0)
+
+
+def completed_month_ends(
+    dates: pd.DatetimeIndex, next_session: Callable[[pd.Timestamp], pd.Timestamp] | None = None
+) -> pd.DatetimeIndex:
+    """每个日历月的最后一个交易日;日历最后一天若不是该月最后一个交易日(按交易所日历,下一个交易日仍在同月)则不算,
+    避免实盘用"月初至今"的半个月;节前月末(如 2020-01-23)按交易所日历算作完整月。"""
     me = fs.month_end_dates(dates)
     if len(me) and len(dates):
         last = pd.Timestamp(dates[-1])
-        if (last + pd.offsets.BDay(1)).month == last.month:
+        nxt = (next_session or _exchange_next_session)(last + pd.Timedelta(days=1))
+        if (nxt.year, nxt.month) == (last.year, last.month):
             me = me[me < last]
     return pd.DatetimeIndex(me)
 
@@ -59,21 +74,33 @@ def _next_day(dates: pd.DatetimeIndex, t: pd.Timestamp) -> Any:
     return pd.Timestamp(after[0]) if len(after) else pd.NaT
 
 
+TARGET_RULE = "on_or_after"  # 发布类成分(A、B、P)的目标日规则,见 fs.first_session_on_or_after
+
+
 def release_audit(releases: list[fs.Release], dates: pd.DatetimeIndex) -> Frame:
-    """每条发布一行:期末、公布日、目标日(effective_target_day)、建仓日;没有目标日的发布不产生信号。"""
+    """每条发布一行:期末 data_date、实际公布日 publish_date、决策日 info_date = 目标日(公布日当天或之后第一个交易日)、
+    建仓日 exec_day。publish_date ≤ target_day 由 release_timing_ok 单独检查;没有目标日的发布不产生信号。"""
     rows = []
     for r in releases:
-        t = fs.effective_target_day(r.info_date, dates)
+        t = fs.first_session_on_or_after(r.info_date, dates)
         rows.append(
             {
                 "data_date": r.period_end,
-                "info_date": r.info_date,
+                "publish_date": r.info_date,
+                "info_date": t if t is not None else pd.NaT,
                 "available_day": t if t is not None else pd.NaT,
                 "target_day": t if t is not None else pd.NaT,
                 "exec_day": _next_day(dates, t) if t is not None else pd.NaT,
             }
         )
-    return pd.DataFrame(rows, columns=["data_date", "info_date", "available_day", "target_day", "exec_day"])
+    cols = ["data_date", "publish_date", "info_date", "available_day", "target_day", "exec_day"]
+    return pd.DataFrame(rows, columns=cols)
+
+
+def release_timing_ok(audit: Frame) -> bool:
+    """发布类成分:公布日(09:30)不晚于目标日;目标日 T 的成交在 T 日 21:00 夜盘或 T+1 日盘,均晚于公布。"""
+    a = audit.dropna(subset=["target_day"])
+    return bool((pd.to_datetime(a["publish_date"]) <= pd.to_datetime(a["target_day"])).all())
 
 
 def _a_releases(
@@ -90,7 +117,9 @@ def _a_releases(
 
 def component_a(src: DataSource, specs: InstrumentTable, dates: pd.DatetimeIndex, cols: list[str]) -> Frame:
     """全市场名义持仓:六板块等权、12 个月几何平均增长 → 扩展 z → clip;月末收盘可得;全部品种同一信号。"""
-    return _broadcast(fs.releases_to_daily(_a_releases(src, specs, dates, cols), dates), cols, cols)
+    return _broadcast(
+        fs.releases_to_daily(_a_releases(src, specs, dates, cols), dates, target_rule=TARGET_RULE), cols, cols
+    )
 
 
 def _signal_releases(
@@ -118,7 +147,9 @@ def component_b(
     dates: pd.DatetimeIndex, basket: list[str], cols: list[str], macro_dir: Path = MACRO_DIR
 ) -> Frame:
     """PMI 新订单 / 产成品库存:按公布日 → 扩展 z → clip;工业品 + 能源篮子。"""
-    return _broadcast(fs.releases_to_daily(_b_releases(macro_dir), dates), basket, cols)
+    return _broadcast(
+        fs.releases_to_daily(_b_releases(macro_dir), dates, target_rule=TARGET_RULE), basket, cols
+    )
 
 
 def _p_releases(macro_dir: Path) -> list[fs.Release]:
@@ -143,7 +174,9 @@ def component_p(
     dates: pd.DatetimeIndex, basket: list[str], cols: list[str], macro_dir: Path = MACRO_DIR
 ) -> Frame:
     """工业品利润剪刀差:PPI 同比 − PPIRM 同比的 3 个月变化 → 扩展 z → clip(去极值);剪刀差扩大 → 多工业品。"""
-    return _broadcast(fs.releases_to_daily(_p_releases(macro_dir), dates), basket, cols)
+    return _broadcast(
+        fs.releases_to_daily(_p_releases(macro_dir), dates, target_rule=TARGET_RULE), basket, cols
+    )
 
 
 def _option_tables(alt_dir: Path) -> Frame:
@@ -222,14 +255,14 @@ def build_component_candidates(
     out["A"] = Candidate(
         "A",
         "全市场名义持仓增长",
-        _broadcast(fs.releases_to_daily(rel_a, dates), cols, cols),
+        _broadcast(fs.releases_to_daily(rel_a, dates, target_rule=TARGET_RULE), cols, cols),
         release_audit(rel_a, dates),
     )
     rel_b = _b_releases(macro_dir)
     out["B"] = Candidate(
         "B",
         "PMI 新订单 / 产成品库存",
-        _broadcast(fs.releases_to_daily(rel_b, dates), industrial, cols),
+        _broadcast(fs.releases_to_daily(rel_b, dates, target_rule=TARGET_RULE), industrial, cols),
         release_audit(rel_b, dates),
     )
     opts = _option_tables(alt_dir)
@@ -245,7 +278,7 @@ def build_component_candidates(
     out["P"] = Candidate(
         "P",
         "工业品利润剪刀差(PPI − PPIRM 的 3 个月变化)",
-        _broadcast(fs.releases_to_daily(rel_p, dates), industrial, cols),
+        _broadcast(fs.releases_to_daily(rel_p, dates, target_rule=TARGET_RULE), industrial, cols),
         release_audit(rel_p, dates),
     )
     assert tuple(out) == COMPONENTS

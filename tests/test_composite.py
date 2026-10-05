@@ -14,12 +14,50 @@ DATA = Path("data/ricecta/data")
 needs_data = pytest.mark.skipif(not DATA.exists(), reason="需要本地米筐/交易所数据")
 
 
+def _bday_next(d: pd.Timestamp) -> pd.Timestamp:
+    return pd.Timestamp(d) + pd.offsets.BDay(0)
+
+
 def test_completed_month_ends_drops_partial_last_month() -> None:
     d = pd.bdate_range("2024-01-02", "2024-03-14")
-    me = cp.completed_month_ends(d)
+    me = cp.completed_month_ends(d, next_session=_bday_next)
     assert list(me) == [pd.Timestamp("2024-01-31"), pd.Timestamp("2024-02-29")]
     d2 = pd.bdate_range("2024-01-02", "2024-03-29")
-    assert cp.completed_month_ends(d2)[-1] == pd.Timestamp("2024-03-29")
+    assert cp.completed_month_ends(d2, next_session=_bday_next)[-1] == pd.Timestamp("2024-03-29")
+
+
+def test_completed_month_ends_pre_holiday_month_end_is_complete() -> None:
+    """2020-01-23 之后春节休市到 2020-02-02:按交易所日历这是 1 月最后一个交易日,实盘 as-of 当天应算作完整月。"""
+    hol = pd.date_range("2020-01-24", "2020-01-31")
+
+    def nxt(d: pd.Timestamp) -> pd.Timestamp:
+        x = pd.Timestamp(d) + pd.offsets.BDay(0)
+        while x in hol:
+            x = x + pd.offsets.BDay(1)
+        return pd.Timestamp(x)
+
+    d = pd.bdate_range("2019-12-02", "2020-01-23")
+    assert cp.completed_month_ends(d, next_session=nxt)[-1] == pd.Timestamp("2020-01-23")
+    assert cp.completed_month_ends(d, next_session=_bday_next)[-1] == pd.Timestamp("2019-12-31")
+    if Path("data/exchanges").exists():  # 真实交易所日历
+        assert cp.completed_month_ends(d)[-1] == pd.Timestamp("2020-01-23")
+
+
+def test_release_audit_weekend_publication_targets_next_session() -> None:
+    from cta.analysis import fundamental_signals as fs
+
+    dates = pd.bdate_range("2024-03-25", "2024-04-05")
+    rel = [
+        fs.Release(pd.Timestamp("2024-03-27"), pd.Timestamp("2024-02-29"), 1.0),  # 周三
+        fs.Release(pd.Timestamp("2024-03-31"), pd.Timestamp("2024-03-31"), 0.5),  # 周日
+    ]
+    a = cp.release_audit(rel, dates)
+    assert list(a["target_day"]) == [pd.Timestamp("2024-03-27"), pd.Timestamp("2024-04-01")]
+    assert cp.release_timing_ok(a)
+    daily = fs.releases_to_daily(rel, dates, target_rule="on_or_after")
+    assert daily.loc["2024-03-29"] == 1.0 and daily.loc["2024-04-01"] == 0.5
+    legacy = fs.releases_to_daily(rel, dates)  # 试验 51 的旧规则保持不变(周日公布记到周五)
+    assert legacy.loc["2024-03-29"] == 0.5
 
 
 def test_combine_msf_equal_weight_sqrt_n() -> None:
@@ -66,9 +104,9 @@ def test_component_p_definition_and_point_in_time(tmp_path: Path) -> None:
     sig = cp.component_p(dates, ["CU"], ["CU", "C"], macro_dir=tmp_path)
     assert sig["C"].isna().all()
     s = sig["CU"]
-    # 公布日之前看不到:第 k 次公布的值从公布日之后第一个交易日的前一交易日起生效
+    # 公布日之前看不到:第 k 次公布的值从公布日当天或之后第一个交易日起生效(周末公布 → 下周一)
     first = s.first_valid_index()
-    assert first is not None and first >= info[3 + 23] - pd.Timedelta(days=3)  # 3 个月变化 + 24 个观测
+    assert first is not None and first >= info[3 + 23]  # 3 个月变化 + 24 个观测
     # 截断:只给 2018 年底之前公布的数据,2018 年底之前信号不变
     cut = pd.Timestamp("2018-12-31")
     keep = [k for k, i in enumerate(info) if i <= cut]
@@ -83,6 +121,11 @@ def test_component_p_definition_and_point_in_time(tmp_path: Path) -> None:
     s2 = cp.component_p(dates, ["CU"], ["CU", "C"], macro_dir=tmp2)["CU"]
     m = s.index <= cut
     assert np.allclose(s[m].to_numpy(), s2[m].to_numpy(), equal_nan=True)
+    # 周五截断、周末公布:截断日历下的信号与完整日历相同(公布前不可用)
+    sat = next(i for i in info[30:] if i.weekday() == 5)
+    fri = sat - pd.Timedelta(days=1)
+    s3 = cp.component_p(dates[dates <= fri], ["CU"], ["CU", "C"], macro_dir=tmp_path)["CU"]
+    assert np.allclose(s3.to_numpy(), s.reindex(s3.index).to_numpy(), equal_nan=True)
     # 方向:剪刀差 3 个月变化为正且偏大 → 信号为正
     g = ppi - ppirm
     chg = g[3:] - g[:-3]
@@ -147,14 +190,16 @@ def test_components_a_b_p_truncation_invariance() -> None:
     dates = pd.DatetimeIndex(adj.index)
     cols = [str(c) for c in adj.columns]
     ind = [s for s in cols if specs[s].asset_class in cp.INDUSTRIAL_CLASSES]
-    cut = pd.Timestamp("2021-06-30")
-    dt = dates[dates <= cut]
-    for fn in (
-        lambda d: cp.component_a(src, specs, d, cols),
-        lambda d: cp.component_b(d, ind, cols),
-        lambda d: cp.component_p(d, ind, cols),
-    ):
-        full, part = fn(dates), fn(dt)
-        a = full.reindex(dt).to_numpy(dtype=float)
-        b = part.to_numpy(dtype=float)
-        assert np.allclose(a, b, equal_nan=True)
+    fns = {
+        "A": lambda d: cp.component_a(src, specs, d, cols),
+        "B": lambda d: cp.component_b(d, ind, cols),
+        "P": lambda d: cp.component_p(d, ind, cols),
+    }
+    full = {k: fn(dates) for k, fn in fns.items()}
+    # 周三公布日、周日 PMI 之前的周五、春节前月末、周六 PPI 之前的周五
+    for cut in ("2021-06-30", "2019-06-28", "2020-01-23", "2024-03-08"):
+        dt = dates[dates <= pd.Timestamp(cut)]
+        for k, fn in fns.items():
+            a = full[k].reindex(dt).to_numpy(dtype=float)
+            b = fn(dt).to_numpy(dtype=float)
+            assert np.allclose(a, b, equal_nan=True), (k, cut)
