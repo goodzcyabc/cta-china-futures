@@ -18,7 +18,14 @@ from cta.continuous.roll import SymbolPanel
 from cta.data.source import DataSource
 from cta.execution.plan import SymbolInputs, plan_lots
 from cta.instruments.specs import InstrumentTable
-from cta.pipeline import _receipts_of, _reg_events_of, build_panels, compute_signals, git_sha
+from cta.pipeline import (
+    _extra_factors_of,
+    _receipts_of,
+    _reg_events_of,
+    build_panels,
+    compute_signals,
+    git_sha,
+)
 
 
 def _num(v: object) -> float:
@@ -72,7 +79,12 @@ def generate_orders(
     last_dates = {s: p.frame.index.max() for s, p in panels.items()}
     stale = {s: str(d.date()) for s, d in last_dates.items() if d < asof_ts - pd.Timedelta(days=7)}
     signals = compute_signals(
-        panels, cfg, receipts=_receipts_of(src), specs=specs, reg_events=_reg_events_of(src, cfg)
+        panels,
+        cfg,
+        receipts=_receipts_of(src),
+        specs=specs,
+        reg_events=_reg_events_of(src, cfg),
+        extra_factors=_extra_factors_of(src, cfg, specs, panels),
     )
     if asof_ts not in signals.target.index:
         raise RuntimeError(

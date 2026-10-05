@@ -195,10 +195,11 @@ def pmi_ratio_releases(new_orders: list[Release], fg_inventory: list[Release]) -
 
 
 def effective_target_day(info_date: pd.Timestamp, dates: pd.DatetimeIndex) -> pd.Timestamp | None:
-    """公布日 D → 之后第一个交易日开盘建仓 → 目标暴露记在该交易日的前一个交易日(≤ D)。日历外 → None。"""
+    """公布日 D → 之后第一个交易日开盘建仓 → 目标暴露记在该交易日的前一个交易日(≤ D)。日历外 → None。
+    D 恰为日历最后一个交易日(实盘 as-of 当天公布)→ 目标日 = D,与完整日历下的结果一致。"""
     after = dates[dates > info_date]
     if len(after) == 0:
-        return None
+        return pd.Timestamp(dates[-1]) if len(dates) and info_date == dates[-1] else None
     exec_day = after[0]
     pos = dates.get_loc(exec_day)
     if not isinstance(pos, (int, np.integer)) or pos == 0:

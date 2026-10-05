@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +19,8 @@ from cta.instruments.specs import InstrumentTable, load_instruments
 from cta.risk.metrics import perf_stats, yearly
 from cta.signals import core as sig
 
+BUILTIN_FACTORS = ("tsmom", "carry", "receipts_level")
+
 
 @dataclass
 class Signals:
@@ -31,6 +33,7 @@ class Signals:
     combined: pd.DataFrame
     eligible: pd.DataFrame
     target: pd.DataFrame  # 目标名义暴露/权益(已应用交易缓冲)
+    extra: dict[str, pd.DataFrame] = field(default_factory=dict)  # 配置启用的外部因子(如 msf),默认无
 
 
 def build_panels(
@@ -102,6 +105,7 @@ def compute_signals(
     receipts: pd.DataFrame | None = None,
     specs: InstrumentTable | None = None,
     reg_events: pd.DataFrame | None = None,
+    extra_factors: dict[str, pd.DataFrame] | None = None,
 ) -> Signals:
     """信号集合。cfg.signals.weights 里出现 receipts_level 时需要传入仓单表(交易所直连源 `src.receipts()`);
     配置了板块菜单时需要 specs(取 asset_class),缺省读默认参数表。"""
@@ -136,6 +140,15 @@ def compute_signals(
             raise ValueError("config weights include receipts_level but no receipts data was provided")
         rl = sig.receipts_level(receipts, pd.DatetimeIndex(adj.index), list(adj.columns), eligible)
         parts["receipts_level"] = rl
+    # 外部因子(如多源合成因子 msf,docs/msf_prereg.md):只有配置权重里出现时才使用;现有配置不含,输出逐位不变
+    extra_used: dict[str, pd.DataFrame] = {}
+    for name in cfg.signals.weights:
+        if name in BUILTIN_FACTORS:
+            continue
+        if extra_factors is None or name not in extra_factors:
+            raise ValueError(f"config weights include {name!r} but no extra factor frame was provided")
+        extra_used[name] = extra_factors[name].reindex(index=adj.index, columns=adj.columns)
+        parts[name] = extra_used[name]
     # 板块因子菜单(design_log 十二):不允许的因子在该品种上置 NaN,由 nan-aware 合成自动退出分母
     sc = cfg.signals
     if sc.sector_menu or sc.symbol_menu:
@@ -171,7 +184,7 @@ def compute_signals(
         buffered = sig.trade_buffer(row, prev, cfg.portfolio.exposure_buffer)
         tgt.loc[d] = buffered
         prev = buffered
-    return Signals(adj, vol, ts, cr, rl, fw, comb, eligible, tgt)
+    return Signals(adj, vol, ts, cr, rl, fw, comb, eligible, tgt, extra_used)
 
 
 def _reg_events_of(src: DataSource, cfg: StrategyConfig) -> pd.DataFrame | None:
@@ -199,12 +212,28 @@ def git_sha() -> str:
         return "unknown"
 
 
+def _extra_factors_of(
+    src: DataSource, cfg: StrategyConfig, specs: InstrumentTable, panels: dict[str, SymbolPanel]
+) -> dict[str, pd.DataFrame] | None:
+    """配置启用的外部因子;目前只有 msf(多源基本面合成因子,docs/msf_prereg.md)。未启用 → None。"""
+    if "msf" not in cfg.signals.weights:
+        return None
+    from cta.factors.composite import build_msf
+
+    return {"msf": build_msf(src, cfg, specs, panels)}
+
+
 def run_research(
     cfg: StrategyConfig, src: DataSource, specs: InstrumentTable, out_dir: Path
 ) -> dict[str, Any]:
     panels = build_panels(src, cfg, specs)
     signals = compute_signals(
-        panels, cfg, receipts=_receipts_of(src), specs=specs, reg_events=_reg_events_of(src, cfg)
+        panels,
+        cfg,
+        receipts=_receipts_of(src),
+        specs=specs,
+        reg_events=_reg_events_of(src, cfg),
+        extra_factors=_extra_factors_of(src, cfg, specs, panels),
     )
     start, end = pd.Timestamp(cfg.backtest.start), pd.Timestamp(cfg.backtest.end)
     idx = signals.target.index
