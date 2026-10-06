@@ -1,0 +1,73 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+China commodity-futures CTA: research backtest, daily order generation and paper trading on **one code path**. Champion strategy is v0.3 (time-series momentum + carry + exchange warehouse-receipt factor). Docs, reports and the design log are written in Chinese; dates in them are Beijing time. Layout overview: `README.md`; docs index: `docs/README.md`; roadmap: `TODO.md`.
+
+## Running things
+
+The package is **not pip-installed** on this machine (system Python 3.9.6; `cta`/`pytest`/`ruff`/`mypy` are not on PATH). Always run from the **repo root**: CLI defaults, `cta.factors.composite`, caches and about half of the real-data test guards use cwd-relative paths (`Path("data/...")`), and those tests silently *skip* when run elsewhere.
+
+```bash
+PYTHONPATH=src python3 -m cta.cli --help                      # commands: research | live | report | paper
+PYTHONPATH=src python3 -m cta.cli research --config configs/strategy_v03.yaml   # -> results/<cfg_digest>_<instr_digest>_stitched/
+PYTHONPATH=src python3 -m cta.cli live --asof YYYY-MM-DD --equity 3000000 --positions book.csv --config configs/strategy_v03.yaml
+PYTHONPATH=src python3 -m cta.cli paper status --book paper/v03 --config configs/strategy_v03.yaml
+
+PYTHONPATH=src python3 -m pytest                               # full suite (~15 min with local data; test_paths_agree alone ~8.5 min)
+PYTHONPATH=src python3 -m pytest --ignore tests/test_paths_agree.py
+PYTHONPATH=src python3 -m pytest tests/test_signals.py::test_tsmom_signs_and_range   # single test
+PYTHONPATH=src python3 -m pytest -rs tests/test_composite.py   # -rs shows why real-data tests skipped
+python3 -m ruff format --check src tests && python3 -m ruff check src tests && python3 -m mypy src   # CI gates
+TZ=Asia/Shanghai date                                          # date to write into docs (machine clock is Toronto)
+```
+
+- `pyproject.toml` sets pytest `addopts = "-q"` and mypy `strict = true`; without `PYTHONPATH=src` pytest fails at collection.
+- CI (`.github/workflows/ci.yml`, Python 3.9 and 3.11): `pip install -e ".[dev]"`, the same ruff/mypy gates, `pytest -q`. `data/` and `results/` are gitignored, so real-data tests always skip in CI; run them locally in the main checkout. A fresh worktree or clone has no `data/`/`results/` either (symlink them in, or a green run means nothing for data/signal/execution changes).
+- Some real-data tests need gitignored `results/` artifacts: `results/settle_baseline/` (from `scripts/research/settle_baseline.py`) and `results/quarterly_walkforward/equity_B_S3.csv` (from `scripts/research/quarterly_walkforward_diagnostic.py --mode full`; without it `tests/test_adaptive_quarterly.py` fails rather than skips).
+- mypy gates `src/` only and targets `python_version = "3.10"`. Ruff (`target-version = py39`) catches 3.9 *syntax* problems (reused outer quotes or backslashes inside f-string expressions, `match`). Runtime-only 3.9 problems pass every gate and show up only when the code runs: `zip(strict=)`, and `X | None` in annotations evaluated at runtime (pydantic fields in `config.py` and `instruments/specs.py`, typer signatures in `cli.py`). `config.py` uses `Optional[...]` and is the only file exempt from ruff UP007/UP045; `cli.py` uses a bare type with a `None` default (`typer.Option(None)`). No test imports `cta.cli`, so smoke-check it with `--help`. `warn_unused_ignores` makes a stale `# type: ignore` fail.
+- The full suite is not side-effect free with local data: it rebuilds `data/exchanges/<EX>/quotes_all.parquet` when stale and writes `data/exchanges/SHFE/reconcile_ricequant.json`.
+
+## Architecture
+
+**Data** (`src/cta/data/`). `DataSource` protocol in `data/source.py`; `--source` (on `research`/`live`; default `stitched`) picks one of three implementations:
+- `RicequantParquetSource`: vendor export in `data/ricecta/data` (separate clone, gitignored), 2016-01-04 → 2026-06-05. It has no settlement column and no receipts or regulatory events, so `--source ricequant` fails in `build_panels` for every shipped config (the default `data.settle: official` rejects close-as-settle).
+- `ExchangeSource`: the exchange-direct store `data/exchanges/<EXCH>/` (SHFE, INE, DCE, CZCE; no CFFEX). It is append-only: raw downloads under `raw/`, one normalized parquet per day per kind (`quotes|positions|receipts|params`), and `Store.write_day` refuses to overwrite. `cta.cli` has no data commands; each exchange module has its own CLI (`PYTHONPATH=src python3 -m cta.data.exchanges.<shfe|ine|czce|dce|params> --help`). After a parser fix, re-parse from raw (`czce/dce reparse`, or `backfill … --overwrite` for shfe/ine/params), then delete `quotes_all.{parquet,stamp}` (a cache keyed by day count that a reparse does not invalidate).
+- `StitchedSource` (`default_stitched`): vendor rows up to the cutover, exchange rows after; vendor rows get the exchange's official settle/prev_settle, and a missing settle is never filled from close (`build_panels` raises). Receipts and reg events come only from the exchange store.
+- DCE data (and CZCE `.htm/.zip`) can only be fetched through the web-access skill's Chrome CDP proxy at `localhost:3456`. If it is down during the daily paper job, every book holding a DCE contract fails at stage `settle` and writes `FAILED.json` (happened 2026-09-23); start the proxy and rerun catchup. DCE risk parameters are never ingested. Exchanges publish intraday files with empty settlement, so today's data is never ingested before 16:30 Beijing.
+- Alt data pipelines: `src/cta/data/alt/` → `data/external/alt/<src>/`, raw files plus fetch metadata. Scalar sources write `observations.csv` with a pre-registered `available_day`; the option sources write `options_daily.parquet`.
+
+**Panels** (`continuous/roll.py`, `pipeline.build_panels`). The dominant contract switches only after 3 confirming days and only forward in maturity. `sched_next` (the contract held on T+1) is shared by the engine and the order generator. `adj_close` is ratio back-adjusted and used only for signals; its historical levels change at every roll, so compare returns, not levels. Sizing, PnL, margin and limits use the real held contract. `configs/instruments.yaml` supplies tick, margin, fees and limit_pct; for vendor-era contracts the panel `multiplier` (used in lot sizing) comes from vendor metadata (currently identical to the yaml).
+
+**Signals** (`pipeline.compute_signals`, `signals/core.py`). Vol → tsmom → optional `tick_filter` → optional `reg_overlay` (used by the paper book `paper/v01r`; needs exchange reg events) → carry → `receipts_level` (only if it is a key in `signals.weights`) → extra factors → sector/symbol menus → `combine` (or `combine_tv` when `factor_weighting: inverse_vol`) → vol targeting → gross cap → stateful `trade_buffer` (exposure_buffer). `combine` is a NaN-aware weighted mean × √(n_active/n_max), clipped to [−1, 1]; with equal weighting `signals.weights` must contain `tsmom` and `carry`. Any weights key outside `BUILTIN_FACTORS` is an external factor supplied by `pipeline._extra_factors_of` (currently only `msf` → `cta.factors.composite.build_msf`, which imports `cta.analysis.{altdata,fundamental,options}_signals`); research, live and paper all go through it.
+
+**Execution** (`src/cta/execution/`), shared by `backtest/engine.py`, `live/orders.py` and `paper/`:
+- `plan.plan_lots`: T close of the T+1 contract → round lots → proportional margin cap → `lot_band`; full closes are never banded.
+- `ledger.execute_day`: absolute targets; rolls are two legs that fill together or not at all; legs are pre-checked for missing quote, empty open or limit-lock; fill = open ± slippage ticks; unfilled targets are not carried forward.
+- `ledger.mark`: marks to each held contract's official settle (engine non-strict, paper strict).
+- "Next open" is the exchange daily-bar open: for night-session products the T+1 fill is the calendar-T 21:00 night open. Any point-in-time reasoning about data published after 15:00 must account for this.
+- `tests/test_paths_agree.py` asserts engine and day-by-day paper path agree exactly. `backtest/engine_legacy.py` is frozen (reproduces pre-2026-09-22 reports only). `execution.fill` in the config schema has no effect (fills are always next open) but it feeds the pinned config digests; leave it.
+
+**Paper trading** (`paper/runner.py`, `scripts/paper_daily.sh`, `deploy/com.cta.paper.plist`):
+- Five books under `paper/`, each tied to one config: `paper/v01`→`strategy.yaml` (v0.1, the only book that ingests data; must run first), `paper/v03`→`strategy_v03.yaml` (champion), `paper/v03p`, `paper/v01r`, `paper/v05` → `strategy_v03p/v01r/v05.yaml`. The CLI does not check the pairing; always pass `--book` with its `--config`. `configs/paper_protocol.yaml` keeps the old labels (`paper`, `paper_v03`, …) with a `dir` field for each book.
+- `PaperBook` on a directory without `state.json` silently creates a fresh 3M book (`paper status`, `step` and `catchup` all do). Never point `--book` at `paper/` itself or at `paper/log/`.
+- A step stages everything in `<book>/.txn/<date>/` and commits with `os.replace`, writing `state.json` last. On failure it writes `FAILED.json` and leaves state unchanged; rerunning `catchup` after a fix is idempotent. A settled day cannot be recomputed by rerunning; never hand-edit `state.json`. To verify a book without side effects: `paper step --date <a settled day> --no-ingest --book … --config …` → "already settled".
+- launchd runs `paper_daily.sh` Mon–Fri at 05:10 Toronto (17:10 Beijing under EDT, 18:10 under EST), including Chinese holidays (books skip). It `git add`s the five book dirs, commits **whatever is staged**, then always runs `git push origin HEAD`. Keep this checkout on `main` with nothing staged around that time; do branch work in a worktree. `paper/log/cron.log` must exist (launchd redirects into it).
+- Trading days are Mon–Fri minus `configs/holidays.csv`; an unlisted exchange holiday makes the step fail by design, so append each year's announced holidays.
+
+**Research layer**:
+- `cta.factors` (`base`/`library`/`evaluate`) is research code; production signals live in `cta.signals`, except `composite.build_msf`, which reaches the production path when `msf` is a weights key (only `configs/strategy_v06_msf.yaml`, a demo not used by any paper book).
+- `cta.analysis.candidate_eval` is the three-arm evaluator (candidate alone / static production baseline / 50-50 ex-ante risk-budget blend, same engine and costs), checks R0–R14, verdict. `build_context` raises if the rebuilt baseline target does not match production (`np.allclose`); the reference-equity match is only recorded in `baseline_matches_reference`, so scripts must stop on False themselves.
+- `scripts/` holds operational tools (`paper_daily.sh`, `paper_acceptance.py`, `portfolio_diagnostics.py`, `capital_scan.py`, `rqdata_export_options.py`); one-off research scripts are in `scripts/research/` and write `results/<name>/` (gitignored) and `docs/research/<name>.md`.
+- Smoke switches differ: `altdata/options/fundamental_signal_diagnostic.py` take `--smoke`; `quarterly_walkforward_diagnostic.py` and `adaptive_quarterly_v1.py` take `--mode smoke|full`. A full run of these newer diagnostics evaluates 2016 → 2026-06 including the out-of-sample window (no holdout gate), so it counts as a trial. Only the older `factor_*.py`/`exec_trials.py` gate the holdout behind `--confirm-holdout`.
+- Only some generators keep hand-written text on rerun: `altdata/fundamental_signal/options_diagnostic.py` and `adaptive_quarterly_v1.py` preserve `<!-- narrative-top/bottom -->` blocks, `msf_demo.py` preserves `<!-- human:start/end -->`. Every other doc-writing script rewrites its whole doc (e.g. `docs/research/quarterly_walkforward_diagnostic.md` has unmarked hand-written conclusions); back up and merge by hand before rerunning.
+
+## Invariants and research discipline
+
+- **Config and instrument digests.** `StrategyConfig.digest()` and `InstrumentTable.digest()` hash `model_dump()`, defaults included. Adding any schema field, or changing a default the YAML leaves unset, changes the digests. Every later paper snapshot then stops matching the pins in `configs/paper_protocol.yaml` (acceptance window 2026-09-23 → 2026-12-15, report 2026-12-16) and results directory names change. A `declared_transitions` entry does not fix a mid-window change. Make no schema/default changes before the report; add features by reusing existing fields (as MSF does with a `signals.weights` key).
+- Unknown YAML keys are silently ignored (pydantic default).
+- New features must default to off, keyed on config content, so existing configs stay bitwise identical. Nothing enforces this in CI (`tests/test_composite.py` checks only v0.3, in-process, and needs local data). Recompute the five paper-book config digests and compare them with `paper_protocol.yaml`.
+- Do not edit the five paper-book configs or `configs/instruments.yaml` during the acceptance window (`scripts/research/fundamental_signal_diagnostic.py` also hashes the bytes of `strategy_v03.yaml`). Do not change champion/challenger semantics without the user's decision.
+- **Pre-registration.** Every new hypothesis gets a `docs/research/<topic>_prereg.md` committed (commit message `PREREG: …`) before any returns are computed. Scripts record the prereg commit with `git log --follow --diff-filter=A` on that path; keep any future move of a prereg as a pure-rename commit so this still finds the original. Results are appended only to the prereg's final "结果(运行后只追加)" section.
+- **Trial count and design log.** `docs/design_log.md` records every trial (running count, currently 60) and every post-hoc change. Corrections are appended as new subsections; earlier text, prereg texts and `report/archive/` are never rewritten (old `docs/<file>` paths in them now live under `docs/research/` or `docs/data/`). Do not flip a wrong direction, add windows or variants after seeing results, or call a reused out-of-sample window clean.
+- **Point-in-time checks.** Truncation-invariance tests (rebuild with data cut at date T; nothing ≤ T may change) are the real guard; date-only audits miss night-session timing. Include cuts on a Friday before a weekend release and on a pre-holiday month end. New release-based factors must pass `target_rule="on_or_after"` to `fundamental_signals.releases_to_daily` (as `composite.TARGET_RULE` does); the default `"legacy"` (`effective_target_day`) books weekend releases on the previous Friday and is kept only to reproduce trials 50/51.
