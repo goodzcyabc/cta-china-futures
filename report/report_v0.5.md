@@ -59,7 +59,7 @@
                               失败 → FAILED.json + 非零退出 + 桌面通知,状态不变,重跑幂等;git 留痕
 ```
 
-- 合约参数:57 个品种的乘数、跳价、保证金、涨跌停、手续费全部按交易所官网一手来源核验(两名独立复核),带生效日与来源 URL(`configs/instruments.yaml`,`docs/instruments_verification*.md`)。生产品种池由配置显式列出 22 个。
+- 合约参数:57 个品种的乘数、跳价、保证金、涨跌停、手续费全部按交易所官网一手来源核验(两名独立复核),带生效日与来源 URL(`configs/instruments.yaml`,`docs/data/instruments_verification*.md`)。生产品种池由配置显式列出 22 个。
 - 结果目录以"配置指纹 + 参数表指纹"命名;每次出单的快照含 git sha、数据指纹、配置指纹、结算价口径与覆盖率。
 - 质量门:`ruff format/check`、`mypy --strict`、`pytest`(307 项:合成数据单元测试 + 真实数据的三层截断不变测试 + 交易所解析样例 + 纸面账故障注入 + **研究/实盘逐日一致性** + 另类数据管道与合成因子的点时测试)、GitHub Actions。旧引擎冻结为 `engine_legacy.py`,只用于复现 v0.3 报告。
 
@@ -238,14 +238,14 @@
 | 执行层共用代码 | `src/cta/execution/plan.py`、`ledger.py`;引擎 `src/cta/backtest/engine.py`(旧引擎 `engine_legacy.py` 冻结) |
 | 口径分解 | `docs/research/settle_baseline.md`、`scripts/research/settle_baseline.py`、`report/settle_baseline_segments.csv` |
 | 研究/实盘一致性 | `tests/test_paths_agree.py`、`docs/research/lookahead_audit.md` |
-| 因子研究细表 | `docs/factor_research_*.md`、`factor_newdata_*.md`、`factor_spotbasis_is.md`、`factor_global_is.md`、`factor_reg_*.md`、`factor_combo_*.md` |
+| 因子研究细表 | `docs/research/factor_research_*.md`、`factor_newdata_*.md`、`factor_spotbasis_is.md`、`factor_global_is.md`、`factor_reg_*.md`、`factor_combo_*.md` |
 | 执行层试验 | `docs/research/exec_trials_is.md`、`exec_trials_oos_2026-06-03.md`、`scripts/research/exec_fills.py`、`exec_trials.py` |
-| 参数核验 | `docs/instruments_verification*.md`、`configs/instruments.yaml` |
-| 数据接入 | `docs/data_exchanges_*.md`、`data_exchange_params.md`、`data_exchange_events.md`、`data_global_futures.md`、`data_notes.md` |
+| 参数核验 | `docs/data/instruments_verification*.md`、`configs/instruments.yaml` |
+| 数据接入 | `docs/data/data_exchanges_*.md`、`data_exchange_params.md`、`data_exchange_events.md`、`data_global_futures.md`、`data_notes.md` |
 | 基线对照 | `docs/data/baselines.md`、`docs/data/industry_baselines.md` |
 | 运行手册与失败语义 | `docs/deployment.md`、`scripts/paper_daily.sh`、`deploy/com.cta.paper.plist` |
 | 纸面账 | `paper/<账本>/equity.csv`、`orders/<日>/`、`fills/`、`log/<日>.json`、`FAILED.json`(失败时) |
 | 非量价因子 | `docs/research/non_pv_factor_card.md`(仓单水平)、`docs/research/msf_prereg.md` + `docs/research/msf_demo.md`(合成因子演示)、`src/cta/factors/composite.py`、`configs/strategy_v06_msf.yaml` |
-| 二十–二十五轮研究 | `docs/research/adaptive_quarterly_v1_report.md`、`fundamental_signal_diagnostic.md`、`altdata_diagnostic.md`(+ `altdata_sources.md` 数据源目录)、`options_diagnostic.md`;数据管道 `src/cta/data/alt/` |
+| 二十–二十五轮研究 | `docs/research/adaptive_quarterly_v1_report.md`、`fundamental_signal_diagnostic.md`、`altdata_diagnostic.md`(+ `docs/data/altdata_sources.md` 数据源目录)、`options_diagnostic.md`;数据管道 `src/cta/data/alt/` |
 | 旧报告(legacy 对照) | `report/archive/report_v0.4.md`(2026-09-23,基线数字与本版相同)、`report/archive/report_v0.3.md`(2026-09-22 前口径,原样保留) |
 | 回测原始输出 | `results/exp_full/`、`results/settle_baseline/`(不进 git;汇总表进 git) |

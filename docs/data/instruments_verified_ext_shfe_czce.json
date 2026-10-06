@@ -3,7 +3,7 @@
     "verified": true,
     "verified_date": "2026-09-18",
     "param_snapshot": "交易所 2026-09-18 结算参数(上期所 Settlement/ContractDailyTradeArgument .dat; 郑商所 FutureDataClearParams/FutureTradeParam .txt) + 交易所公告/收费一览表/合约文本",
-    "scope": "SHFE 9 + CZCE 13 = 22 品种(任务描述写 21, 实际列出 22; 补充 docs/instruments_verified.json 的 23 品种; DCE/INE 由另一任务核验)",
+    "scope": "SHFE 9 + CZCE 13 = 22 品种(任务描述写 21, 实际列出 22; 补充 docs/data/instruments_verified.json 的 23 品种; DCE/INE 由另一任务核验)",
     "slippage_ticks_per_side": 1,
     "field_units": {
       "fee_per_lot": "元/手(开仓, 交易所投机标准; 按比例品种填 0)",

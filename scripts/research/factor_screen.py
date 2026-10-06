@@ -3,7 +3,7 @@
 用法:
   PYTHONPATH=src python3 scripts/research/factor_screen.py                       # IS
   PYTHONPATH=src python3 scripts/research/factor_screen.py --end 2026-06-05 --confirm-holdout   # OOS(选择冻结后只跑一次)
-输出:docs/factor_research_<tag>.md 与 results/factors/<tag>/*.csv。
+输出:docs/research/factor_research_<tag>.md 与 results/factors/<tag>/*.csv。
 """
 
 from __future__ import annotations

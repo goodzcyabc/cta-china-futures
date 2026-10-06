@@ -3,7 +3,7 @@
 文件:`data/external/exchange_events/events.csv`(不进 git;同目录 `README.md` 为简版说明)。生成日 2026-09-21。
 用途:研究"监管事件"因子——交易所对**期货**品种的保证金、涨跌停板、手续费、平今手续费、持仓限额、交易限额的调整,一行 = 一次公告(或一次参数文件变动)中对一个品种的一项调整。
 覆盖 2016-01-01 至 2026-09-21;上期所(SHFE)、上期能源(INE)为公告正文抽取,郑商所(CZCE)为交易所日参数文件推导(见"抽取方法"与"已知遗漏"),大商所(DCE)本次未覆盖。
-本表是一次性生成的历史表;每日可复现的"参数文件推导"事件源已接入数据层(`kind="params"`,`src/cta/data/exchanges/params.py`,文档 `docs/data_exchange_params.md`,输出 `events_derived.csv` 同 14 列),与本表 `DERIVED` 行同口径。
+本表是一次性生成的历史表;每日可复现的"参数文件推导"事件源已接入数据层(`kind="params"`,`src/cta/data/exchanges/params.py`,文档 `docs/data/data_exchange_params.md`,输出 `events_derived.csv` 同 14 列),与本表 `DERIVED` 行同口径。
 
 ## 1. 总览
 
@@ -128,7 +128,7 @@ direction 分布:{'up': 3401, 'down': 1845, 'restore': 1155};reason 分布(多�
 
 **抽取员 REVIEW 标注**:355 行 notes 含 `REVIEW:`(集中在 2016–2019 分档公告的方向判断、2024 年集运欧线新合约上市初始值、2026 年只写"调整为"不写旧值的公告),各批 `review_<批>.txt` 逐条说明。
 
-**与 docs/instruments_verification*.md 已核验值交叉核对**(两名独立复核员在交易所官网核过的生效日与数值;20 条主核对 + 25 条附加):主核对一致 **20/20**,附加一致 24/25。
+**与 docs/data/instruments_verification*.md 已核验值交叉核对**(两名独立复核员在交易所官网核过的生效日与数值;20 条主核对 + 25 条附加):主核对一致 **20/20**,附加一致 24/25。
 
 主核对 20 条:
 

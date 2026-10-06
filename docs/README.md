@@ -1,6 +1,17 @@
 # 文档索引
 
-2026-10-06 起 `docs/` 分成三块,**文件名都没改**:设计日志、报告和旧文档里写的 `docs/<文件名>`,现在在 `docs/research/<文件名>` 或 `docs/data/<文件名>`。查某个文件改名前的历史用 `git log --follow -- docs/research/<文件名>`。
+2026-10-06 仓库整理过一次(经过见 [design_log.md](design_log.md) 第二十六节),**文件名都没改**。此前写成的文字(设计日志一至二十五、各预注册与结果、`report/archive/`)里的旧路径不改写,对照如下:
+
+| 旧路径 | 现在 |
+|---|---|
+| `docs/<文件>` | `docs/research/<文件>` 或 `docs/data/<文件>`(design_log、architecture、deployment、drills 不变) |
+| `scripts/<名>.py` | `scripts/research/<名>.py`(paper_daily.sh、paper_acceptance.py、portfolio_diagnostics.py、capital_scan.py、rqdata_export_options.py 不变) |
+| `paper/`(当时指 v0.1 账本) | `paper/v01/`;现在的 `paper/` 是五本账的父目录 |
+| `paper_v03/`、`paper_v03p/`、`paper_v01r/`、`paper_v05/` | `paper/v03/`、`paper/v03p/`、`paper/v01r/`、`paper/v05/` |
+| `report/report_v0.1.2.md`、`report/report_v0.3.*`、`report/report_v0.4.*`、`report/yearly_v04.csv`、`report/paper_acceptance_record_2026-09-16_2026-09-22.md` 及旧图 | `report/archive/` 下同名 |
+| `configs/exp_e1/e2/e3.yaml`、`strategy_v03r.yaml`、`strategy_v04_ew.yaml`、`strategy_v04_iv.yaml` | `configs/experiments/` 下同名 |
+
+查改名前的历史用 `git log --follow -- <新路径>`。`configs/instruments.yaml` 的两行注释仍写旧路径 `docs/instruments_verification*.md`(现在在 `docs/data/`),纸面验收期(至 2026-12-15)内不改动这个文件。
 
 | 文件 | 内容 |
 |---|---|

@@ -1,5 +1,5 @@
 """每日风控参数(kind="params"):用 tests/fixtures 里的截断样例测解析与校验(不联网);推导逻辑用合成数据测;
-有本地数据时与 docs/instruments_verification*.md 已核验的 2026 现行值对照。"""
+有本地数据时与 docs/data/instruments_verification*.md 已核验的 2026 现行值对照。"""
 
 from __future__ import annotations
 

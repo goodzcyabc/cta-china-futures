@@ -24,9 +24,9 @@
 |---|---|---|---|
 | A | Lim, Zohren & Roberts (2019). *Enhancing Time-Series Momentum Strategies Using Deep Neural Networks.* Journal of Financial Data Science 1(4). [arXiv:1904.04912](https://arxiv.org/abs/1904.04912) | LSTM 直接输出仓位 [−1, 1],以夏普比率作损失函数(Deep Momentum Network);原文在 88 个海外期货上检验 | 22 个品种合并训练,按年扩展窗口重训,损失函数扣除每个品种的真实手续费与滑点;输出接入现有波动率目标与执行层,对照 v0.3。中国期货上已有同类研究(Liu, Mirza, You & Zhan, *Annals of Operations Research*, 2024, [doi:10.1007/s10479-024-06277-x](https://doi.org/10.1007/s10479-024-06277-x)),这里是在更严格条件下复现,不算新发现。CPU 即可 |
 | B | Wood, Roberts & Zohren (2022). *Slow Momentum with Fast Reversion: A Trading Strategy Using Deep Learning and Changepoint Detection.* Journal of Financial Data Science 4(1). [arXiv:2105.13727](https://arxiv.org/abs/2105.13727) | 用高斯过程在线检测趋势拐点,把拐点强度与位置作为特征 | 先把"拐点强度"单独当作一个因子,用现有三臂评价检验(1 次试验);过线再并入 A |
-| C | Wood, Giegerich, Roberts & Zohren (2021). *Trading with the Momentum Transformer: An Intelligent and Interpretable Architecture.* [arXiv:2112.08534](https://arxiv.org/abs/2112.08534) | 用注意力机制处理一年的日频序列 | 论文的组合在单边成本 3 bp 时转负;本项目 1 跳滑点折合 0.7–8.9 bp(另加手续费),所以成本建模决定成败。需要 GPU,见第 3 节 |
+| C | Wood, Giegerich, Roberts & Zohren (2021). *Trading with the Momentum Transformer: An Intelligent and Interpretable Architecture.* [arXiv:2112.08534](https://arxiv.org/abs/2112.08534) | 用注意力机制处理一年的日频序列 | 论文 2015–2020 年的全资产组合夏普在单边成本 2.5–3 bp 时转负(只交易其中 25 个商品期货时,3 bp 下仍为 1.23);本项目 1 跳滑点折合 0.7–8.9 bp(另加手续费),所以成本建模决定成败。需要 GPU,见第 3 节 |
 
-另有项目自己登记、尚未检验的候选(设计日志 七、六:趋势 sleeve、仓单变化率与同比等),按同样规则排队。
+另有项目已登记、只能用 2026-06 之后新数据检验的候选,按同样规则排队:设计日志 6.1 的 C1 趋势 sleeve(样本内已按 5.1 规则被否,只差新数据)、C2、C4;七 的 C9、C11–C13;13.4 的 C14、C15;15.6 的 C16。已检验并关闭的不再排队(C3、C10 成本版、仓单 21 日变化 H-REC)。仓单变化率的其他窗口、同比、分板块变体与 H-REC 同族,要测须先写预注册、按新增试验计数、只用新数据。
 
 ## 2. 大规模特征搜索
 

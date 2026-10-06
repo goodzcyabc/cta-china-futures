@@ -1,5 +1,5 @@
 """design_log 九 的执行脚本:会员持仓排名与仓单因子。默认样本内(≤2021-12-31);样本外需 --confirm-holdout。
-输出 docs/factor_newdata_<tag>.md 与 results/newdata/<tag>/。"""
+输出 docs/research/factor_newdata_<tag>.md 与 results/newdata/<tag>/。"""
 
 from __future__ import annotations
 

@@ -1,6 +1,6 @@
 # 交易所参数复核补充表 (SHFE 9 + CZCE 13 品种)
 
-- 参数快照: 2026-09-18 交易所结算参数/交易参数; 生成日 2026-09-18; 口径同 docs/instruments_verification.md(一般月份/主力档, 交易所投机标准)
+- 参数快照: 2026-09-18 交易所结算参数/交易参数; 生成日 2026-09-18; 口径同 docs/data/instruments_verification.md(一般月份/主力档, 交易所投机标准)
 - 复核: 22 品种 × 6 字段 = 132 项; verified 132, corrected 0, unverified 0; 与当前 YAML 差异 88 处(乘数/跳价 0 处差异)
 - 范围: 上期所 FU/BU/ZN/HC/PB/SP/SS/BR/AO, 郑商所 FG/OI/SF/RM/SM/AP/UR/CJ/PF/PK/SH/PX/PR; 大商所/能源中心由另一任务核验
 

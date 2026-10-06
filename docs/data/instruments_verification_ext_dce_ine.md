@@ -1,6 +1,6 @@
 # 交易所参数复核终表 — 扩展品种(DCE 10 + INE 3) (instruments_verified_ext_dce_ine)
 
-- 范围: `docs/instruments_verification.md` 未覆盖的 13 个品种(DCE: JM PP L A B CS EG EB PG LH; INE: NR LU BC)。SHFE/CZCE 扩展品种由另一任务核验, 不在本表。
+- 范围: `docs/data/instruments_verification.md` 未覆盖的 13 个品种(DCE: JM PP L A B CS EG EB PG LH; INE: NR LU BC)。SHFE/CZCE 扩展品种由另一任务核验, 不在本表。
 - 参数快照: DCE 2026-09-18 结算参数 / 2026-09-21 日交易参数(自 09-18 结算起); INE 2026-09-18 业务参数汇总(结算参数 + 交易参数) / 2026-09-07 收费一览表; 生成日 2026-09-18
 - 复核: 13 品种 × 6 字段 = 78 项; verified 78, corrected 0, unverified 0; 与当前 YAML(数据反推占位值) 差异 56 处; 乘数/跳价 13/13 与占位一致
 - 口径同主表: margin_rate = 交易所一般持仓(投机)最低保证金(一般月份/主力档); limit_pct = 现行涨跌停(一般月份/主力档); fee 为交易所投机非日内开仓费(元/手 或 万分比, 二选一); fee_close_today 为平今费。

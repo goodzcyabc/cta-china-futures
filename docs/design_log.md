@@ -860,11 +860,12 @@ M1(主):三个核心 sleeve(tsmom、carry、receipts_level 各自按波动率目
 - **文件位置**(文件名都不变,用 `git log --follow` 追溯):
   - `docs/` 分为 `docs/research/`(各轮预注册与结果)和 `docs/data/`(数据源、参数核验、基线);design_log、architecture、deployment、drills 留在原处;新增 `docs/README.md` 按轮次索引。
   - 一次性研究脚本移到 `scripts/research/`;运维脚本(paper_daily.sh、paper_acceptance.py、portfolio_diagnostics.py、capital_scan.py、rqdata_export_options.py)留在 `scripts/`。
-  - 旧报告 v0.1.2、v0.3、v0.4 及其图移到 `report/archive/`;无引用的实验配置移到 `configs/experiments/`。
+  - 旧报告 v0.1.2、v0.3、v0.4 及其图、`yearly_v04.csv`、纸面验收记录 `paper_acceptance_record_2026-09-16_2026-09-22.md` 移到 `report/archive/`(`equity_variants_v04.png` 复制一份到 `report/archive/figures/`,v0.5 仍用原图);无引用的实验配置移到 `configs/experiments/`。
   - 本节之前的文字(含各预注册与旧报告)里写的旧路径不改写。
 - **纸面账目录**:五本账从仓库根目录移到 `paper/v01`(原 `paper/`)、`paper/v03`(原 `paper_v03/`)、`paper/v03p`、`paper/v01r`、`paper/v05`。
   - 与之同一提交修改:每日脚本的账本路径与 git add 清单、`PaperBook` 默认目录与命令行默认账本、`.gitignore`(`.txn/`)、验收程序按协议清单新增的 `dir` 字段找账本(标签与锁定的配置摘要不变;找不到 state.json 改为报错,不再当空账本)。
-  - launchd 日志仍在 `paper/log/cron.log`,plist 不变。
+  - launchd 日志仍在 `paper/log/cron.log`,plist 不变;`paper/log/` 用 `.gitkeep` 入库,保证新检出的仓库里也有这个目录。
+  - 防误建账本:账本目录没有 `state.json` 时,每日脚本报警且不运行该账本,命令行拒绝运行(新建账本须显式 `--init`)。此前路径写错会静默新建 300 万空账本。
   - 迁移前在独立工作区验证:五本账 `paper step --date 2026-09-30 --no-ingest` 均为 "already settled";`paper status` 与迁移前 state.json 逐字节相同;新每日脚本(屏蔽 git)在假日全部跳过且不写任何文件;验收程序读到五本账(5/5、对账一致)。
   - 本次提交会作为一次 git_sha 变化出现在下一次订单快照里(与其他代码提交相同)。
 - **说明文件**:README 重写(现状、目录、运行、文档入口);新增 `TODO.md`(路线图,所列论文均经网络核实出处);`docs/architecture.md` 按现有代码重写;deployment.md 的过时段落更正;删除空的 `cta.portfolio` 包;新增 `CLAUDE.md`(给编码助手的工作说明)。

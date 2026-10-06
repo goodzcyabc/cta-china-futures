@@ -3,7 +3,7 @@
   "verified": true,
   "verified_date": "2026-09-18",
   "param_snapshot": "DCE 2026-09-18 结算参数(futAndOptSettle) / 2026-09-21 日交易参数(dayTradPara, 自 09-18 结算起); INE 2026-09-18 业务参数汇总(结算参数+交易参数 tab) / 2026-09-07 收费一览表",
-  "scope": "docs/instruments_verification.md 之外的 10 个 DCE + 3 个 INE 品种; SHFE/CZCE 由另一任务核验",
+  "scope": "docs/data/instruments_verification.md 之外的 10 个 DCE + 3 个 INE 品种; SHFE/CZCE 由另一任务核验",
   "slippage_ticks_per_side": 1,
   "field_units": {
    "fee_per_lot": "元/手(开仓, 交易所投机非日内标准; 按比例品种填 0)",

@@ -9,6 +9,11 @@ echo "=== $(date '+%F %T') paper catchup to $TODAY"
 FAILED=""
 run_book() {  # run_book <账本目录> [其余参数...]
   local book=$1; shift
+  if [ ! -f "$book/state.json" ]; then  # 账本目录或状态缺失:报警,不补跑(否则会静默新建 300 万空账本)
+    FAILED="$FAILED $book(no-state)"
+    echo "!!! $book has no state.json (book dir missing or moved?) -- not run"
+    return
+  fi
   if ! PYTHONPATH=src python3 -m cta.cli paper catchup --date "$TODAY" --book "$book" "$@"; then
     FAILED="$FAILED $book"
     echo "!!! $book FAILED (see $book/FAILED.json)"
@@ -21,7 +26,7 @@ run_book paper/v05  --no-ingest --config configs/strategy_v05.yaml     # 工业�
 run_book paper/v03p --no-ingest --config configs/strategy_v03p.yaml    # P1 剔除 5 品种(十四)
 # 每日结果入库(含 FAILED.json),形成不可篡改的时间戳(git 提交时间)
 MSG="paper: $TODAY"; [ -n "$FAILED" ] && MSG="$MSG (FAILED:$FAILED)"
-git add paper/v01 paper/v03 paper/v03p paper/v01r paper/v05 || FAILED="$FAILED git-add"  # 显式列出:任一目录缺失即报警
+git add paper/v01 paper/v03 paper/v03p paper/v01r paper/v05 || FAILED="$FAILED git-add"  # 显式列出;账本缺失由 run_book 的 state.json 检查报警
 if ! git diff --cached --quiet; then  # 有改动才提交;提交失败与推送失败都进告警链
   git -c user.name=paper-bot -c user.email=paper@local commit -q -m "$MSG" || FAILED="$FAILED git-commit"
 fi

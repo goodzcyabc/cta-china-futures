@@ -96,6 +96,9 @@ def paper(
     book: Path = typer.Option(
         Path("paper/v01"), help="账本目录(默认 paper/v01;其余为 paper/v03 等,须与 --config 配对)"
     ),
+    init: bool = typer.Option(
+        False, help="账本目录还没有 state.json 时新建账本(默认拒绝,防止路径写错静默新建)"
+    ),
 ) -> None:
     """纸面交易:step 处理单个交易日(拉数据 → 成交昨日订单并盯市 → 生成今日订单);catchup 补跑到指定日;status 打印账本。"""
     import pandas as pd
@@ -105,6 +108,9 @@ def paper(
 
     d = pd.Timestamp(date) if date else pd.Timestamp.today().normalize()
     cfg = load_config(config)
+    if not (book / "state.json").exists() and not init:
+        typer.echo(f"no book at {book} (state.json missing); pass --init to create a new book", err=True)
+        raise typer.Exit(2)
     try:
         if action == "step":
             typer.echo(
