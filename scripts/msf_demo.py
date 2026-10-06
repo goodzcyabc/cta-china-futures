@@ -72,7 +72,7 @@ def msf_candidate(cands: dict[str, ce.Candidate]) -> ce.Candidate:
         audits.append(a)
     audit = pd.concat(audits, ignore_index=True)
     msf = cp.combine_msf({k: c.signal for k, c in cands.items()})
-    return ce.Candidate("MSF", "多源基本面合成因子(12 个非量价成分等权)", msf, audit)
+    return ce.Candidate("MSF", "多源基本面合成因子(12 个成分等权:11 个非量价 + 全市场持仓)", msf, audit)
 
 
 def truncation_check(src: Any, cfg: Any, specs: Any, full: dict[str, pd.DataFrame]) -> dict[str, Any]:
@@ -363,7 +363,7 @@ def write_doc(log: dict[str, Any], ev3: ce.CandidateEval, ev1: ce.CandidateEval)
     lines = [
         "# 多源基本面合成因子 MSF:演示结果(样本内演示;预注册 `docs/msf_prereg.md`;试验 60)",
         "",
-        "> 第 0 节由人撰写(标记之间,重跑保留);第 1–5 节由 `scripts/msf_demo.py` 生成。所有成分在 2016–2026 上都已单独看过,本文数字**只是演示,不是证据**。",
+        "> 第 0 节由人撰写(标记之间,重跑保留);第 1–5 节由 `scripts/msf_demo.py` 生成。除新成分 P 外,其余 11 个成分在 2016–2026 上都已单独看过,本文数字**只是演示,不是证据**。",
         "",
         f"git `{log['git_sha']}`;预注册提交 `{log['prereg_commit']}`;窗口 {log['window'][0]} → {log['window'][1]};种子 {log['seed']};基线复现 v0.3 {log['baseline_matches_reference']['v0.3']} / v0.1 {log['baseline_matches_reference']['v0.1']}。",
         "",
