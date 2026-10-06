@@ -5,7 +5,7 @@
 - 候选 = v0.3 流水线算出的 receipts_level 信号(与生产完全相同);
 - 三臂:仓单单独 / 量价基线 / 50-50 事前风险预算混合(cta.analysis.candidate_eval,同一引擎、成本、执行);
 - 另附因子评估器口径的 sleeve 相关性(results/adaptive_quarterly_v1/sleeve_returns.csv)与逐品种覆盖。
-用法:PYTHONPATH=src python3 scripts/non_pv_factor_card.py
+用法:PYTHONPATH=src python3 scripts/research/non_pv_factor_card.py
 输出:results/non_pv_factor_card/
 """
 
@@ -19,7 +19,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from cta.analysis import candidate_eval as ce  # noqa: E402
 from cta.config import load_config  # noqa: E402

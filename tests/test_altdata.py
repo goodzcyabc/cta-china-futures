@@ -1,4 +1,4 @@
-"""另类数据五条(预注册 docs/altdata_prereg.md 第 9 节):可得日规则、目标日、冻结、截断不变、噪声不变、版本拼接、重写延后、确定性、失效、
+"""另类数据五条(预注册 docs/research/altdata_prereg.md 第 9 节):可得日规则、目标日、冻结、截断不变、噪声不变、版本拼接、重写延后、确定性、失效、
 基线复现与混合凸性由 tests/test_fundamental_signals.py 覆盖;真实数据存在时再检查整表。"""
 
 from __future__ import annotations

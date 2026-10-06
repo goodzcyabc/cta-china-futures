@@ -1,4 +1,4 @@
-"""季度 walk-forward 诊断核心(只读;预注册见 docs/quarterly_walkforward_prereg.md)。
+"""季度 walk-forward 诊断核心(只读;预注册见 docs/research/quarterly_walkforward_prereg.md)。
 
 - 排程:每个季度模型的训练截止 = 上一季度最后一个交易日(含),交易区间 = 本季度交易日;程序断言 cutoff < 交易首日。
 - 4.4 重选:训练窗口 2016-01-04 → cutoff,规则与 6.2 脚本逐字相同,并保留全部训练期统计;C3:carry 过去 3 年净夏普 ≤ 0 → 权重 0.5。

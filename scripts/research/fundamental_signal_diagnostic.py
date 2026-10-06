@@ -1,10 +1,10 @@
-"""独立信息两条的回顾性诊断(预注册 docs/fundamental_signal_prereg.md;试验 50、51)。
+"""独立信息两条的回顾性诊断(预注册 docs/research/fundamental_signal_prereg.md;试验 50、51)。
 
 A. 全市场持仓兴趣(Hong–Yogo 2012 口径):全市场名义持仓 12 个月对数增长 → 扩展窗口 z → clip ±2 / 2 → 全部 22 个品种同一信号;
 B. PMI 新订单 / 产成品库存 → 扩展窗口 z → clip ±2 / 2 → 工业品 + 能源篮子(13 个品种)同一信号。
 每条候选三个固定组合:candidate standalone / 静态正式基线 v0.3 / 50-50 事前风险预算混合;同一数据、引擎、成本、执行、风险模型。
-用法:PYTHONPATH=src python3 scripts/fundamental_signal_diagnostic.py [--smoke]
-输出:results/fundamental_signal_diagnostic/、docs/fundamental_signal_diagnostic.md(表格;结论由人按预注册第 7 节判读后追加在标记之间)。
+用法:PYTHONPATH=src python3 scripts/research/fundamental_signal_diagnostic.py [--smoke]
+输出:results/fundamental_signal_diagnostic/、docs/research/fundamental_signal_diagnostic.md(表格;结论由人按预注册第 7 节判读后追加在标记之间)。
 不改任何策略对象、纸面账或正式报告。
 """
 
@@ -21,7 +21,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from cta.analysis import fundamental_signals as fs  # noqa: E402
 from cta.analysis.attribution import (
@@ -71,7 +71,15 @@ def prereg_commit() -> str:
 
     try:
         out = subprocess.run(
-            ["git", "log", "--format=%h", "--diff-filter=A", "--", "docs/fundamental_signal_prereg.md"],
+            [
+                "git",
+                "log",
+                "--follow",
+                "--format=%h",
+                "--diff-filter=A",
+                "--",
+                "docs/research/fundamental_signal_prereg.md",
+            ],
             capture_output=True,
             text=True,
             check=True,
@@ -213,7 +221,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--smoke", action="store_true", help="只做基线复现与点时检查,不跑候选引擎")
     ap.add_argument("--out", default="results/fundamental_signal_diagnostic")
-    ap.add_argument("--doc", default="docs/fundamental_signal_diagnostic.md")
+    ap.add_argument("--doc", default="docs/research/fundamental_signal_diagnostic.md")
     args = ap.parse_args()
     t0 = time.time()
     out = Path(args.out)
@@ -712,7 +720,7 @@ def write_doc(
     coverage: pd.DataFrame,
 ) -> None:
     lines: list[str] = [
-        "# 独立信息两条:全市场持仓兴趣与 PMI 订单/库存(回顾性诊断;预注册 `docs/fundamental_signal_prereg.md`)",
+        "# 独立信息两条:全市场持仓兴趣与 PMI 订单/库存(回顾性诊断;预注册 `docs/research/fundamental_signal_prereg.md`)",
         "",
         "> 第 0 节(结论)与第 6 节以后由人撰写、保留在 HTML 标记之间;第 1–5 节表格由脚本生成,重跑只刷新表格;预注册第 1–10 节未改。",
         "",

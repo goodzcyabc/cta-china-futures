@@ -1,6 +1,6 @@
 """交易所每日风控参数(保证金 / 手续费 / 平今手续费 / 涨跌停)接入,kind="params";并从逐日参数机械推导"上调"事件。
 
-来源(交易所官网静态文件,桌面 UA 直接 curl 即可;字段映射、口径与已知坑见 docs/data_exchange_params.md):
+来源(交易所官网静态文件,桌面 UA 直接 curl 即可;字段映射、口径与已知坑见 docs/data/data_exchange_params.md):
   SHFE  https://www.shfe.com.cn/data/busiparamdata/future/Settlement{YYYYMMDD}.dat                 结算参数:保证金、手续费、平今折扣
         https://www.shfe.com.cn/data/busiparamdata/future/ContractDailyTradeArgument{YYYYMMDD}.dat  每日交易参数:当日盘中生效的涨跌停
   INE   同上两个文件,域名 www.ine.cn(上期所文件里也含能源中心品种,按 INE_SYMBOLS 拆分,两者逐合约一致)
@@ -184,7 +184,7 @@ def fetch_params(
     郑商所交易参数文件 2025-08-18 之前不存在,不请求。DCE 需浏览器会话:抛 NotImplementedError。"""
     if exchange == "DCE":
         raise NotImplementedError(
-            "DCE daily parameters need a browser session (dcereport WAF); see docs/data_exchange_params.md"
+            "DCE daily parameters need a browser session (dcereport WAF); see docs/data/data_exchange_params.md"
         )
     if exchange not in EXCHANGES:
         raise ValueError(f"unknown exchange {exchange!r}; choose from {EXCHANGES}")

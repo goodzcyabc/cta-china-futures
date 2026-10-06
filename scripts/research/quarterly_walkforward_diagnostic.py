@@ -1,9 +1,9 @@
-"""季度 walk-forward 诊断(预注册 docs/quarterly_walkforward_prereg.md;后验提出的历史 walk-forward,只作诊断)。
+"""季度 walk-forward 诊断(预注册 docs/research/quarterly_walkforward_prereg.md;后验提出的历史 walk-forward,只作诊断)。
 
 用法:
-  PYTHONPATH=src python3 scripts/quarterly_walkforward_diagnostic.py --mode smoke   # 只跑 2022Q1、2022Q2 + 三项门槛检查
-  PYTHONPATH=src python3 scripts/quarterly_walkforward_diagnostic.py --mode full    # 2020Q1–2026Q2 全部 vintage
-输出:results/quarterly_walkforward/*.csv、run.json;docs/quarterly_walkforward_diagnostic.md(表格部分;结论由人写在文末)。
+  PYTHONPATH=src python3 scripts/research/quarterly_walkforward_diagnostic.py --mode smoke   # 只跑 2022Q1、2022Q2 + 三项门槛检查
+  PYTHONPATH=src python3 scripts/research/quarterly_walkforward_diagnostic.py --mode full    # 2020Q1–2026Q2 全部 vintage
+输出:results/quarterly_walkforward/*.csv、run.json;docs/research/quarterly_walkforward_diagnostic.md(表格部分;结论由人写在文末)。
 不改任何策略对象、纸面账或正式报告。
 """
 
@@ -19,7 +19,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from cta.analysis import walkforward as wf  # noqa: E402
 from cta.analysis.loo import segment_stats  # noqa: E402
@@ -70,7 +70,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["smoke", "full"], default="smoke")
     ap.add_argument("--out", default="results/quarterly_walkforward")
-    ap.add_argument("--doc", default="docs/quarterly_walkforward_diagnostic.md")
+    ap.add_argument("--doc", default="docs/research/quarterly_walkforward_diagnostic.md")
     args = ap.parse_args()
     t0 = time.time()
     out = Path(args.out)
@@ -409,7 +409,7 @@ def write_doc(
     lines: list[str] = [
         f"# 季度 walk-forward 诊断({'SMOKE' if mode == 'smoke' else '全量'};后验提出的历史 walk-forward,只作诊断)",
         "",
-        f"预注册:`docs/quarterly_walkforward_prereg.md`;git `{log['git_sha']}`;季度模型 {len(quarters)} 个({sum(q.formal_oos for q in quarters)} 个在正式 OOS 内);训练窗口相互重叠,不是独立实验;引擎自 2020-01-02 空仓连续运行到 2026-06-05。",
+        f"预注册:`docs/research/quarterly_walkforward_prereg.md`;git `{log['git_sha']}`;季度模型 {len(quarters)} 个({sum(q.formal_oos for q in quarters)} 个在正式 OOS 内);训练窗口相互重叠,不是独立实验;引擎自 2020-01-02 空仓连续运行到 2026-06-05。",
         "",
         "## 汇总(主指标:2022-01-04 → 2026-06-05 拼接段;配对差相对各自基线,NW lag 5,块 bootstrap 块长 10 × 2000 次,种子 20260925)",
         "",

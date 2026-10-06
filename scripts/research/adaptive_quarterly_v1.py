@@ -1,9 +1,9 @@
-"""季度自适应 v1(预注册 docs/adaptive_quarterly_v1_prereg.md,提交 97f525c):M1 主模型 + A1/A2 消融,对照 5 个已有臂。
+"""季度自适应 v1(预注册 docs/research/adaptive_quarterly_v1_prereg.md,提交 97f525c):M1 主模型 + A1/A2 消融,对照 5 个已有臂。
 
 用法:
-  PYTHONPATH=src python3 scripts/adaptive_quarterly_v1.py --mode smoke   # 2022Q1/Q2 + 停止规则检查
-  PYTHONPATH=src python3 scripts/adaptive_quarterly_v1.py --mode full
-输出:results/adaptive_quarterly_v1/、docs/adaptive_quarterly_v1_report.md(表格部分;结论由人按预注册第 8 节判读后追加)。
+  PYTHONPATH=src python3 scripts/research/adaptive_quarterly_v1.py --mode smoke   # 2022Q1/Q2 + 停止规则检查
+  PYTHONPATH=src python3 scripts/research/adaptive_quarterly_v1.py --mode full
+输出:results/adaptive_quarterly_v1/、docs/research/adaptive_quarterly_v1_report.md(表格部分;结论由人按预注册第 8 节判读后追加)。
 不改任何策略对象、纸面账或正式报告。
 """
 
@@ -19,7 +19,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from cta.analysis import adaptive_quarterly as aq  # noqa: E402
 from cta.analysis import walkforward as wf  # noqa: E402
@@ -85,7 +85,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["smoke", "full"], default="smoke")
     ap.add_argument("--out", default="results/adaptive_quarterly_v1")
-    ap.add_argument("--doc", default="docs/adaptive_quarterly_v1_report.md")
+    ap.add_argument("--doc", default="docs/research/adaptive_quarterly_v1_report.md")
     args = ap.parse_args()
     t0 = time.time()
     out = Path(args.out)
@@ -470,7 +470,7 @@ def write_doc(
     quarters: list[wf.QuarterSpec],
 ) -> None:
     lines: list[str] = [
-        "# 季度自适应 v1:结果(后验提出的历史 walk-forward 诊断;预注册 `docs/adaptive_quarterly_v1_prereg.md`,提交 97f525c)",
+        "# 季度自适应 v1:结果(后验提出的历史 walk-forward 诊断;预注册 `docs/research/adaptive_quarterly_v1_prereg.md`,提交 97f525c)",
         "",
         "> 第 0 节(结论先行)与第 5–8 节由人撰写、保留在 HTML 标记之间;第 1–4 节表格由脚本生成,重跑只刷新表格;预注册第 1–12 节未改。",
         "",

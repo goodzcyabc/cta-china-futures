@@ -1,4 +1,4 @@
-"""来源 E:NOAA CPC 周度 OISST Niño 3.4 海温异常(预注册 docs/altdata_prereg.md 第 4 节,试验 53)。
+"""来源 E:NOAA CPC 周度 OISST Niño 3.4 海温异常(预注册 docs/research/altdata_prereg.md 第 4 节,试验 53)。
 
 数据文件(均为固定宽度文本,负异常可能与海温粘连,如 "20.6-0.1",因此用正则解析):
 - ``wksst8110.for``:冻结版,1981–2010 基期,行 1990-01-03 → 2021-01-27(核验者证实 2014-09 起只追加、无修订);

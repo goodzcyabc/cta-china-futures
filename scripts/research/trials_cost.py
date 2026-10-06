@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from cta.config import load_config
 from cta.data.source import RicequantParquetSource
 from cta.instruments.specs import load_instruments

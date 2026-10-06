@@ -1,7 +1,7 @@
-"""候选信号的统一三臂评价(从 scripts/fundamental_signal_diagnostic.py 抽出;该脚本保持原样不动)。
+"""候选信号的统一三臂评价(从 scripts/research/fundamental_signal_diagnostic.py 抽出;该脚本保持原样不动)。
 
 任何候选只需给出:date × symbol 的信号矩阵(取值 [−1, 1],篮子外 NaN)与点时审计表(数据日 / 公布日 / 目标日 / 建仓日)。
-评价口径与 docs/fundamental_signal_prereg.md 第 5、6 节相同:
+评价口径与 docs/research/fundamental_signal_prereg.md 第 5、6 节相同:
   candidate standalone / 静态正式基线 / 50-50 事前风险预算混合,同一条 raw_exposure → apply_buffer → run_backtest 路径;
   自候选首个持仓日起的绩效、配对差(NW + 块 bootstrap)、相关性、贡献与集中度、剔除最好项(前三品种为完整重跑)、多空两侧;
   判读 R0–R14 机械计算。本模块不含任何数据源或参数搜索。

@@ -6,9 +6,9 @@
   C 新引擎 + 交易所官方结算价,持仓路径固定为 B 的 —— 纯记账口径的影响;
   D 新引擎 + 交易所官方结算价,完整递归(结算权益继续影响次日定手数)—— **新的正式基线**。
 每个配置 × {全样本, 样本内, 样本外};官方结算价覆盖率单列(official 模式缺一即报错,不会静默回退)。
-输出:results/settle_baseline/<版本>_<期>_<级>.json / equity_*.csv、summary.csv,docs/settle_baseline.md。
+输出:results/settle_baseline/<版本>_<期>_<级>.json / equity_*.csv、summary.csv,docs/research/settle_baseline.md。
 
-用法:PYTHONPATH=src python3 scripts/settle_baseline.py [--only v0.3]
+用法:PYTHONPATH=src python3 scripts/research/settle_baseline.py [--only v0.3]
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from typing import Any
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from cta.backtest import engine, engine_legacy  # noqa: E402
 from cta.config import DataCfg, load_config  # noqa: E402
@@ -147,7 +147,7 @@ def run(versions: list[str]) -> pd.DataFrame:
 
 def write_doc(df: pd.DataFrame) -> None:
     lines = [
-        "# 官方结算价基线与执行统一的分解(2026-09-22;脚本 `scripts/settle_baseline.py`)",
+        "# 官方结算价基线与执行统一的分解(2026-09-22;脚本 `scripts/research/settle_baseline.py`)",
         "",
         "四级阶梯,每级只改一件事:A 旧引擎 + 收盘价代结算(旧报告口径)→ B 新引擎 + 收盘价代结算(执行统一的影响)"
         "→ C 新引擎 + 官方结算价、持仓路径固定为 B(纯记账口径)→ D 新引擎 + 官方结算价、完整递归(**新正式基线**)。",
@@ -172,7 +172,7 @@ def write_doc(df: pd.DataFrame) -> None:
                 f"{r['年化名义换手(倍)']:.0f}× | {r['年化手续费占权益'] + r['年化滑点占权益']:.2%} | {int(r['未成交腿数'])} | {int(r['未盯市持仓日数'])} |"
             )
         lines.append("")
-    Path("docs/settle_baseline.md").write_text("\n".join(lines), encoding="utf-8")
+    Path("docs/research/settle_baseline.md").write_text("\n".join(lines), encoding="utf-8")
 
 
 if __name__ == "__main__":

@@ -140,7 +140,7 @@ def compute_signals(
             raise ValueError("config weights include receipts_level but no receipts data was provided")
         rl = sig.receipts_level(receipts, pd.DatetimeIndex(adj.index), list(adj.columns), eligible)
         parts["receipts_level"] = rl
-    # 外部因子(如多源合成因子 msf,docs/msf_prereg.md):只有配置权重里出现时才使用;现有配置不含,输出逐位不变
+    # 外部因子(如多源合成因子 msf,docs/research/msf_prereg.md):只有配置权重里出现时才使用;现有配置不含,输出逐位不变
     extra_used: dict[str, pd.DataFrame] = {}
     for name in cfg.signals.weights:
         if name in BUILTIN_FACTORS:
@@ -215,7 +215,7 @@ def git_sha() -> str:
 def _extra_factors_of(
     src: DataSource, cfg: StrategyConfig, specs: InstrumentTable, panels: dict[str, SymbolPanel]
 ) -> dict[str, pd.DataFrame] | None:
-    """配置启用的外部因子;目前只有 msf(多源基本面合成因子,docs/msf_prereg.md)。未启用 → None。"""
+    """配置启用的外部因子;目前只有 msf(多源基本面合成因子,docs/research/msf_prereg.md)。未启用 → None。"""
     if "msf" not in cfg.signals.weights:
         return None
     from cta.factors.composite import build_msf

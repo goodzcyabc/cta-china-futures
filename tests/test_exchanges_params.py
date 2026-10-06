@@ -492,8 +492,8 @@ def test_derive_events_gap_guard_and_symbol_filter() -> None:
 # ---------------------------------------------------------------------------------------------
 
 # 已核验的 2026 现行值(两名复核员在交易所官网核过;"一般月份/主力档"):
-# docs/instruments_verification.md 的快照为 2026-09-11 结算参数 / 2026-09-14 交易参数,
-# docs/instruments_verification_ext_shfe_czce.md 的快照为 2026-09-18(两者)。
+# docs/data/instruments_verification.md 的快照为 2026-09-11 结算参数 / 2026-09-14 交易参数,
+# docs/data/instruments_verification_ext_shfe_czce.md 的快照为 2026-09-18(两者)。
 V1, V2 = ("2026-09-11", "2026-09-14"), ("2026-09-18", "2026-09-18")
 VERIFIED_2026 = [
     # exchange, symbol, contract, (结算参数日, 交易参数日), margin_spec, fee_open, fee_unit, fee_close_today, limit_pct
@@ -565,7 +565,7 @@ def test_params_store_consistency() -> None:
 
 def test_constants_documented() -> None:
     """模块常量与文档保持一致(文档改了要同步)。"""
-    doc = (ROOT / "docs" / "data_exchange_params.md").read_text(encoding="utf-8")
+    doc = (ROOT / "docs" / "data" / "data_exchange_params.md").read_text(encoding="utf-8")
     for c in (xp.CZCE_CLOSE_TODAY_FROM, xp.CZCE_LIMIT_FROM, xp.CZCE_FEE_STYLE_FROM, xp.CZCE_TRADE_PARAM_FROM):
         assert str(c.date()) in doc
     assert json.dumps(xp.EVENT_COLS) and "DERIVED-daily" in doc

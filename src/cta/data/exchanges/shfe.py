@@ -1,7 +1,7 @@
 """上海期货交易所(SHFE)公开日频数据:日行情(kx)、会员成交持仓排名(pm)、仓单日报(dailystock)。
 
 上期能源(INE)的网站与上期所同一套结构,ine.py 只换域名与交易所标签,解析全部复用本模块(Site 参数化)。
-URL 模式、字段映射、口径切换与已知坑见 docs/data_exchanges_shfe.md。
+URL 模式、字段映射、口径切换与已知坑见 docs/data/data_exchanges_shfe.md。
 
 用法:
     PYTHONPATH=src python3 -m cta.data.exchanges.shfe backfill --start 2016-01-04 --end 2026-09-16 \

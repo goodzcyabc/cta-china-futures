@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from cta.config import load_config  # noqa: E402
 from cta.data.exchanges.base import Store  # noqa: E402
 from cta.data.exchanges.source import default_stitched  # noqa: E402
@@ -215,7 +215,7 @@ md = [
     "\n".join(queue_lines),
     "",
 ]
-out_md = Path("docs") / f"factor_newdata_{tag}.md"
+out_md = Path("docs/research") / f"factor_newdata_{tag}.md"
 out_md.write_text("\n".join(md), encoding="utf-8")
 print(fmt.to_string())
 print("判定:", verdict)

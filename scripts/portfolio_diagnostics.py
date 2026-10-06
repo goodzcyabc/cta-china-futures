@@ -7,7 +7,7 @@
 任一区间 Σ净贡献 ≠ 权益变化(超出浮点误差)→ 直接失败,不生成报告。
 
 用法:PYTHONPATH=src python3 scripts/portfolio_diagnostics.py [--config configs/strategy_v03.yaml] [--skip-loo] [--no-oos-flat]
-输出:results/portfolio_diagnostics/*.csv 与 docs/portfolio_diagnostics.md(只写这两处)。
+输出:results/portfolio_diagnostics/*.csv 与 docs/research/portfolio_diagnostics.md(只写这两处)。
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default="configs/strategy_v03.yaml")
     ap.add_argument("--out", default="results/portfolio_diagnostics")
-    ap.add_argument("--doc", default="docs/portfolio_diagnostics.md")
+    ap.add_argument("--doc", default="docs/research/portfolio_diagnostics.md")
     ap.add_argument("--full-start", default="2016-01-04")
     ap.add_argument("--full-end", default="2026-09-18")
     ap.add_argument("--is-end", default="2021-12-31")

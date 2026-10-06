@@ -1,4 +1,4 @@
-"""商品期权三条(预注册 docs/options_prereg.md 第 8 节):Black-76 反解、系列选择只用当日信息、未成交不进 O1、
+"""商品期权三条(预注册 docs/research/options_prereg.md 第 8 节):Black-76 反解、系列选择只用当日信息、未成交不进 O1、
 可得日与截断不变、RV 只用 ≤ T、双边计数不影响成交均价。真实数据存在时检查整表。"""
 
 from __future__ import annotations

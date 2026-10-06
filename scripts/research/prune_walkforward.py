@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from cta.backtest.engine import run_backtest  # noqa: E402
 from cta.config import load_config  # noqa: E402
 from cta.data.exchanges.source import default_stitched  # noqa: E402
@@ -93,6 +93,6 @@ md = [
     summary.to_frame().to_markdown(),
     "",
 ]
-Path("docs/prune_walkforward.md").write_text("\n".join(md), encoding="utf-8")
+Path("docs/research/prune_walkforward.md").write_text("\n".join(md), encoding="utf-8")
 print(tab.to_string())
 print(summary.to_string())

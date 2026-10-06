@@ -1,4 +1,4 @@
-"""独立信息两条(预注册 docs/fundamental_signal_prereg.md;回顾性诊断,不进生产):
+"""独立信息两条(预注册 docs/research/fundamental_signal_prereg.md;回顾性诊断,不进生产):
 
 A. 全市场持仓兴趣(Hong–Yogo 2012 口径):四所全部合约持仓量按品种汇总 → 单边口径 → 全市场名义持仓 12 个月对数增长;
 B. PMI 新订单 / 产成品库存(国家统计局制造业 PMI 分项,按公布日 info_date 点时对齐)。
@@ -197,7 +197,7 @@ def pmi_ratio_releases(new_orders: list[Release], fg_inventory: list[Release]) -
 def effective_target_day(info_date: pd.Timestamp, dates: pd.DatetimeIndex) -> pd.Timestamp | None:
     """公布日 D → 之后第一个交易日开盘建仓 → 目标暴露记在该交易日的前一个交易日(≤ D)。日历外 → None。
     (试验 51 的规则,保留以便复现。D 为周末时目标日是之前的周五,夜盘品种会在周五 21:00 成交、早于公布;
-    MSF 用 first_session_on_or_after,见 docs/msf_prereg.md 第 8 节。)"""
+    MSF 用 first_session_on_or_after,见 docs/research/msf_prereg.md 第 8 节。)"""
     after = dates[dates > info_date]
     if len(after) == 0:
         return None

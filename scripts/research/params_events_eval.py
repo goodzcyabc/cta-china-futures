@@ -1,6 +1,6 @@
-"""推导事件(params 逐日比对)vs 公告事件(events.csv 公告行)的召回/精确;docs/data_exchange_params.md §6 的数字由此而来。
+"""推导事件(params 逐日比对)vs 公告事件(events.csv 公告行)的召回/精确;docs/data/data_exchange_params.md §6 的数字由此而来。
 
-    PYTHONPATH=src python3 scripts/params_events_eval.py --exchanges SHFE,INE
+    PYTHONPATH=src python3 scripts/research/params_events_eval.py --exchanges SHFE,INE
 
 公告事件 = events.csv 中 notice_id 非空、param ∈ {margin, fee}、direction=up 的行按 (品种, 参数, 生效交易日) 去重;
 生效日不是交易日的取其后第一个交易日,晚于最后一个参数文件的不计。匹配 = 同品种同参数、事件日与生效日相差 ≤tol 个交易日。
@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from cta.data.exchanges import params as xp  # noqa: E402
 from cta.data.exchanges.base import Store  # noqa: E402
 

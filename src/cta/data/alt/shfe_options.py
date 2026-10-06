@@ -1,4 +1,4 @@
-"""上期所 + 能源中心(SHFE/INE)商品期权日行情 → options_daily.parquet(预注册 docs/options_prereg.md 第 2–3 节)。
+"""上期所 + 能源中心(SHFE/INE)商品期权日行情 → options_daily.parquet(预注册 docs/research/options_prereg.md 第 2–3 节)。
 
 来源(官方、免登录、纯 GET):
 - 期权日交易快讯 ``https://www.shfe.com.cn/data/tradedata/option/dailydata/kx{YYYYMMDD}.dat``(JSON,含能源中心期权;

@@ -1,8 +1,8 @@
 """v0.2 因子筛选(docs/design_log.md 第四节的执行脚本)。默认只跑样本内(≤ 2021-12-31)。
 
 用法:
-  PYTHONPATH=src python3 scripts/factor_screen.py                       # IS
-  PYTHONPATH=src python3 scripts/factor_screen.py --end 2026-06-05 --confirm-holdout   # OOS(选择冻结后只跑一次)
+  PYTHONPATH=src python3 scripts/research/factor_screen.py                       # IS
+  PYTHONPATH=src python3 scripts/research/factor_screen.py --end 2026-06-05 --confirm-holdout   # OOS(选择冻结后只跑一次)
 输出:docs/factor_research_<tag>.md 与 results/factors/<tag>/*.csv。
 """
 
@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from cta.config import load_config  # noqa: E402
 from cta.data.source import RicequantParquetSource  # noqa: E402
 from cta.factors.base import FactorInputs  # noqa: E402
@@ -176,7 +176,7 @@ md = [
     f"**选入:{chosen if chosen else '无'}**",
     "",
 ]
-out_md = Path("docs") / f"factor_research_{tag}.md"
+out_md = Path("docs/research") / f"factor_research_{tag}.md"
 out_md.write_text("\n".join(md), encoding="utf-8")
 print(fmt.to_string())
 print("选入:", chosen)

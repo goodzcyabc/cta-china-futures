@@ -1,4 +1,4 @@
-"""郑商所期权日行情 → 标准期权日表 options_daily.parquet(预注册 docs/options_prereg.md 第 2–3 节)。
+"""郑商所期权日行情 → 标准期权日表 options_daily.parquet(预注册 docs/research/options_prereg.md 第 2–3 节)。
 
 来源(官方静态文件,免登录、无需浏览器;.htm/.zip 受 JS 反爬保护,本模块从不请求、也不绕过):
   每日文件 https://www.czce.com.cn/cn/DFSStaticFiles/Option/{YYYY}/{YYYYMMDD}/OptionDataDaily.txt

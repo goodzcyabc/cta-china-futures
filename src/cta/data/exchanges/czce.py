@@ -1,6 +1,6 @@
 """郑州商品交易所(CZCE)公开日频数据:期货行情、会员持仓排名、仓单日报。
 
-数据源(均为交易所官网静态文件,2016-01-04 起可用,见 docs/data_exchanges_czce.md):
+数据源(均为交易所官网静态文件,2016-01-04 起可用,见 docs/data/data_exchanges_czce.md):
   每日文件  https://www.czce.com.cn/cn/DFSStaticFiles/Future/{YYYY}/{YYYYMMDD}/FutureData{Daily|Holding|Whsheet}.txt
   年度打包  https://www.czce.com.cn/cn/DFSStaticFiles/Future/{YYYY}/ALLFUTURES{YYYY}.zip(2020 起)
             https://www.czce.com.cn/cn/DFSStaticFiles/Future/{YYYY}/FutureDataHistory.zip(2015–2019),仅行情

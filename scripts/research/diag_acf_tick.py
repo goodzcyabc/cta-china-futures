@@ -2,7 +2,7 @@
 T1:标准化收益 z_t = r_t/σ_{t−1}(σ=√EWMA_33(r²))的自相关 ρ(m),分 2016–2021 / 2022–2026;按各趋势定义对滞后的隐含权重
     算"自相关通道"Σ_m w(m)ρ(m)/√Σw²(Sepp & Lucic 2026 式 4.22 的线性化形式)。
 T2:跳价占日波动比例 ρ̄ = 月均(tick / EWMA_336(|Δp|))(Kurth 等 2026 式 6),换月日的 Δp 剔除。
-输出 docs/diagnostics_acf_tick.md。"""
+输出 docs/research/diagnostics_acf_tick.md。"""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from cta.config import load_config  # noqa: E402
 from cta.data.source import RicequantParquetSource  # noqa: E402
 from cta.instruments.specs import load_instruments  # noqa: E402
@@ -140,7 +140,7 @@ t2 = pd.DataFrame(
     }
 ).sort_values("最近 12 月", ascending=False)
 
-out = Path("docs/diagnostics_acf_tick.md")
+out = Path("docs/research/diagnostics_acf_tick.md")
 md = [
     "# 诊断 T1/T2(2026-09-16;不选因子、不改配置)",
     "",

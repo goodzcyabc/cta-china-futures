@@ -1,4 +1,4 @@
-"""design_log 十三 H-GLOBAL 外盘趋势溢出。映射按 13.1 预注册(9 个品种,US 合约);外盘用 ≤ T−1 日的收盘(docs/data_global_futures.md 的时间戳结论)。
+"""design_log 十三 H-GLOBAL 外盘趋势溢出。映射按 13.1 预注册(9 个品种,US 合约);外盘用 ≤ T−1 日的收盘(docs/data/data_global_futures.md 的时间戳结论)。
 默认样本内;样本外需 --confirm-holdout。"""
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from cta.config import load_config  # noqa: E402
 from cta.data.exchanges.source import default_stitched  # noqa: E402
 from cta.factors.base import REGISTRY, FactorInputs  # noqa: E402
@@ -150,7 +150,7 @@ md = [
     f"## 4. 判定:{verdict}",
     "",
 ]
-Path("docs").joinpath(f"factor_global_{tag}.md").write_text("\n".join(md), encoding="utf-8")
+Path("docs/research").joinpath(f"factor_global_{tag}.md").write_text("\n".join(md), encoding="utf-8")
 print(fmt.to_string())
 print("信号相关:", sig_corr)
 print("判定:", verdict)

@@ -2,7 +2,7 @@
 
 协议见 design_log 19.2–19.4:季度 cutoff = 日历季度最后一个交易日;每季只用上一季度末(含)以前的数据做决定,配置冻结一季;
 逐季决定的合成信号按季拼接,再连续做波动率目标缩放 → 总名义上限 → 暴露缓冲 → 引擎从 2020-01-02 空仓连续跑到 2026-09-18。
-只作诊断;不据此替换 champion。输出 results/walkforward_quarterly/ 与 docs/walkforward_quarterly.md。
+只作诊断;不据此替换 champion。输出 results/walkforward_quarterly/ 与 docs/research/walkforward_quarterly.md。
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from cta.analysis.loo import segment_stats  # noqa: E402
 from cta.backtest.engine import run_backtest  # noqa: E402
@@ -280,9 +280,9 @@ def main() -> int:
         tab46.round(3).to_markdown(index=False),
         "",
     ]
-    Path("docs/walkforward_quarterly.md").write_text("\n".join(lines), encoding="utf-8")
+    Path("docs/research/walkforward_quarterly.md").write_text("\n".join(lines), encoding="utf-8")
     print(df.round(3).to_string())
-    print(f"-> {OUT} / docs/walkforward_quarterly.md ({meta['elapsed_s']} s)")
+    print(f"-> {OUT} / docs/research/walkforward_quarterly.md ({meta['elapsed_s']} s)")
     return 0
 
 

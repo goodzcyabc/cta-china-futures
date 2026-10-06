@@ -1,4 +1,4 @@
-"""季度自适应 v1(预注册 docs/adaptive_quarterly_v1_prereg.md,提交 97f525c;试验 47–49)。
+"""季度自适应 v1(预注册 docs/research/adaptive_quarterly_v1_prereg.md,提交 97f525c;试验 47–49)。
 
 三个核心因子 sleeve(tsmom、carry、receipts_level)的组合权重每季度末重训、下一季冻结:
 - M1(主):EWMA(半衰期 1 年)年化夏普评分 → score = max(ŝ, 0) 归一 → 向等权收缩 κ = 0.6 → 上限 0.5(超出按比例再分配);

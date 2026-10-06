@@ -1,4 +1,4 @@
-"""另类数据五条的信号构造(预注册 docs/altdata_prereg.md 第 2–7 节;常数写死,不提供搜索接口)。
+"""另类数据五条的信号构造(预注册 docs/research/altdata_prereg.md 第 2–7 节;常数写死,不提供搜索接口)。
 
 输入是各数据管道的标准观测表(obs_date, available_day, key, value, meta...),输出是 cta.analysis.candidate_eval.Candidate。
 点时规则由构造保证:

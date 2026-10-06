@@ -9,7 +9,7 @@ signals:
   tsmom_lookbacks: [21, 63, 126, 252]
   vol_window: 40
   carry_scale: 0.20
-  weights: {tsmom: 1.0, carry: 1.0, msf: 1.0}   # v0.6 演示:时序动量 + 展期收益 + 多源基本面合成因子 MSF(docs/msf_prereg.md);MSF 取代单一仓单因子;不进纸面账
+  weights: {tsmom: 1.0, carry: 1.0, msf: 1.0}   # v0.6 演示:时序动量 + 展期收益 + 多源基本面合成因子 MSF(docs/research/msf_prereg.md);MSF 取代单一仓单因子;不进纸面账
 portfolio:
   target_vol: 0.10
   max_leverage_per_symbol: 1.0

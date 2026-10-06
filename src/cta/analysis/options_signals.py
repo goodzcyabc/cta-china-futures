@@ -1,4 +1,4 @@
-"""商品期权隐含信息三条的特征与信号(预注册 docs/options_prereg.md 第 3–6 节;常数写死,不提供搜索接口)。
+"""商品期权隐含信息三条的特征与信号(预注册 docs/research/options_prereg.md 第 3–6 节;常数写死,不提供搜索接口)。
 
 输入:期权日行情标准表(cta.data.alt.shfe_options / czce_options 的 options_daily.parquet)、
 标的期货逐合约结算价(data/exchanges/<EX>/quotes_all.parquet)、项目复权连续价(已实现波动)。

@@ -1,4 +1,4 @@
-"""多源基本面合成因子 MSF 的演示评估(预注册 docs/msf_prereg.md;试验 60;样本内演示,不构成证据)。
+"""多源基本面合成因子 MSF 的演示评估(预注册 docs/research/msf_prereg.md;试验 60;样本内演示,不构成证据)。
 
 步骤:
 1. 12 个成分(cta.factors.composite)各自点时审计 + 发布类成分公布日 ≤ 目标日 + 截断不变性(交易日历与面板截到 cut 重算,
@@ -7,8 +7,8 @@
 3. 三臂(MSF 单独 / 静态基线 / 50-50 混合),基线分别为 v0.3(champion)与 v0.1(纯量价);
 4. 系统级:v0.6(时序动量 + 展期收益 + MSF)全流程回测对 v0.3、v0.1;
 5. 分散化:12 个成分信号加权收益的相关矩阵、合成相对各成分的波动与夏普、每个品种平均有几个成分在发声。
-用法:PYTHONPATH=src python3 scripts/msf_demo.py
-输出:results/msf_demo/、docs/msf_demo.md(表格;结论由人写在标记之间,重跑保留)。
+用法:PYTHONPATH=src python3 scripts/research/msf_demo.py
+输出:results/msf_demo/、docs/research/msf_demo.md(表格;结论由人写在标记之间,重跑保留)。
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from cta.analysis import candidate_eval as ce  # noqa: E402
 from cta.analysis import fundamental_signals as fs  # noqa: E402
@@ -42,7 +42,7 @@ from cta.pipeline import (  # noqa: E402
 from cta.risk.metrics import TRADING_DAYS  # noqa: E402
 
 OUT = Path("results/msf_demo")
-DOC = Path("docs/msf_demo.md")
+DOC = Path("docs/research/msf_demo.md")
 DATA = Path("data/ricecta/data")
 SEED = 20261005
 V01_REF = "results/settle_baseline/equity_v0.1_full_D_unified_official.csv"
@@ -54,7 +54,7 @@ HUMAN_START, HUMAN_END = "<!-- human:start -->", "<!-- human:end -->"
 def prereg_commit() -> str:
     try:
         out = subprocess.run(
-            ["git", "log", "--format=%h", "--diff-filter=A", "--", "docs/msf_prereg.md"],
+            ["git", "log", "--follow", "--format=%h", "--diff-filter=A", "--", "docs/research/msf_prereg.md"],
             capture_output=True,
             text=True,
             check=True,
@@ -361,9 +361,9 @@ def write_doc(log: dict[str, Any], ev3: ce.CandidateEval, ev1: ce.CandidateEval)
         if HUMAN_START in old and HUMAN_END in old:
             human = old[old.index(HUMAN_START) + len(HUMAN_START) : old.index(HUMAN_END)]
     lines = [
-        "# 多源基本面合成因子 MSF:演示结果(样本内演示;预注册 `docs/msf_prereg.md`;试验 60)",
+        "# 多源基本面合成因子 MSF:演示结果(样本内演示;预注册 `docs/research/msf_prereg.md`;试验 60)",
         "",
-        "> 第 0 节由人撰写(标记之间,重跑保留);第 1–5 节由 `scripts/msf_demo.py` 生成。除新成分 P 外,其余 11 个成分在 2016–2026 上都已单独看过,本文数字**只是演示,不是证据**。",
+        "> 第 0 节由人撰写(标记之间,重跑保留);第 1–5 节由 `scripts/research/msf_demo.py` 生成。除新成分 P 外,其余 11 个成分在 2016–2026 上都已单独看过,本文数字**只是演示,不是证据**。",
         "",
         f"git `{log['git_sha']}`;预注册提交 `{log['prereg_commit']}`;窗口 {log['window'][0]} → {log['window'][1]};种子 {log['seed']};基线复现 v0.3 {log['baseline_matches_reference']['v0.3']} / v0.1 {log['baseline_matches_reference']['v0.1']}。",
         "",

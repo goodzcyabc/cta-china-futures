@@ -1,4 +1,4 @@
-"""来源 W(预注册 docs/altdata_prereg.md 第 3 节):NOAA CPC Global Unified Gauge-Based Daily
+"""来源 W(预注册 docs/research/altdata_prereg.md 第 3 节):NOAA CPC Global Unified Gauge-Based Daily
 Precipitation,实时版(RT)、0.5°,2006 年起。
 
 取值

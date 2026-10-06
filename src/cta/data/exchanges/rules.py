@@ -1,6 +1,6 @@
 """各交易所合约最后交易日规则 → maturity_date(与米筐 maturity_date 同口径:最后交易日)。
 
-规则来源:各交易所合约文本(上线前须逐品种核对,见 docs/data_exchanges.md)。未列出的品种按交易所默认规则。
+规则来源:各交易所合约文本(上线前须逐品种核对,见 docs/data/data_exchanges_shfe.md、data_exchanges_czce.md、data_exchanges_dce.md 与 instruments_verification*.md)。未列出的品种按交易所默认规则。
 """
 
 from __future__ import annotations

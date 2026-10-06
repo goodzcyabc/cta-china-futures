@@ -5,7 +5,7 @@
 而是通过本机 CDP Proxy(http://localhost:3456)在用户 Chrome 里新建一个后台 tab 打开 dcereport 页面,
 在页面上下文里调用 fetch(),由页面自己的反爬脚本补签名。每次站点请求之间至少间隔 MIN_INTERVAL 秒。
 
-口径(见 docs/data_exchanges_dce.md):
+口径(见 docs/data/data_exchanges_dce.md):
 - 交易所公布口径:2020-01-01 起成交量/持仓量由双边改单边(大商所 2019-10-29 通知),首个单边交易日 2020-01-02。
 - dcereport 接口(本模块的数据源)把 2020 年前的历史也按单边重述;"历史数据"打包下载(datadownload)则全程双边。
   本仓库存接口原值(全程单边),与米筐导出对账时 2020-01-02 之前米筐值 = 本仓库值 × 2。

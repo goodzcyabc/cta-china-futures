@@ -100,9 +100,9 @@ PYTHONPATH=src python3 -m cta.data.exchanges.params coverage
 
 ## 6. 质量核验
 
-**与已核验现行值对照**(`tests/test_exchanges_params.py::test_params_match_verified_2026_values`,有本地数据才跑):`docs/instruments_verification.md`(2026-09-11 结算参数 / 2026-09-14 交易参数)与 `docs/instruments_verification_ext_shfe_czce.md`(2026-09-18)中 22 个品种的主力/一般月份合约,每项比 `margin_spec`、`fee_open`+单位、`fee_close_today`、`limit_pct` 五个字段:**22/22 品种 110/110 字段一致**(2026-09-21 回填后运行)。
+**与已核验现行值对照**(`tests/test_exchanges_params.py::test_params_match_verified_2026_values`,有本地数据才跑):`docs/data/instruments_verification.md`(2026-09-11 结算参数 / 2026-09-14 交易参数)与 `docs/data/instruments_verification_ext_shfe_czce.md`(2026-09-18)中 22 个品种的主力/一般月份合约,每项比 `margin_spec`、`fee_open`+单位、`fee_close_today`、`limit_pct` 五个字段:**22/22 品种 110/110 字段一致**(2026-09-21 回填后运行)。
 
-**推导事件 vs 公告事件**(`scripts/params_events_eval.py`;公告事件 = `events.csv` 中 `notice_id` 非空、`param ∈ {margin, fee}`、`direction=up` 的行按 (品种, 参数, 生效交易日) 去重;生效日不是交易日的取其后第一个交易日;生效日晚于最后一个参数文件的不计;匹配 = 同所同品种同参数、事件日与生效日相差 ≤1 个交易日):
+**推导事件 vs 公告事件**(`scripts/research/params_events_eval.py`;公告事件 = `events.csv` 中 `notice_id` 非空、`param ∈ {margin, fee}`、`direction=up` 的行按 (品种, 参数, 生效交易日) 去重;生效日不是交易日的取其后第一个交易日;生效日晚于最后一个参数文件的不计;匹配 = 同所同品种同参数、事件日与生效日相差 ≤1 个交易日):
 
 | 交易所 | 公告事件数(scope=all / 非节假日) | 容差(交易日) | 召回率 全部 | 召回率 scope=all | 召回率 非节假日 | 命中者新值一致 | 推导事件数(非 holiday) | 精确率 全部 | 精确率 非 holiday |
 |---|---|---|---|---|---|---|---|---|---|
@@ -116,7 +116,7 @@ PYTHONPATH=src python3 -m cta.data.exchanges.params coverage
 解读:
 - 公告范围为全部合约(`contract_scope=all`)的公告事件几乎全部被推导命中(SHFE 597 个中 594、INE 121 个中 120,±1 交易日)。未命中的三个:AO 2025-03-11(公告表 direction 标错:参数文件 12% → 10%、3 bp → 1.5 bp 实为下调)、WR 2021-06-15(线材合约极少,众数被交割月档拉走)、NR 2021-04-16 手续费 3 元/手 → 万分之 0.2(单位改变,本模块判为不可比不出事件;公告表自己也标 `direction uncertain`)。
 - 未命中的其余公告事件是**只针对个别合约**的调整(如 FU2610/FU2611、SC2610/SC2611、RB2401),不改变品种一般档,按定义不是推导事件——这是口径差异,不是漏抓;能源中心此类公告占比高(原油按合约月份分档调整多),所以 INE 的"全部"召回率更低。
-- 推导有而公告没有的事件(SHFE 58 条、INE 16 条 `derived`):2016 螺纹钢/白银/橡胶、2020-03 原油系与白银、2021 有色、2023–2026 集运欧线 EC 等,与 `docs/data_exchange_events.md` §4 "无公告解释的推导事件"一致——多为单边市后的规则自动加档或公告正文未抓到的调整,它们是真实的参数变动。
+- 推导有而公告没有的事件(SHFE 58 条、INE 16 条 `derived`):2016 螺纹钢/白银/橡胶、2020-03 原油系与白银、2021 有色、2023–2026 集运欧线 EC 等,与 `docs/data/data_exchange_events.md` §4 "无公告解释的推导事件"一致——多为单边市后的规则自动加档或公告正文未抓到的调整,它们是真实的参数变动。
 - 节假日标记:与公告行匹配的对上,公告写 `holiday` 且推导标 `holiday` SHFE 436 / INE 98 对;公告 `holiday` 但推导标 `derived` SHFE 42 / INE 4 对(节前上调后 10 个交易日内**没有**回落,如 2021-06-10 上期发〔2021〕156 号有色、2016-03-31 螺纹钢——交易所节后没有恢复,推导把它当作真收紧);公告非节假日而推导标 `holiday` 两所均为 0 对。
 - 郑商所无公告正文可比,与 `events.csv` 里上一版一次性推导的 CZCE `DERIVED` 上调行比较:809 条中 809 条完全相同(日期、品种、参数、新值),上一版多出的 1 条(PL 2026-06-08 fee)是手续费由元/手改为比例值,本版判为单位不可比、不出事件。
 

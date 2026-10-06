@@ -1,4 +1,4 @@
-"""候选 N(试验 54):GDELT DOC 2.0 API 新闻语调(预注册 docs/altdata_prereg.md 第 5 节)。
+"""候选 N(试验 54):GDELT DOC 2.0 API 新闻语调(预注册 docs/research/altdata_prereg.md 第 5 节)。
 
 来源:https://api.gdeltproject.org/api/v2/doc/doc ,mode=timelinetone(日均语调)与 mode=timelinevolraw
 (日匹配文章数与当日监测总量),format=csv,日频、UTC 日,历史自 2017-01-01 起。每个品种一个固定英文短语

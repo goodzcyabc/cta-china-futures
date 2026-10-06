@@ -1,8 +1,8 @@
-"""商品期权隐含信息三条的回顾性诊断(预注册 docs/options_prereg.md;试验 57–59)。
+"""商品期权隐含信息三条的回顾性诊断(预注册 docs/research/options_prereg.md;试验 57–59)。
 
-用法:PYTHONPATH=src python3 scripts/options_diagnostic.py [--smoke] [--only O1,O2,O3]
+用法:PYTHONPATH=src python3 scripts/research/options_diagnostic.py [--smoke] [--only O1,O2,O3]
 smoke:只做基线复现、点时审计与信号覆盖统计,不跑候选引擎、不看收益。
-输出:results/options_diagnostic/、docs/options_diagnostic.md(表格;结论由人按预注册判读后追加在标记之间)。
+输出:results/options_diagnostic/、docs/research/options_diagnostic.md(表格;结论由人按预注册判读后追加在标记之间)。
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from cta.analysis import candidate_eval as ce  # noqa: E402
 from cta.analysis import options_signals as osig  # noqa: E402
@@ -34,7 +34,15 @@ SEED = 20261004
 def prereg_commit() -> str:
     try:
         out = subprocess.run(
-            ["git", "log", "--format=%h", "--diff-filter=A", "--", "docs/options_prereg.md"],
+            [
+                "git",
+                "log",
+                "--follow",
+                "--format=%h",
+                "--diff-filter=A",
+                "--",
+                "docs/research/options_prereg.md",
+            ],
             capture_output=True,
             text=True,
             check=True,
@@ -145,7 +153,7 @@ def main() -> int:
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--only", default="O1,O2,O3")
     ap.add_argument("--out", default="results/options_diagnostic")
-    ap.add_argument("--doc", default="docs/options_diagnostic.md")
+    ap.add_argument("--doc", default="docs/research/options_diagnostic.md")
     args = ap.parse_args()
     t0 = time.time()
     out = Path(args.out)
@@ -304,7 +312,7 @@ def write_doc(
     meta: dict[str, Any],
 ) -> None:
     lines = [
-        "# 商品期权隐含信息三条:结果(回顾性诊断;预注册 `docs/options_prereg.md`)",
+        "# 商品期权隐含信息三条:结果(回顾性诊断;预注册 `docs/research/options_prereg.md`)",
         "",
         "> 第 0 节(结论)与第 5 节以后由人撰写、保留在 HTML 标记之间;第 1–4 节表格由脚本生成,重跑只刷新表格;预注册第 1–10 节未改。",
         "",

@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from cta.config import load_config  # noqa: E402
 from cta.data.source import RicequantParquetSource  # noqa: E402
 from cta.factors.base import FactorInputs  # noqa: E402
@@ -86,6 +86,6 @@ md = [
     summary.round(2).to_frame().to_markdown(),
     "",
 ]
-Path("docs/factor_walkforward.md").write_text("\n".join(md), encoding="utf-8")
+Path("docs/research/factor_walkforward.md").write_text("\n".join(md), encoding="utf-8")
 print(tab.round(2).to_string())
 print(summary.round(2).to_string())

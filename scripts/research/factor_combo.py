@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from cta.config import load_config  # noqa: E402
 from cta.data.source import RicequantParquetSource  # noqa: E402
 from cta.factors.base import REGISTRY, FactorInputs  # noqa: E402
@@ -145,6 +145,6 @@ md = [
     f"**采用基准:{adopted}**",
     "",
 ]
-out_md = Path("docs") / f"factor_combo_{tag}.md"
+out_md = Path("docs/research") / f"factor_combo_{tag}.md"
 out_md.write_text("\n".join(md), encoding="utf-8")
 print(f"-> {out_md}")

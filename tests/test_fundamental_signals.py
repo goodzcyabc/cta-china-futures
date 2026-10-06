@@ -1,4 +1,4 @@
-"""独立信息两条(预注册 docs/fundamental_signal_prereg.md 第 9 节)的防泄漏测试:
+"""独立信息两条(预注册 docs/research/fundamental_signal_prereg.md 第 9 节)的防泄漏测试:
 cutoff 严格早于交易日、月内冻结、公布日前不可见、cutoff 后噪声不改历史、月末持仓量只影响下一交易日、未来合约持仓不改过去、
 修订不覆盖历史 vintage、确定性、静态基线逐位复现、候选关闭时基线不变、混合不偷杠杆、缺失不补 0 不无限前填。"""
 
@@ -207,7 +207,7 @@ def test_static_baseline_reproduces_production_target_and_reference_equity() -> 
 
     ref = Path("results/settle_baseline/v0.3_full_D_unified_official.json")
     if not ref.exists():
-        pytest.skip("需要 results/settle_baseline(先跑 scripts/settle_baseline.py)")
+        pytest.skip("需要 results/settle_baseline(先跑 scripts/research/settle_baseline.py)")
     cfg = load_config(Path("configs/strategy_v03.yaml"))
     specs = load_instruments()
     src = default_stitched(DATA, official_settle=True)

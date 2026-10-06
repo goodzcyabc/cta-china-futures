@@ -1,4 +1,4 @@
-"""多源基本面合成因子 MSF(docs/msf_prereg.md 第 4 节):接入不改变现有配置、缺数据时报错、成分点时、合成归一。"""
+"""多源基本面合成因子 MSF(docs/research/msf_prereg.md 第 4 节):接入不改变现有配置、缺数据时报错、成分点时、合成归一。"""
 
 from __future__ import annotations
 

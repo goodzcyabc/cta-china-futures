@@ -1,4 +1,4 @@
-"""季度 walk-forward 诊断(docs/quarterly_walkforward_prereg.md 第 7 节的六项测试):
+"""季度 walk-forward 诊断(docs/research/quarterly_walkforward_prereg.md 第 7 节的六项测试):
 排程与拼接(合成数据);截断/扰动后选择不变、只用 cutoff 以前数据、静态基线复现报告数字(真实数据,无数据时跳过)。"""
 
 from __future__ import annotations
@@ -123,7 +123,7 @@ def test_static_v03_baseline_reproduces_report_numbers() -> None:
 
     ref = Path("results/settle_baseline/v0.3_full_D_unified_official.json")
     if not ref.exists():
-        pytest.skip("需要 results/settle_baseline(先跑 scripts/settle_baseline.py)")
+        pytest.skip("需要 results/settle_baseline(先跑 scripts/research/settle_baseline.py)")
     cfg = load_config(Path("configs/strategy_v03.yaml"))
     specs = load_instruments()
     src = default_stitched(DATA, official_settle=True)

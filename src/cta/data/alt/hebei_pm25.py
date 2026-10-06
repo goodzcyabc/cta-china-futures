@@ -1,4 +1,4 @@
-"""候选 Q(试验 56):河北四钢城(唐山、邯郸、石家庄、邢台)PM2.5 日均 —— 限产代理。预注册 docs/altdata_prereg.md 第 7 节。
+"""候选 Q(试验 56):河北四钢城(唐山、邯郸、石家庄、邢台)PM2.5 日均 —— 限产代理。预注册 docs/research/altdata_prereg.md 第 7 节。
 
 数据:中国环境监测总站实时城市小时数据的第三方逐日存档
     https://quotsoft.net/air/data/china_cities_YYYYMMDD.csv

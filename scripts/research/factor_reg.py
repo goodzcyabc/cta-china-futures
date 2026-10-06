@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from cta import signals as _sig  # noqa: E402,F401
 from cta.backtest.engine import run_backtest  # noqa: E402
 from cta.config import load_config  # noqa: E402
@@ -145,6 +145,6 @@ md = [
     f"Δ夏普 {d_sr:+.3f},Δ最大回撤 {d_mdd:+.1%} → 规则(夏普 ≥ 基线 −0.02 且回撤改善 ≥2pp,或夏普 ≥ 基线 +0.05):**{verdict}**",
     "",
 ]
-Path("docs").joinpath(f"factor_reg_{tag}.md").write_text("\n".join(md), encoding="utf-8")
+Path("docs/research").joinpath(f"factor_reg_{tag}.md").write_text("\n".join(md), encoding="utf-8")
 print(tab.round(3).to_string())
 print(f"Δ夏普 {d_sr:+.3f} Δ回撤 {d_mdd:+.1%} → {verdict}")
