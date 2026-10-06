@@ -1,6 +1,6 @@
 # 文档索引
 
-2026-10-06 仓库整理过一次(经过见 [design_log.md](design_log.md) 第二十六节),**文件名都没改**。此前写成的文字(设计日志一至二十五、各预注册与结果、`report/archive/`)里的旧路径不改写,对照如下:
+2026-10-06 仓库整理过一次(经过见 [design_log.md](design_log.md) 第二十六节),**文件名都没改**。此前写成的文字(设计日志一至二十五、各预注册与结果、`report/archive/`)里的旧路径不改写(唯一例外:`research/non_pv_factor_card.md` 是现行说明书,账本路径已改为 `paper/v03/` 并注明旧名,脚本与 `msf_prereg.md` 的引用也已改为 `scripts/research/`、`docs/research/` 下的新路径),对照如下:
 
 | 旧路径 | 现在 |
 |---|---|
@@ -15,16 +15,16 @@
 
 | 文件 | 内容 |
 |---|---|
-| [design_log.md](design_log.md) | 设计日志:每一轮的预注册要点、全部试验(计数 60)、事后改动与更正;只追加,不改写 |
+| [design_log.md](design_log.md) | 设计日志:每一轮的预注册要点、全部试验(计数 60)、事后改动与更正;以追加为主,更正一般另起小节;少数旧文字曾原地修改(如占位符、运行中的试验计数、2026-09-22 更正的笔误日期),可用 `git log -p -- docs/design_log.md` 查到 |
 | [architecture.md](architecture.md) | 代码结构与关键约定 |
 | [deployment.md](deployment.md) | 纸面交易运行手册:每日流程、失败语义与恢复 |
-| [drills/](drills/) | 故障恢复演练证据(纸面验收程序读取) |
+| [drills/](drills/) | 故障恢复演练证据的存放目录与格式说明(验收程序读取其中的 `*.json`;截至 2026-10-06 尚无演练记录,验收报告该项为 PENDING) |
 
 ## research/ — 各轮研究(预注册 → 结果),按设计日志轮次
 
 | 轮次(设计日志) | 主题 | 文件 |
 |---|---|---|
-| 四–六 | 11 个价格类因子:样本内筛选、组合、样本外、walk-forward | `factor_research_is.md`、`factor_research_oos_2026-06-05.md`、`factor_combo_is.md`、`factor_combo_oos_2026-06-05.md`、`factor_walkforward.md`、`factor_literature_check.json`(4.2 文献核对) |
+| 四–六 | 11 个量价类因子(趋势、反转、期限结构、风险、持仓量、季节、量价复合):样本内筛选、组合、样本外、walk-forward | `factor_research_is.md`、`factor_research_oos_2026-06-05.md`、`factor_combo_is.md`、`factor_combo_oos_2026-06-05.md`、`factor_walkforward.md`、`factor_literature_check.json`(4.2 文献核对) |
 | 七 | alphaXiv/arXiv 文献扫描;T1/T2 诊断(收益自相关、跳价) | `alphaxiv_survey_2026-09.md`、`diagnostics_acf_tick.md` |
 | 九–十 | 新数据:会员持仓、仓单(选入仓单水平 → v0.3) | `factor_newdata_is.md`、`factor_newdata_oos_2026-06-05.md` |
 | 十三 | 现货基差、外盘趋势溢出、监管事件覆盖层 | `factor_spotbasis_is.md`、`factor_global_is.md`、`factor_reg_is.md`、`factor_reg_oos_2026-06-05.md` |

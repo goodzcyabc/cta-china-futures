@@ -26,7 +26,7 @@
 | B | Wood, Roberts & Zohren (2022). *Slow Momentum with Fast Reversion: A Trading Strategy Using Deep Learning and Changepoint Detection.* Journal of Financial Data Science 4(1). [arXiv:2105.13727](https://arxiv.org/abs/2105.13727) | 用高斯过程在线检测趋势拐点,把拐点强度与位置作为特征 | 先把"拐点强度"单独当作一个因子,用现有三臂评价检验(1 次试验);过线再并入 A |
 | C | Wood, Giegerich, Roberts & Zohren (2021). *Trading with the Momentum Transformer: An Intelligent and Interpretable Architecture.* [arXiv:2112.08534](https://arxiv.org/abs/2112.08534) | 用注意力机制处理一年的日频序列 | 论文 2015–2020 年的全资产组合夏普在单边成本 2.5–3 bp 时转负(只交易其中 25 个商品期货时,3 bp 下仍为 1.23);本项目 1 跳滑点折合 0.7–8.9 bp(另加手续费),所以成本建模决定成败。需要 GPU,见第 3 节 |
 
-另有项目已登记、只能用 2026-06 之后新数据检验的候选,按同样规则排队:设计日志 6.1 的 C1 趋势 sleeve(样本内已按 5.1 规则被否,只差新数据)、C2、C4;七 的 C9、C11–C13;13.4 的 C14、C15;15.6 的 C16。已检验并关闭的不再排队(C3、C10 成本版、仓单 21 日变化 H-REC)。仓单变化率的其他窗口、同比、分板块变体与 H-REC 同族,要测须先写预注册、按新增试验计数、只用新数据。
+另有项目已登记、只能用 2026-06 之后新数据检验的候选,按同样规则排队:设计日志 6.1 的 C1 趋势 sleeve(样本内已按 5.1 规则被否,只差新数据)、C2、C4;4.2 附 的 C5–C7(基差动量 120 日横截面、横截面动量不跳月、carry 秩权重);七 的 C9、C11–C13;13.4 的 C14、C15(须先接入现货价格源:米筐现货基差导出止于 2026-06-03,交易所不发布现货价格);15.6 的 C16。已检验并关闭的不再排队(C3、C10 成本版、仓单 21 日变化 H-REC)。仓单变化率的其他窗口、同比、分板块变体与 H-REC 同族,要测须先写预注册、按新增试验计数、只用新数据。
 
 ## 2. 大规模特征搜索
 
@@ -50,14 +50,14 @@
 
 ## 3. GPU 实验项目
 
-- **模型对照**:在 22 个中国商品期货上跑 Momentum Transformer(上面 C)和其他深度模型。用多随机种子集成、按年滚动重训、真实成本。比较协议参考同一组作者的大规模基准 Saly-Kaufmann, Wood, Calliess & Zohren (2026), *Deep Learning for Financial Time Series: A Large-Scale Benchmark of Risk-Adjusted Performance*([arXiv:2603.01820](https://arxiv.org/abs/2603.01820),预印本)。该文中 LSTM 版本的毛夏普从 2010–15 年的 1.83 降到 2020–25 年的 1.07,衰减是否同样发生在中国数据上,正是要检验的。
+- **模型对照**:在 22 个中国商品期货上跑 Momentum Transformer(上面 C)和其他深度模型。用多随机种子集成、按年滚动重训、真实成本。比较协议参考同一研究组(Wood、Zohren 也是 Momentum Transformer 的作者)的大规模基准 Saly-Kaufmann, Wood, Calliess & Zohren (2026), *Deep Learning for Financial Time Series: A Large-Scale Benchmark of Risk-Adjusted Performance*([arXiv:2603.01820](https://arxiv.org/abs/2603.01820),预印本)。该文中 LSTM 版本的毛夏普从 2010–15 年的 1.83 降到 2020–25 年的 1.07,衰减是否同样发生在中国数据上,正是要检验的。
 - **迁移学习**:参考 Wood, Kessler, Roberts & Zohren (2024) *Few-Shot Learning Patterns in Financial Time Series for Trend-Following Strategies*(Journal of Financial Data Science 6(2),[arXiv:2310.10500](https://arxiv.org/abs/2310.10500))。先在海外长历史期货上预训练,再对中国品种做少样本或零样本交易,需要外部长历史期货数据。
 - **中文文本**:如果拿到带历史时间戳的新闻全文,用大语言模型抽取品种层面的供需事件与情绪。免费的 GDELT 新闻语调已检验过,结果是 Noise;瓶颈在数据,不在模型。
 - 判据同上:预注册、计入试验数、对照 champion、用纸面期验证。
 
 ## 4. 数据(决定上限的部分)
 
-- **付费产业链数据**(开工率、社会库存、表观需求):本项目的结论是免费数据已经挖尽,下一步有效信息主要来自这里,需要先解决来源与成本。
+- **付费产业链数据**(开工率、社会库存、表观需求):本项目已检验的免费数据里,只有仓单水平按预注册规则(样本内)选入了 champion v0.3(完整引擎样本外夏普未高于 v0.1),监管参数覆盖层按样本内规则进了对照账本 v0.1r;其余(价格/成交/持仓的其他因子、仓单 21 日变化率、会员持仓、现货基差、外盘、公开宏观指标、五条免费另类数据、上期所/能源中心与郑商所期权)都没有带来可采用的增量。其余免费来源未测:USDA、EIA、CFTC 持仓的信息经海外期货价格传导(外盘价格已测无增量)且独特性低;统计局/央行月度数据独特性低、月频;波罗的海运价只有非官方镜像、有许可问题(见 `docs/research/altdata_prereg.md` 第 10 节);大商所期权也还没检验。下一步有效信息更可能来自付费数据,需要先解决来源与成本。
 - **带时间戳的中文新闻全文库**。
 - **大商所期权 2025–2026**:目前只能经浏览器或米筐导出。
 
@@ -65,5 +65,5 @@
 
 见 [`report/report_v0.5.md`](report/report_v0.5.md) 与 [`docs/README.md`](docs/README.md):
 - 数据到出单同一条代码路径、交易所直连数据、合约级引擎、五本纸面账;
-- 60 次预注册试验,包括价格因子、重训、另类数据、商品期权、多源合成因子;
+- 60 次计数试验(设计日志第四节起每次都先写预注册或采用规则再运行;v0.1 阶段的 9 次里含仅动量、仅展期、滑点/资金敏感性等诊断),包括价格因子、重训、另类数据、商品期权、多源合成因子;
 - 非量价因子(交易所仓单水平)已在 champion 里运行。

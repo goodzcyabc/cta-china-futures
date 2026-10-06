@@ -13,7 +13,7 @@
 
 2016-01 → 2026-09,统计自首个持仓日 2017-01-11;22 个品种,10% 目标波动。样本外明显弱于样本内,报告第 0 节如实解释了原因。
 
-- **纸面交易**:五本账(champion v0.3 + 4 个对照版本)自 2026-09-16 起每个交易日自动运行;2026-12-16 出工程验收报告,版本采用决定不早于 2027-09。
+- **纸面交易**:五本账(champion v0.3 + 4 个对照版本)的账期都从 2026-09-16 起算,但开立时间不同(北京时间 v0.1 09-17、v0.3 09-19、其余三本 09-22),开立前的交易日用点时数据补算;开立后由定时任务每个交易日自动运行。验收指标自 2026-09-23 起算,2026-12-16 出工程验收报告,版本采用决定不早于 2027-09。
 - **研究**:累计 60 次计数试验,包括价格因子、季度重训、全市场持仓、PMI、天气/新闻/库存/空气质量等另类数据、商品期权、多源合成因子;按预注册规则,样本外没有一个带来可采用的改善(详见报告第 6、6A 节)。
 
 ## 目录
@@ -42,11 +42,11 @@ PYTHONPATH=src python3 -m pytest
 python3 -m ruff check src tests && python3 -m mypy src
 ```
 
-数据不随仓库分发:米筐导出放在 `data/ricecta/data`,交易所直连数据由每日纸面任务写入 `data/exchanges/`,另类数据见 [`docs/data/altdata_sources.md`](docs/data/altdata_sources.md)。
+数据不随仓库分发:米筐导出放在 `data/ricecta/data`;交易所直连数据在 `data/exchanges/`,历史部分(行情与仓单 2016 年起,能源中心 2018-03 上市起;会员持仓排名大商所 2020-07 起、能源中心 2019-11 起;大商所风控参数未接入)用各交易所模块的命令行回填(`PYTHONPATH=src python3 -m cta.data.exchanges.<shfe|ine|czce|dce|params> backfill …`),之后由每日纸面任务逐日追加,大商所需要本机 Chrome 的 CDP 代理;另类数据见 [`docs/data/altdata_sources.md`](docs/data/altdata_sources.md)。
 
 ## 文档
 
 - [`docs/README.md`](docs/README.md):全部研究文档的索引(按设计日志轮次)
-- [`docs/design_log.md`](docs/design_log.md):预注册、试验计数、事后改动(只追加)
+- [`docs/design_log.md`](docs/design_log.md):预注册、试验计数、事后改动(以追加为主,少数原地修改可在 git 历史中查到)
 - [`docs/architecture.md`](docs/architecture.md)、[`docs/deployment.md`](docs/deployment.md):代码结构、纸面交易运行手册
 - 非量价因子:[`docs/research/non_pv_factor_card.md`](docs/research/non_pv_factor_card.md)(仓单水平);多源合成因子演示 [`docs/research/msf_demo.md`](docs/research/msf_demo.md)

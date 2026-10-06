@@ -373,8 +373,8 @@ def write_doc(log: dict[str, Any], ev3: ce.CandidateEval, ev1: ce.CandidateEval)
         "## 1. 点时与接线核对",
         "",
         f"- 12 个成分各自点时审计(决策日 ≤ 信息日 < 建仓日):{log['point_in_time_ok']}",
-        f"- 发布类成分(A 月末持仓、B PMI、P PPI−PPIRM)实际公布日 ≤ 目标日(目标日 T 的成交在 T 日 21:00 夜盘或 T+1 日盘,均晚于 09:30 公布):{log['release_timing_ok']}",
-        f"- 截断不变性(面板与数据截到 {', '.join(TRUNC_CUTS)} 重算,截止日及之前的信号与完整数据下的最大差异):"
+        f"- 发布类成分(A 月末持仓、B PMI、P PPI−PPIRM)实际公布日 ≤ 目标日(目标日 T 的成交在 T 日 21:00 夜盘或 T+1 日盘:B、P 于 09:30 公布,A 是交易所 T 日收盘后公布的月末持仓与结算价,均早于成交;该检查只比较日期):{log['release_timing_ok']}",
+        f"- 截断不变性(交易日历与价格面板截到 {', '.join(TRUNC_CUTS)} 重算;仓单、另类数据、宏观发布、期权与结算价等原始数据文件不截断,其点时由各成分的可得日规则与审计保证;截止日及之前的信号与完整数据下的最大差异):"
         + "; ".join(
             f"{cut}: " + ", ".join(f"{k} {v:.1e}" for k, v in r.items() if not k.endswith("mismatch"))
             for cut, r in log["truncation"].items()
