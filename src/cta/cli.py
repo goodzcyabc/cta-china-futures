@@ -93,7 +93,9 @@ def paper(
     date: str = typer.Option(None, help="交易日(默认今天)"),
     no_ingest: bool = typer.Option(False, help="不拉交易所数据,只用已落盘的数据"),
     config: Path = typer.Option(Path("configs/strategy.yaml"), help="策略配置(不同账本可用不同配置)"),
-    book: Path = typer.Option(Path("paper"), help="账本目录(默认 paper/;并行账本用 paper_v03/ 等)"),
+    book: Path = typer.Option(
+        Path("paper/v01"), help="账本目录(默认 paper/v01;其余为 paper/v03 等,须与 --config 配对)"
+    ),
 ) -> None:
     """纸面交易:step 处理单个交易日(拉数据 → 成交昨日订单并盯市 → 生成今日订单);catchup 补跑到指定日;status 打印账本。"""
     import pandas as pd

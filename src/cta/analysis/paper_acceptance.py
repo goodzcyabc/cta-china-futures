@@ -488,8 +488,16 @@ def run_acceptance(
     root, out_dir, report_path = Path(root), Path(out_dir), Path(report_path)
     protocol = load_protocol(protocol_path)
     champ_name = str(protocol["champion"])
-    books = [load_book(root / champ_name, champ_name, "champion")] + [
-        load_book(root / str(n), str(n), "challenger") for n in protocol.get("challengers", [])
+    book_dirs = {str(k): str(v.get("dir", k)) for k, v in (protocol.get("books") or {}).items()}
+
+    def _load(name: str, role: str) -> Book:
+        d = root / book_dirs.get(name, name)
+        if not (d / "state.json").exists():  # 目录写错时不能静默当成空账本(完整率 0、对账空真)
+            raise FileNotFoundError(f"book {name!r}: no state.json under {d}")
+        return load_book(d, name, role)
+
+    books = [_load(champ_name, "champion")] + [
+        _load(str(n), "challenger") for n in protocol.get("challengers", [])
     ]
     last = max((pd.Timestamp(b.equity.index.max()) for b in books if len(b.equity)), default=start)
     asof_ts = asof if asof is not None else min(end, last)

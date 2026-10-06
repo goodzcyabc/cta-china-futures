@@ -14,14 +14,14 @@ run_book() {  # run_book <账本目录> [其余参数...]
     echo "!!! $book FAILED (see $book/FAILED.json)"
   fi
 }
-run_book paper                                                       # v0.1 主账本(拉当日交易所数据)
-run_book paper_v03  --no-ingest --config configs/strategy_v03.yaml   # v0.3:+仓单水平(design_log 十)
-run_book paper_v01r --no-ingest --config configs/strategy_v01r.yaml  # v0.1 + 监管事件覆盖层(13.6/13.7)
-run_book paper_v05  --no-ingest --config configs/strategy_v05.yaml   # 工业品 12 品种(十五;事后假设)
-run_book paper_v03p --no-ingest --config configs/strategy_v03p.yaml  # P1 剔除 5 品种(十四)
+run_book paper/v01                                                      # v0.1 主账本(拉当日交易所数据;须排第一)
+run_book paper/v03  --no-ingest --config configs/strategy_v03.yaml     # v0.3 champion:+仓单水平(design_log 十)
+run_book paper/v01r --no-ingest --config configs/strategy_v01r.yaml    # v0.1 + 监管事件覆盖层(13.6/13.7)
+run_book paper/v05  --no-ingest --config configs/strategy_v05.yaml     # 工业品 12 品种(十五;事后假设)
+run_book paper/v03p --no-ingest --config configs/strategy_v03p.yaml    # P1 剔除 5 品种(十四)
 # 每日结果入库(含 FAILED.json),形成不可篡改的时间戳(git 提交时间)
 MSG="paper: $TODAY"; [ -n "$FAILED" ] && MSG="$MSG (FAILED:$FAILED)"
-git add paper paper_v03 paper_v03p paper_v01r paper_v05 || FAILED="$FAILED git-add"
+git add paper/v01 paper/v03 paper/v03p paper/v01r paper/v05 || FAILED="$FAILED git-add"  # 显式列出:任一目录缺失即报警
 if ! git diff --cached --quiet; then  # 有改动才提交;提交失败与推送失败都进告警链
   git -c user.name=paper-bot -c user.email=paper@local commit -q -m "$MSG" || FAILED="$FAILED git-commit"
 fi
