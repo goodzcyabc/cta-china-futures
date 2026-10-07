@@ -7,14 +7,20 @@ mkdir -p paper/log
 TODAY=$(TZ=Asia/Shanghai date +%F)
 echo "=== $(date '+%F %T') paper catchup to $TODAY"
 FAILED=""
+PY=.venv/bin/python  # 项目环境(Python 3.12,scripts/setup_env.sh 创建);缺失时报警,不退回系统 Python
+if [ ! -x "$PY" ]; then
+  FAILED=" no-venv"
+  echo "!!! $PY not found -- run scripts/setup_env.sh"
+fi
 run_book() {  # run_book <账本目录> [其余参数...]
   local book=$1; shift
+  if [ ! -x "$PY" ]; then return; fi
   if [ ! -f "$book/state.json" ]; then  # 账本目录或状态缺失:报警,不补跑(否则会静默新建 300 万空账本)
     FAILED="$FAILED $book(no-state)"
     echo "!!! $book has no state.json (book dir missing or moved?) -- not run"
     return
   fi
-  if ! PYTHONPATH=src python3 -m cta.cli paper catchup --date "$TODAY" --book "$book" "$@"; then
+  if ! PYTHONPATH=src "$PY" -m cta.cli paper catchup --date "$TODAY" --book "$book" "$@"; then
     FAILED="$FAILED $book"
     echo "!!! $book FAILED (see $book/FAILED.json)"
   fi

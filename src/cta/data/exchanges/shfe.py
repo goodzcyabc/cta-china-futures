@@ -15,7 +15,6 @@ import http.client
 import json
 import logging
 import re
-import socket
 import sys
 import time
 import urllib.error
@@ -197,7 +196,7 @@ def http_get(url: str, retries: int = RETRIES, timeout: int = TIMEOUT) -> bytes 
             if 200 <= status < 300:
                 return body
             last = urllib.error.HTTPError(url, status, f"HTTP {status}", None, None)  # type: ignore[arg-type]
-        except (http.client.HTTPException, socket.timeout, ConnectionError, OSError) as e:
+        except (TimeoutError, http.client.HTTPException, ConnectionError, OSError) as e:
             last = e
         if attempt < retries:
             log.warning("fetch %s failed (%s); retry in %.0fs", url, last, delay)

@@ -33,13 +33,12 @@ import io
 import json
 import logging
 import math
-import socket
 import sys
 import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any
@@ -140,7 +139,7 @@ def _write_meta(path: Path, meta: dict[str, Any]) -> None:
 
 
 def _utc_now_iso() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _http_date_to_iso(value: str | None) -> str | None:
@@ -152,8 +151,8 @@ def _http_date_to_iso(value: str | None) -> str | None:
     except (TypeError, ValueError):
         return None
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        dt = dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _parse_day(text: str) -> date:
@@ -403,12 +402,7 @@ def _request(url: str, throttle: _Throttle, etag: str | None = None) -> _Respons
                 last_err = f"HTTP {status}"
                 continue
             raise FetchError(f"HTTP {status} for {url}") from exc
-        except (
-            urllib.error.URLError,
-            http.client.HTTPException,
-            socket.timeout,
-            OSError,
-        ) as exc:  # 连接/超时
+        except (TimeoutError, urllib.error.URLError, http.client.HTTPException, OSError) as exc:  # 连接/超时
             last_err = f"{type(exc).__name__}: {exc}"
             continue
         if status == 304:

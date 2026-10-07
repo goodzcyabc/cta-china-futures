@@ -14,14 +14,18 @@ from cta.instruments.specs import load_instruments
 app = typer.Typer(add_completion=False, help="商品期货 CTA:研究回测与实盘出单")
 
 
-def _make_source(source: str, data: Path, official_settle: bool = True) -> DataSource:
-    """ricequant:米筐导出;exchange:交易所直连;stitched:米筐历史 + 交易所增量(默认;official_settle 时米筐段结算价用官方值覆盖)。"""
+def _make_source(
+    source: str, data: Path, official_settle: bool = True, exchange_root: Path | None = None
+) -> DataSource:
+    """ricequant:米筐导出;exchange:交易所直连(只用交易所公开数据,exchange_root 可指向样例数据);
+    stitched:米筐历史 + 交易所增量(默认;official_settle 时米筐段结算价用官方值覆盖)。"""
     if source == "ricequant":
         return RicequantParquetSource(data)
     if source == "exchange":
+        from cta.data.exchanges.base import Store
         from cta.data.exchanges.source import ExchangeSource
 
-        return ExchangeSource()
+        return ExchangeSource(Store(root=exchange_root) if exchange_root else Store())
     if source == "stitched":
         from cta.data.exchanges.source import default_stitched
 
@@ -35,6 +39,9 @@ def research(
     data: Path = typer.Option(Path("data/ricecta/data")),
     out: Path = typer.Option(Path("results")),
     source: str = typer.Option("stitched", help="ricequant | exchange | stitched"),
+    exchange_root: Path = typer.Option(
+        None, help="--source exchange 时的交易所数据目录(默认 data/exchanges)"
+    ),
     end: str = typer.Option(None, help="回测截止日(默认到数据末尾)"),
 ) -> None:
     """跑完整研究回测,结果写入 results/<config_digest>_<instruments_digest>[_<source>]/。"""
@@ -42,7 +49,7 @@ def research(
 
     cfg = load_config(config)
     specs = load_instruments()
-    src = _make_source(source, data, cfg.data.settle == "official")
+    src = _make_source(source, data, cfg.data.settle == "official", exchange_root)
     if end:
         cfg = cfg.model_copy(update={"backtest": cfg.backtest.model_copy(update={"end": end})})
     suffix = "" if source == "ricequant" else f"_{source}"
@@ -68,13 +75,16 @@ def live(
     data: Path = typer.Option(Path("data/ricecta/data")),
     out: Path = typer.Option(Path("results/live")),
     source: str = typer.Option("stitched", help="ricequant | exchange | stitched"),
+    exchange_root: Path = typer.Option(
+        None, help="--source exchange 时的交易所数据目录(默认 data/exchanges)"
+    ),
 ) -> None:
     """按 as-of 日生成次日目标手数与订单差异,并留存输入快照。"""
     from cta.live.orders import generate_orders
 
     cfg = load_config(config)
     specs = load_instruments()
-    src = _make_source(source, data, cfg.data.settle == "official")
+    src = _make_source(source, data, cfg.data.settle == "official", exchange_root)
     report = generate_orders(cfg, src, specs, asof=asof, equity=equity, positions_csv=positions, out_dir=out)
     typer.echo(json.dumps(report["summary"], ensure_ascii=False, indent=2))
 

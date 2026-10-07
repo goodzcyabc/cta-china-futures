@@ -6,6 +6,7 @@ import json
 from datetime import date, timedelta
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -265,7 +266,19 @@ def test_real_observations_obey_rule_and_have_no_duplicates() -> None:
 
 
 @pytest.mark.skipif(not OBS_CSV.exists(), reason="real data not fetched")
-def test_real_load_reproduces_csv_bit_for_bit(tmp_path: Path) -> None:
+def test_real_load_reproduces_csv(tmp_path: Path) -> None:
+    """重建结果与已存的 observations.csv 一致:非浮点列逐字相同,浮点列相对误差 ≤ 1e-12。
+    已存文件在 Python 3.9 下生成;Python 3.12 起内置 sum() 对浮点用补偿求和,四城均值末位可能差 1 ULP。"""
     obs = q.load(DATA_DIR)
     obs.to_csv(tmp_path / "observations.csv", index=False)
-    assert (tmp_path / "observations.csv").read_bytes() == OBS_CSV.read_bytes()
+    new = pd.read_csv(tmp_path / "observations.csv")
+    old = pd.read_csv(OBS_CSV)
+    assert list(new.columns) == list(old.columns) and len(new) == len(old)
+    for c in old.columns:
+        if pd.api.types.is_float_dtype(old[c]):
+            a, b = old[c].to_numpy(dtype=float), new[c].to_numpy(dtype=float)
+            assert np.array_equal(np.isnan(a), np.isnan(b))
+            ok = ~np.isnan(a)
+            assert np.allclose(a[ok], b[ok], rtol=1e-12, atol=0.0), c
+        else:
+            assert old[c].astype(str).equals(new[c].astype(str)), c

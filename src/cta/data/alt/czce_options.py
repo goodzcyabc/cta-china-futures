@@ -40,7 +40,7 @@ import time
 import zlib
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any
@@ -195,7 +195,7 @@ class ParseError(ValueError):
 
 
 def _utc_now_iso() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _last_modified_iso(header: str | None) -> str:
@@ -204,8 +204,8 @@ def _last_modified_iso(header: str | None) -> str:
         return ""
     dt = parsedate_to_datetime(header)
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        dt = dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _ymd(d: pd.Timestamp) -> str:
@@ -422,7 +422,7 @@ def _record_not_found(
 
 
 def _not_found_is_final(d: pd.Timestamp, probed_at_utc: str) -> bool:
-    probed = datetime.strptime(probed_at_utc, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    probed = datetime.strptime(probed_at_utc, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
     return (probed.astimezone(BEIJING).date() - pd.Timestamp(d).date()).days >= NOT_FOUND_STABLE_DAYS
 
 

@@ -39,13 +39,12 @@ import html as html_lib
 import json
 import logging
 import re
-import socket
 import time
 import urllib.error
 import urllib.request
 from collections.abc import Callable, Collection, Iterator
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any
@@ -204,7 +203,7 @@ def _today_beijing() -> date:
 
 
 def _utc_now_iso() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _last_modified_iso(header: str | None) -> str:
@@ -213,8 +212,8 @@ def _last_modified_iso(header: str | None) -> str:
         return ""
     dt = parsedate_to_datetime(header)
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        dt = dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _combine(a: float | None, b: float | None) -> float | None:
@@ -463,7 +462,7 @@ def http_get(url: str, valid: Callable[[bytes], bool]) -> tuple[int, bytes, str 
                 last = f"HTTP {status} but body failed validation ({len(body)} bytes)"
             else:
                 last = f"HTTP {status}"
-        except (urllib.error.URLError, socket.timeout, ConnectionError, OSError, EOFError) as e:  # 网络层
+        except (TimeoutError, urllib.error.URLError, ConnectionError, OSError, EOFError) as e:  # 网络层
             last = str(e)
         if attempt < RETRIES:
             log.warning("GET %s failed (%s); retry in %.0fs", url, last, delay)
@@ -525,7 +524,7 @@ def _record_not_found(raw: Path, d: date, fmt: str, not_found: dict[tuple[str, s
 
 
 def _not_found_is_final(d: date, probed_at_utc: str) -> bool:
-    probed = datetime.strptime(probed_at_utc, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    probed = datetime.strptime(probed_at_utc, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
     return (probed.astimezone(BEIJING).date() - d).days >= NOT_FOUND_STABLE_DAYS
 
 
