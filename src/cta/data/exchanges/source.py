@@ -2,7 +2,10 @@
 
 约定:
 - contracts(symbol) 的 OHLC 在无成交日用结算价填充(交易所无成交时 OHLC 为空),volume/open_interest 保留交易所原值。
-- dominant_map:每品种每日的候选主力 = **前一交易日**持仓量最大的合约(T 日开盘前可知);首日用当日。
+- dominant_map:每品种每日的候选主力,只用**前一交易日**持仓量(T 日开盘前可知);首日用当日。两种规则:
+  "max_oi"(默认,纸面/实盘在用):前一日持仓量最大的合约;
+  "oi_1.1x"(复刻米筐主力表):前一日持仓量最大的合约超过当前主力 1.1 倍、且到期更晚时才切换,不回切
+  (与米筐主力表逐日一致 99.75%,见 docs/research/source_check.md)。
   持仓量口径若与米筐不同(单/双边),只影响绝对数,不影响主力判定。
 - contract_meta:listed_date = 首次出现日,de_listed_date = 最后出现日(仍在交易的合约取到期日),maturity_date 按 rules.py,
   multiplier / margin_rate 取自 configs/instruments.yaml(交易所数据不含乘数)。
@@ -30,6 +33,7 @@ from cta.data.source import (
 from cta.instruments.specs import InstrumentTable, load_instruments
 
 SYMBOL_EXCHANGE_DEFAULT = ("SHFE", "INE", "DCE", "CZCE")
+DOMINANT_RULES = ("max_oi", "oi_1.1x")
 
 
 class ExchangeSource:
@@ -39,7 +43,11 @@ class ExchangeSource:
         exchanges: tuple[str, ...] = SYMBOL_EXCHANGE_DEFAULT,
         specs: InstrumentTable | None = None,
         calendar: TradingCalendar | None = None,
+        dominant_rule: str = "max_oi",
     ):
+        if dominant_rule not in DOMINANT_RULES:
+            raise ValueError(f"dominant_rule must be one of {DOMINANT_RULES}, got {dominant_rule!r}")
+        self.dominant_rule = dominant_rule
         self.store = store or Store()
         self.exchanges = exchanges
         self.specs = specs or load_instruments()
@@ -98,11 +106,34 @@ class ExchangeSource:
 
     def dominant_map(self) -> pd.DataFrame:
         q = self.quotes()
+        if self.dominant_rule == "oi_1.1x":
+            return self._dominant_ratio(q, 1.1)
         idx = q.groupby(["symbol", "date"])["open_interest"].idxmax()
         top = q.loc[idx, ["symbol", "date", "contract"]].sort_values(["symbol", "date"])
         # 前一交易日的最大持仓合约作为 T 日候选
         top["contract"] = top.groupby("symbol")["contract"].shift(1).fillna(top["contract"])
         return top[["date", "symbol", "contract"]].reset_index(drop=True)
+
+    def _dominant_ratio(self, q: pd.DataFrame, ratio: float) -> pd.DataFrame:
+        """米筐式主力:T 日主力由 T−1 日持仓量决定;最大持仓合约超过当前主力 ratio 倍且到期更晚才切换(不回切);
+        当前主力在 T−1 日已无行情(到期)时直接换成 T−1 日持仓最大者。首日用当日持仓最大者。"""
+        mat = self.contract_meta()["maturity_date"]
+        rows: list[tuple[pd.Timestamp, str, str]] = []
+        for sym, g in q.groupby("symbol"):
+            oi = g.pivot_table(index="date", columns="contract", values="open_interest", aggfunc="last")
+            oi = oi.sort_index()
+            cur = str(oi.iloc[0].idxmax())
+            rows.append((oi.index[0], str(sym), cur))
+            for i in range(1, len(oi)):
+                prev = oi.iloc[i - 1].dropna()
+                best = str(prev.idxmax())
+                if cur not in prev.index or (
+                    best != cur and prev[best] > ratio * prev[cur] and mat[best] > mat[cur]
+                ):
+                    cur = best
+                rows.append((oi.index[i], str(sym), cur))
+        out = pd.DataFrame(rows, columns=["date", "symbol", "contract"])
+        return out.sort_values(["symbol", "date"]).reset_index(drop=True)
 
     def contract_meta(self) -> pd.DataFrame:
         if self._meta is None:

@@ -1,5 +1,6 @@
 data/*
 !data/benchmarks/
+!data/sample/
 __pycache__/
 *.pyc
 .pytest_cache/

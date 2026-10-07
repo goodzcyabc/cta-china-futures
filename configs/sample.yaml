@@ -1,0 +1,31 @@
+# 公开样例配置:与 v0.3 champion(strategy_v03.yaml)参数相同,只把品种与区间缩到样例数据覆盖的范围。
+# 配合 data/sample/exchanges_sample.tar.gz(交易所官网公开数据:CU、RB、M、SR,2021-01-04 → 2024-12-31)。
+# 只用于演示与测试流程能跑通;4 个品种的结果不代表 22 品种策略的表现。
+version: "0.3.0-sample"
+universe:
+  asset_classes: [agri, chem, energy, ferrous, metal, precious]
+  min_history_days: 250
+  min_dominant_turnover_cny: 50000000
+  symbols: [CU, M, RB, SR]
+signals:
+  tsmom_lookbacks: [21, 63, 126, 252]
+  vol_window: 40
+  carry_scale: 0.20
+  weights: {tsmom: 1.0, carry: 1.0, receipts_level: 1.0}
+portfolio:
+  target_vol: 0.10
+  max_leverage_per_symbol: 1.0
+  max_gross_exposure: 3.0
+  max_margin_usage: 0.40
+  exposure_buffer: 0.30
+  lot_band: 0.30
+  vol_scale_update: daily
+execution:
+  fill: next_open
+  slippage_ticks: 1
+  roll_confirm_days: 3
+backtest:
+  start: "2021-01-04"
+  end: "2024-12-31"
+  initial_capital_cny: 3000000
+  cash_rate: none

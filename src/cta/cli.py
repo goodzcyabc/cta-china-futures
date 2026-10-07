@@ -15,17 +15,26 @@ app = typer.Typer(add_completion=False, help="商品期货 CTA:研究回测与�
 
 
 def _make_source(
-    source: str, data: Path, official_settle: bool = True, exchange_root: Path | None = None
+    source: str,
+    data: Path,
+    official_settle: bool = True,
+    exchange_root: Path | None = None,
+    dominant_rule: str = "max_oi",
 ) -> DataSource:
-    """ricequant:米筐导出;exchange:交易所直连(只用交易所公开数据,exchange_root 可指向样例数据);
+    """ricequant:米筐导出;exchange:交易所直连(只用交易所公开数据,exchange_root 可指向样例数据;
+    dominant_rule="oi_1.1x" 用复刻的米筐主力规则,可复现正式基线);
     stitched:米筐历史 + 交易所增量(默认;official_settle 时米筐段结算价用官方值覆盖)。"""
+    if dominant_rule != "max_oi" and source != "exchange":
+        raise typer.BadParameter("--dominant-rule only applies to --source exchange")
     if source == "ricequant":
         return RicequantParquetSource(data)
     if source == "exchange":
         from cta.data.exchanges.base import Store
         from cta.data.exchanges.source import ExchangeSource
 
-        return ExchangeSource(Store(root=exchange_root) if exchange_root else Store())
+        return ExchangeSource(
+            Store(root=exchange_root) if exchange_root else Store(), dominant_rule=dominant_rule
+        )
     if source == "stitched":
         from cta.data.exchanges.source import default_stitched
 
@@ -42,6 +51,9 @@ def research(
     exchange_root: Path = typer.Option(
         None, help="--source exchange 时的交易所数据目录(默认 data/exchanges)"
     ),
+    dominant_rule: str = typer.Option(
+        "max_oi", help="--source exchange 时的主力规则:max_oi(纸面在用)| oi_1.1x(复刻米筐,复现正式基线)"
+    ),
     end: str = typer.Option(None, help="回测截止日(默认到数据末尾)"),
 ) -> None:
     """跑完整研究回测,结果写入 results/<config_digest>_<instruments_digest>[_<source>]/。"""
@@ -49,10 +61,12 @@ def research(
 
     cfg = load_config(config)
     specs = load_instruments()
-    src = _make_source(source, data, cfg.data.settle == "official", exchange_root)
+    src = _make_source(source, data, cfg.data.settle == "official", exchange_root, dominant_rule)
     if end:
         cfg = cfg.model_copy(update={"backtest": cfg.backtest.model_copy(update={"end": end})})
     suffix = "" if source == "ricequant" else f"_{source}"
+    if source == "exchange" and dominant_rule != "max_oi":
+        suffix += f"_{dominant_rule}"
     out_dir = out / f"{cfg.digest()}_{specs.digest()}{suffix}"
     meta = run_research(cfg, src, specs, out_dir)
     typer.echo(
@@ -78,13 +92,16 @@ def live(
     exchange_root: Path = typer.Option(
         None, help="--source exchange 时的交易所数据目录(默认 data/exchanges)"
     ),
+    dominant_rule: str = typer.Option(
+        "max_oi", help="--source exchange 时的主力规则:max_oi(纸面在用)| oi_1.1x(复刻米筐,复现正式基线)"
+    ),
 ) -> None:
     """按 as-of 日生成次日目标手数与订单差异,并留存输入快照。"""
     from cta.live.orders import generate_orders
 
     cfg = load_config(config)
     specs = load_instruments()
-    src = _make_source(source, data, cfg.data.settle == "official", exchange_root)
+    src = _make_source(source, data, cfg.data.settle == "official", exchange_root, dominant_rule)
     report = generate_orders(cfg, src, specs, asof=asof, equity=equity, positions_csv=positions, out_dir=out)
     typer.echo(json.dumps(report["summary"], ensure_ascii=False, indent=2))
 
