@@ -174,3 +174,26 @@ def test_stitched_source_concats_on_cutover(tmp_path: Path) -> None:
     c2 = src2.contracts("CU")
     assert c2.index.get_level_values("date").min() == pd.Timestamp("2026-06-08")
     assert (src2.dominant_map()["date"].min()) == pd.Timestamp("2026-06-08")
+
+
+def test_dominant_rule_ratio_uses_prev_day_and_threshold(tmp_path: Path) -> None:
+    """oi_1.1x:T 日主力只看 T−1 日持仓;新合约要超过当前主力 1.1 倍且到期更晚才切换,不回切。"""
+    st = Store(tmp_path)
+    # (CU2607, CU2608) 持仓:第 1 天 2608 只多 5%(不切);第 2 天多 20%(第 3 天切);第 4 天 2607 反超(不回切)
+    ois = [(100, 50), (100, 105), (100, 120), (100, 130), (300, 130), (300, 130)]
+    days = pd.bdate_range("2026-06-08", periods=len(ois))
+    for d, (o7, o8) in zip(days, ois, strict=True):
+        st.write_day(
+            "SHFE",
+            "quotes",
+            d,
+            _day(str(d.date()), [("CU2607", 100.0, 1000, o7), ("CU2608", 101.0, 900, o8)]).assign(
+                contract=["CU2607", "CU2608"]
+            ),
+        )
+    kw = dict(exchanges=("SHFE",), specs=load_instruments(), calendar=TradingCalendar(st))
+    dm = ExchangeSource(st, dominant_rule="oi_1.1x", **kw).dominant_map()  # type: ignore[arg-type]
+    assert dm["contract"].tolist() == ["CU2607", "CU2607", "CU2607", "CU2608", "CU2608", "CU2608"]
+    base = ExchangeSource(st, **kw).dominant_map()  # type: ignore[arg-type]
+    # 默认 max_oi:第 2 天(T−1 = 第 1 天,2608 多 5%)就切,第 6 天(T−1 = 第 5 天 2607 反超)切回
+    assert base["contract"].tolist() == ["CU2607", "CU2607", "CU2608", "CU2608", "CU2608", "CU2607"]
