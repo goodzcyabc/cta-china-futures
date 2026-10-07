@@ -4,7 +4,7 @@
 URL 模式、字段映射、口径切换与已知坑见 docs/data/data_exchanges_shfe.md。
 
 用法:
-    PYTHONPATH=src python3 -m cta.data.exchanges.shfe backfill --start 2016-01-04 --end 2026-09-16 \
+    python -m cta.data.exchanges.shfe backfill --start 2016-01-04 --end 2026-09-16 \
         --kinds quotes,positions,receipts
 """
 

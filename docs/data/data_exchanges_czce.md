@@ -4,11 +4,11 @@
 覆盖 2016-01-04 起的三类日频数据:期货行情、会员持仓排名、仓单日报。每日增量:
 
 ```
-PYTHONPATH=src python3 -m cta.data.exchanges.czce ingest --date 2026-09-16          # 单日三类
-PYTHONPATH=src python3 -m cta.data.exchanges.czce backfill --start 2016-01-04 --end 2026-09-16 --kinds quotes,positions,receipts
-PYTHONPATH=src python3 -m cta.data.exchanges.czce coverage                          # 每类每年天数
-PYTHONPATH=src python3 -m cta.data.exchanges.czce reconcile --out mism.csv          # 与米筐导出对账
-PYTHONPATH=src python3 -m cta.data.exchanges.czce reparse --kinds receipts          # 解析器修订后从 raw 重建 parquet
+.venv/bin/python -m cta.data.exchanges.czce ingest --date 2026-09-16          # 单日三类
+.venv/bin/python -m cta.data.exchanges.czce backfill --start 2016-01-04 --end 2026-09-16 --kinds quotes,positions,receipts
+.venv/bin/python -m cta.data.exchanges.czce coverage                          # 每类每年天数
+.venv/bin/python -m cta.data.exchanges.czce reconcile --out mism.csv          # 与米筐导出对账
+.venv/bin/python -m cta.data.exchanges.czce reparse --kinds receipts          # 解析器修订后从 raw 重建 parquet
 ```
 
 ## 1. URL 模式与反爬应对

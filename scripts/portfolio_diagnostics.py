@@ -6,7 +6,7 @@
 逐品种净贡献 = pnl_by_symbol(盯市 + 已实现,滑点已在成交价内)− 该品种逐笔手续费;不再扣滑点。
 任一区间 Σ净贡献 ≠ 权益变化(超出浮点误差)→ 直接失败,不生成报告。
 
-用法:PYTHONPATH=src python3 scripts/portfolio_diagnostics.py [--config configs/strategy_v03.yaml] [--skip-loo] [--no-oos-flat]
+用法:python scripts/portfolio_diagnostics.py [--config configs/strategy_v03.yaml] [--skip-loo] [--no-oos-flat]
 输出:results/portfolio_diagnostics/*.csv 与 docs/research/portfolio_diagnostics.md(只写这两处)。
 """
 

@@ -1,6 +1,6 @@
 """纸面交易验收(只读):完整率、成交率、权益对账、失败与漂移、共同日期、演练证据、champion/challenger 配对差。
 
-用法:PYTHONPATH=src python3 scripts/paper_acceptance.py --start 2026-09-23 --end 2026-12-15 [--strict] [--asof YYYY-MM-DD]
+用法:python scripts/paper_acceptance.py --start 2026-09-23 --end 2026-12-15 [--strict] [--asof YYYY-MM-DD]
 验收期未结束 → 生成标有 PRELIMINARY 的阶段报告。--strict 时任一账本权益对账不一致 → 退出码 1。
 只写 results/paper_acceptance/ 与 report/paper_acceptance_<end>.md;不修改任何 paper*/ 文件。
 """

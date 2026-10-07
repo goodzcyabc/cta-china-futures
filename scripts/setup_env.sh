@@ -1,5 +1,5 @@
 #!/bin/bash
-# 创建项目环境:.venv(Python 3.12)+ requirements-dev.txt,并把 src/ 加入环境的导入路径(之后不需要 PYTHONPATH)。
+# 创建项目环境:.venv(Python 3.12)+ requirements-dev.txt,并把 src/(生产)与 research/(研究)加入环境的导入路径(之后不需要 PYTHONPATH)。
 # 用法:scripts/setup_env.sh [python3.12 的路径]
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -9,5 +9,5 @@ if [ -z "$PY312" ]; then echo "需要 Python 3.12(例如 brew install python@3.1
 .venv/bin/python -m pip install -q --upgrade pip
 .venv/bin/python -m pip install -q -r requirements-dev.txt
 SITE=$(.venv/bin/python -c "import sysconfig; print(sysconfig.get_paths()['purelib'])")
-printf '%s\n' "$PWD/src" > "$SITE/cta_repo.pth"
-.venv/bin/python -c "import cta, sys; print('ok:', sys.version.split()[0], cta.__file__)"
+printf '%s\n' "$PWD/src" "$PWD/research" > "$SITE/cta_repo.pth"
+.venv/bin/python -c "import cta, cta_research, sys; print('ok:', sys.version.split()[0], cta.__file__, cta_research.__file__)"

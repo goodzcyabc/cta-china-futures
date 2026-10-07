@@ -4,10 +4,10 @@
 公共字段与存储布局见 `src/cta/data/exchanges/base.py`;测试与截断样例见 `tests/test_exchanges_shfe.py`、`tests/fixtures/exchanges/{shfe,ine}/`。
 
 ```
-PYTHONPATH=src python3 -m cta.data.exchanges.shfe backfill --start 2016-01-04 --end 2026-09-16 --kinds quotes,positions,receipts
-PYTHONPATH=src python3 -m cta.data.exchanges.ine  backfill --start 2018-03-26 --end 2026-09-16 --kinds quotes,positions,receipts
-PYTHONPATH=src python3 -m cta.data.exchanges.shfe day --date 2026-09-16          # 每日增量
-PYTHONPATH=src python3 -m cta.data.exchanges.shfe coverage                       # 每类每年落盘天数
+.venv/bin/python -m cta.data.exchanges.shfe backfill --start 2016-01-04 --end 2026-09-16 --kinds quotes,positions,receipts
+.venv/bin/python -m cta.data.exchanges.ine  backfill --start 2018-03-26 --end 2026-09-16 --kinds quotes,positions,receipts
+.venv/bin/python -m cta.data.exchanges.shfe day --date 2026-09-16          # 每日增量
+.venv/bin/python -m cta.data.exchanges.shfe coverage                       # 每类每年落盘天数
 ```
 
 回填逐工作日进行:周末不请求;HTTP 404(节假日 / 尚未发布)与空内容记入 `data/exchanges/<EXCH>/missing.log`(`日期\t类型\t原因\tURL`),下次运行跳过(`--retry-missing` 重试);已有 parquet 跳过;每次请求间隔 ≥0.5 s,非 404 失败按 1/2/4 s 退避重试 3 次,连续 10 天失败中止。当天(`date >= today`)的 404 不写 missing.log,因为可能只是还没发布。原始下载 gzip 存 `raw/`,`--overwrite` 可从 raw 重新解析。

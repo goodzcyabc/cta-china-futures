@@ -12,10 +12,10 @@
 郑商所 FutureTradeParam 的口径;郑商所 2025-08-18 前用前一交易日结算参数表的"涨跌停板"列,两者相等)。
 
 用法:
-    PYTHONPATH=src python3 -m cta.data.exchanges.params backfill --start 2016-01-04 --exchanges SHFE,INE,CZCE [--local-dir DIR]
-    PYTHONPATH=src python3 -m cta.data.exchanges.params day --date 2026-09-18
-    PYTHONPATH=src python3 -m cta.data.exchanges.params derive --out data/external/exchange_events/events_derived.csv
-    PYTHONPATH=src python3 -m cta.data.exchanges.params coverage
+    python -m cta.data.exchanges.params backfill --start 2016-01-04 --exchanges SHFE,INE,CZCE [--local-dir DIR]
+    python -m cta.data.exchanges.params day --date 2026-09-18
+    python -m cta.data.exchanges.params derive --out data/external/exchange_events/events_derived.csv
+    python -m cta.data.exchanges.params coverage
 """
 
 from __future__ import annotations

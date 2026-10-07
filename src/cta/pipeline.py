@@ -215,10 +215,11 @@ def git_sha() -> str:
 def _extra_factors_of(
     src: DataSource, cfg: StrategyConfig, specs: InstrumentTable, panels: dict[str, SymbolPanel]
 ) -> dict[str, pd.DataFrame] | None:
-    """配置启用的外部因子;目前只有 msf(多源基本面合成因子,docs/research/msf_prereg.md)。未启用 → None。"""
+    """配置启用的外部因子;目前只有 msf(多源基本面合成因子,docs/research/msf_prereg.md)。未启用 → None。
+    这是生产代码加载研究代码(research/cta_research)的唯一入口,只在配置启用时按需导入(tests/test_boundaries.py)。"""
     if "msf" not in cfg.signals.weights:
         return None
-    from cta.factors.composite import build_msf
+    from cta_research.factors.composite import build_msf
 
     return {"msf": build_msf(src, cfg, specs, panels)}
 
