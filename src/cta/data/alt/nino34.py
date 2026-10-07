@@ -41,7 +41,7 @@ import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any
@@ -457,12 +457,12 @@ def _http_date_to_iso(value: str) -> str:
     except (TypeError, ValueError, IndexError):
         return ""
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        dt = dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _write_raw(path: Path, content: bytes, meta: dict[str, Any]) -> None:
@@ -672,9 +672,7 @@ def load_live(dest: Path) -> Vintage:
     if df.empty:
         raise ValueError(f"{path}: no data rows")
     lm = str(meta.get("last_modified_utc", ""))
-    capture = (
-        pd.Timestamp(lm.rstrip("Z")) if lm else pd.Timestamp(datetime.now(timezone.utc).replace(tzinfo=None))
-    )
+    capture = pd.Timestamp(lm.rstrip("Z")) if lm else pd.Timestamp(datetime.now(UTC).replace(tzinfo=None))
     return Vintage(
         ts=path.name.split(".")[-1], last_modified_utc=lm, capture_utc=capture, data=_nino34_map(df)
     )

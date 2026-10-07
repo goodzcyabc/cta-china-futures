@@ -141,11 +141,11 @@ def read_meta(dest: Path, symbol: str, mode: str) -> dict[str, Any] | None:
 
 
 def _utc_now() -> dt.datetime:
-    return dt.datetime.now(tz=dt.timezone.utc)
+    return dt.datetime.now(tz=dt.UTC)
 
 
 def _iso_utc(t: dt.datetime) -> str:
-    return t.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return t.astimezone(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def query_params(phrase: str, mode: str, start: str, end: str) -> dict[str, str]:

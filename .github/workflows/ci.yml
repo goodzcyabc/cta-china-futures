@@ -3,16 +3,13 @@ on: [push, pull_request]
 jobs:
   quality:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.11"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-      - run: pip install -e ".[dev]"
-      - run: ruff format --check src tests
-      - run: ruff check src tests
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: ruff format --check src tests scripts
+      - run: ruff check src tests scripts
       - run: mypy src
-      - run: pytest -q          # 依赖真实数据的测试在 CI 上自动跳过
+      - run: pytest          # 依赖完整本地数据的测试会跳过;样例数据测试照常运行
