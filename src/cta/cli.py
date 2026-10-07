@@ -24,6 +24,10 @@ def _make_source(
     """ricequant:米筐导出;exchange:交易所直连(只用交易所公开数据,exchange_root 可指向样例数据;
     dominant_rule="oi_1.1x" 用复刻的米筐主力规则,可复现正式基线);
     stitched:米筐历史 + 交易所增量(默认;official_settle 时米筐段结算价用官方值覆盖)。"""
+    from cta.data.exchanges.source import DOMINANT_RULES
+
+    if dominant_rule not in DOMINANT_RULES:
+        raise typer.BadParameter(f"--dominant-rule must be one of {', '.join(DOMINANT_RULES)}")
     if dominant_rule != "max_oi" and source != "exchange":
         raise typer.BadParameter("--dominant-rule only applies to --source exchange")
     if source == "ricequant":

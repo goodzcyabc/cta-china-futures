@@ -5,7 +5,7 @@
 - dominant_map:每品种每日的候选主力,只用**前一交易日**持仓量(T 日开盘前可知);首日用当日。两种规则:
   "max_oi"(默认,纸面/实盘在用):前一日持仓量最大的合约;
   "oi_1.1x"(复刻米筐主力表):前一日持仓量最大的合约超过当前主力 1.1 倍、且到期更晚时才切换,不回切
-  (与米筐主力表逐日一致 99.75%,见 docs/research/source_check.md)。
+  (22 个品种 2017-01-11 → 2026-06-05 与米筐主力表逐日一致 99.73%,见 docs/research/source_check.md)。
   持仓量口径若与米筐不同(单/双边),只影响绝对数,不影响主力判定。
 - contract_meta:listed_date = 首次出现日,de_listed_date = 最后出现日(仍在交易的合约取到期日),maturity_date 按 rules.py,
   multiplier / margin_rate 取自 configs/instruments.yaml(交易所数据不含乘数)。
@@ -116,7 +116,7 @@ class ExchangeSource:
 
     def _dominant_ratio(self, q: pd.DataFrame, ratio: float) -> pd.DataFrame:
         """米筐式主力:T 日主力由 T−1 日持仓量决定;最大持仓合约超过当前主力 ratio 倍且到期更晚才切换(不回切);
-        当前主力在 T−1 日已无行情(到期)时直接换成 T−1 日持仓最大者。首日用当日持仓最大者。"""
+        当前主力在 T−1 日已无行情(到期)时换成 T−1 日到期更晚的合约中持仓最大者(没有则不限)。首日用当日持仓最大者。"""
         mat = self.contract_meta()["maturity_date"]
         rows: list[tuple[pd.Timestamp, str, str]] = []
         for sym, g in q.groupby("symbol"):
@@ -126,11 +126,13 @@ class ExchangeSource:
             rows.append((oi.index[0], str(sym), cur))
             for i in range(1, len(oi)):
                 prev = oi.iloc[i - 1].dropna()
-                best = str(prev.idxmax())
-                if cur not in prev.index or (
-                    best != cur and prev[best] > ratio * prev[cur] and mat[best] > mat[cur]
-                ):
-                    cur = best
+                if cur not in prev.index:  # 到期或缺行情:只向更晚到期换
+                    later = prev[mat.reindex(prev.index).to_numpy() > mat[cur]]
+                    cur = str((later if len(later) else prev).idxmax())
+                else:
+                    best = str(prev.idxmax())
+                    if best != cur and prev[best] > ratio * prev[cur] and mat[best] > mat[cur]:
+                        cur = best
                 rows.append((oi.index[i], str(sym), cur))
         out = pd.DataFrame(rows, columns=["date", "symbol", "contract"])
         return out.sort_values(["symbol", "date"]).reset_index(drop=True)

@@ -4,7 +4,7 @@
 集运指数(欧线) EC(2023-08-18)。会员排名按能源中心公布标准(原油单合约持仓 ≥10 万手才公布)常年缺原油。
 
 用法:
-    PYTHONPATH=src python3 -m cta.data.exchanges.ine backfill --start 2018-03-26 --end 2026-09-16 \
+    python -m cta.data.exchanges.ine backfill --start 2018-03-26 --end 2026-09-16 \
         --kinds quotes,positions,receipts
 """
 

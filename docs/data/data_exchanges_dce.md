@@ -4,11 +4,11 @@
 数据:`data/exchanges/DCE/{raw,quotes,positions,receipts}/<YYYY>/<YYYYMMDD>.*`,缺失记录 `data/exchanges/DCE/missing.log`。
 
 ```
-PYTHONPATH=src python3 -m cta.data.exchanges.dce backfill --start 2016-01-04 --end 2026-09-16 --kinds quotes,positions,receipts
-PYTHONPATH=src python3 -m cta.data.exchanges.dce ingest --date 2026-09-16          # 每日增量(三类)
-PYTHONPATH=src python3 -m cta.data.exchanges.dce reparse --start ... --end ...      # 解析逻辑改了之后用 raw 重建
-PYTHONPATH=src python3 -m cta.data.exchanges.dce reconcile --symbols C,M,Y,P,JD,V,J,I
-PYTHONPATH=src python3 -m cta.data.exchanges.dce coverage
+.venv/bin/python -m cta.data.exchanges.dce backfill --start 2016-01-04 --end 2026-09-16 --kinds quotes,positions,receipts
+.venv/bin/python -m cta.data.exchanges.dce ingest --date 2026-09-16          # 每日增量(三类)
+.venv/bin/python -m cta.data.exchanges.dce reparse --start ... --end ...      # 解析逻辑改了之后用 raw 重建
+.venv/bin/python -m cta.data.exchanges.dce reconcile --symbols C,M,Y,P,JD,V,J,I
+.venv/bin/python -m cta.data.exchanges.dce coverage
 ```
 
 ## 1. 数据源与 URL 模式

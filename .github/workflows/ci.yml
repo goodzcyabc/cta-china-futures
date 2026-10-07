@@ -9,7 +9,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements-dev.txt
-      - run: ruff format --check src tests scripts
-      - run: ruff check src tests scripts
-      - run: mypy src
+      - run: ruff format --check src research tests scripts
+      - run: ruff check src research tests scripts
+      - run: mypy src research/cta_research
       - run: pytest          # 依赖完整本地数据的测试会跳过;样例数据测试照常运行

@@ -10,7 +10,7 @@
   "book": "paper/v03",
   "injected": "删除 data/exchanges/CZCE/quotes/2026/20261008.parquet 后运行 catchup",
   "detected": {"failed_json": true, "exit_code": 1, "notification": true, "stage": "settle"},
-  "recovered": {"action": "恢复文件后 PYTHONPATH=src python3 -m cta.cli paper catchup --date 2026-10-08 --book paper/v03 --no-ingest --config configs/strategy_v03.yaml", "duration_s": 95},
+  "recovered": {"action": "恢复文件后 .venv/bin/python -m cta.cli paper catchup --date 2026-10-08 --book paper/v03 --no-ingest --config configs/strategy_v03.yaml", "duration_s": 95},
   "outcome": "state.json 推进到 2026-10-08,equity.csv 无重复行,FAILED.json 自动清除,与未注入的重放逐字段一致",
   "operator": "s296he"
 }

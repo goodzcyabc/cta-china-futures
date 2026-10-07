@@ -6,10 +6,10 @@
 用途:纸面/实盘每日拉取当日结算参数(保证金、手续费、平今手续费、涨跌停),并机械推导"品种一般月份档的保证金/手续费上调"事件,作为监管事件覆盖层(design_log 13.6 H-REG)的可复现事件源;历史表 `data/external/exchange_events/events.csv`(公告抽取 + 一次性推导)只能一次性生成,这里的推导口径与其中的 `DERIVED` 行同源。
 
 ```
-PYTHONPATH=src python3 -m cta.data.exchanges.params backfill --start 2016-01-04 --exchanges SHFE,INE,CZCE   # 逐日回填,可断点续跑
-PYTHONPATH=src python3 -m cta.data.exchanges.params day --date 2026-09-21                                    # 每日增量(纸面 ingest_all 已默认包含)
-PYTHONPATH=src python3 -m cta.data.exchanges.params derive --out data/external/exchange_events/events_derived.csv
-PYTHONPATH=src python3 -m cta.data.exchanges.params coverage
+.venv/bin/python -m cta.data.exchanges.params backfill --start 2016-01-04 --exchanges SHFE,INE,CZCE   # 逐日回填,可断点续跑
+.venv/bin/python -m cta.data.exchanges.params day --date 2026-09-21                                    # 每日增量(纸面 ingest_all 已默认包含)
+.venv/bin/python -m cta.data.exchanges.params derive --out data/external/exchange_events/events_derived.csv
+.venv/bin/python -m cta.data.exchanges.params coverage
 ```
 
 `backfill --local-dir DIR`(或 `SHFE=dir1,INE=dir2,CZCE=dir3`)优先导入已下载的原始文件(布局:上期所/能源中心 `S{YYYYMMDD}.json` + `T{YYYYMMDD}.json`,郑商所 `{YYYYMMDD}.txt`;`.404` 后缀为节假日标记),本地没有的再 curl。本次回填即用生成 events.csv 那次会话草稿区的下载件导入了 2016-01-04 … 2026-09-18 的上期所与郑商所文件、2018-03 … 2019-07 与 2022-01 … 2023-03 的能源中心文件,其余全部直连补齐(约 3 400 次请求,0 次失败)。
@@ -102,7 +102,7 @@ PYTHONPATH=src python3 -m cta.data.exchanges.params coverage
 
 **与已核验现行值对照**(`tests/test_exchanges_params.py::test_params_match_verified_2026_values`,有本地数据才跑):`docs/data/instruments_verification.md`(2026-09-11 结算参数 / 2026-09-14 交易参数)与 `docs/data/instruments_verification_ext_shfe_czce.md`(2026-09-18)中 22 个品种的主力/一般月份合约,每项比 `margin_spec`、`fee_open`+单位、`fee_close_today`、`limit_pct` 五个字段:**22/22 品种 110/110 字段一致**(2026-09-21 回填后运行)。
 
-**推导事件 vs 公告事件**(`scripts/research/params_events_eval.py`;公告事件 = `events.csv` 中 `notice_id` 非空、`param ∈ {margin, fee}`、`direction=up` 的行按 (品种, 参数, 生效交易日) 去重;生效日不是交易日的取其后第一个交易日;生效日晚于最后一个参数文件的不计;匹配 = 同所同品种同参数、事件日与生效日相差 ≤1 个交易日):
+**推导事件 vs 公告事件**(`research/scripts/params_events_eval.py`;公告事件 = `events.csv` 中 `notice_id` 非空、`param ∈ {margin, fee}`、`direction=up` 的行按 (品种, 参数, 生效交易日) 去重;生效日不是交易日的取其后第一个交易日;生效日晚于最后一个参数文件的不计;匹配 = 同所同品种同参数、事件日与生效日相差 ≤1 个交易日):
 
 | 交易所 | 公告事件数(scope=all / 非节假日) | 容差(交易日) | 召回率 全部 | 召回率 scope=all | 召回率 非节假日 | 命中者新值一致 | 推导事件数(非 holiday) | 精确率 全部 | 精确率 非 holiday |
 |---|---|---|---|---|---|---|---|---|---|

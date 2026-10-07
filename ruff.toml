@@ -1,6 +1,6 @@
 line-length = 110
 target-version = "py312"
-src = ["src", "tests"]
+src = ["src", "research", "tests"]
 
 [lint]
 select = ["E", "F", "I", "B", "UP", "N", "W", "SIM", "PL"]

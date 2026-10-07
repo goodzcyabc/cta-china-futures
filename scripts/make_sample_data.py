@@ -24,6 +24,7 @@ START, END = "20210104", "20241231"
 
 def _normalize(ti: tarfile.TarInfo) -> tarfile.TarInfo:
     ti.mtime, ti.uid, ti.gid, ti.uname, ti.gname = 0, 0, 0, "", ""
+    ti.mode = 0o755 if ti.isdir() else 0o644  # 不随 umask 变化
     return ti
 
 
@@ -50,7 +51,7 @@ def main() -> int:
                     dst.parent.mkdir(parents=True, exist_ok=True)
                     d.to_parquet(dst, index=False)
                     n_files += 1
-        # 固定时间戳与属主,同样输入重跑得到逐字节相同的压缩包(不产生无意义的 git 差异)
+        # 固定时间戳、属主与权限:同样输入、同一环境(包版本与 zlib 相同)重跑得到逐字节相同的压缩包
         with gzip.GzipFile(out, "wb", mtime=0) as gz, tarfile.open(fileobj=gz, mode="w") as tar:
             tar.add(root, arcname="exchanges", filter=_normalize)
     print(f"{n_files} files -> {out} ({out.stat().st_size / 1e6:.1f} MB)")
