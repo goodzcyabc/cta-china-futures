@@ -47,6 +47,10 @@
 - 日步"全有或全无":成交、盯市、出单全部成功才写 `fills/<日>.csv`、`equity.csv`(按日去重)、`state.json`(原子)。任一步失败 → 命令行在 stderr 输出 `PAPER STEP FAILED: <账本目录名,如 v03> <日> failed at stage '<quotes|fill|settle|orders|save|commit>': <错误>`,写 `<book>/FAILED.json`(日期、阶段、原因、traceback),`state.json` 不变,`log/<日>.json` 带 `failed`,CLI 非零退出。
 - 会触发失败的情况:交易日但磁盘无该日行情(数据迟到、抓取失败、或休市未登记在 `configs/holidays.csv`);持仓合约当日缺行情或结算价为空;账本任何数值非有限;`generate_orders` 抛错(as-of 非交易日、未核验品种等)。
 - 恢复:修好原因(补数据 / 补日历 / 修代码)后重跑 `paper catchup --date <今天>` 即可,从失败日起幂等重放;成功后 FAILED.json 自动删除。不需要手工改 state.json。
+- 最常见的失败是大商所抓取超时(2026-09-23、10-08 两次):`paper/v01/log/<日>.json`(只有主账本记录 ingest)里 DCE 是超时错误(10-08 在系统 Python 3.9 下写作 `error: timeout: timed out`,现在 .venv 的 Python 3.12 下会写作 `error: TimeoutError: timed out`;补跑成功会覆盖这个日志,原始记录在当天的 `paper: <日> (FAILED: …)` 提交里),持有大商所合约的账本在 `settle` 失败。09-23 那次第二天的定时任务自动补上了;10-08 那次原因是 CDP 代理在跑、但没连上 Chrome(`curl -s localhost:3456/health` 显示 `connected: null`、`chromePort: null`;注意代理空闲时也这样显示,有请求进来才连,所以光看它不能确诊)。恢复步骤(10-08 即按此处理;当时该检出还没有 `.venv`,第 2 步用的是 `PYTHONPATH=src python3`,现在用 `.venv/bin/python`):
+  1. 用户确认 Chrome 开着、远程调试可用;
+  2. 在 launchd 用的那个检出(`deploy/com.cta.paper.plist` 里的路径,`main`、暂存区为空)的仓库根目录运行 `.venv/bin/python -m cta.data.exchanges.dce ingest --date <失败日>`,确认 `data/exchanges/DCE/{quotes,receipts}/<年>/<YYYYMMDD>.parquet`(如 `2026/20261008.parquet`)已落盘、health 变成 `connected: true`;
+  3. 在同一检出运行 `scripts/paper_daily.sh >> paper/log/cron.log 2>&1`(重放失败日、提交并推送;已结算的日子跳过),之前先在 cron.log 写一行说明这是手动补跑。不要在 worktree 里跑:脚本会推进 worktree 里那份账本副本并推送分支,真正的账本仍是失败状态。
 - `scripts/paper_daily.sh`:五本账各自运行,一本失败不影响其余;结束时把结果(含 FAILED.json)提交 git,任一失败则 macOS 通知 + 退出码 1(见 `paper/log/cron.log`)。
 - 日历:`configs/holidays.csv` 只登记到 2026-10-07,**2027 年休市安排公告后必须补**,否则元旦当天会失败报警(这是设计:宁可报警也不静默跳日)。
 
