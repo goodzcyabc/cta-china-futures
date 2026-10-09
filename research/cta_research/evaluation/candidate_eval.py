@@ -111,12 +111,18 @@ def build_context(
     is_end: str = "2021-12-31",
     reference_equity: str | None = "results/settle_baseline/equity_v0.3_full_D_unified_official.csv",
     seed: int = 20261002,
+    data_end: str | None = None,
+    cutover: str | None = None,
 ) -> Context:
-    """载入生产数据与信号,按同一条路径重建静态基线;目标暴露须与生产逐位一致,权益与正式 D 臂逐位一致(参考文件存在时)。"""
+    """载入生产数据与信号,按同一条路径重建静态基线;目标暴露须与生产逐位一致,权益与正式 D 臂逐位一致(参考文件存在时)。
+    data_end:只载入 <= 该日的数据(按 as-of 截断;默认载入全部,即旧行为)。
+    cutover:米筐 → 交易所的切换日(默认取米筐导出的最后一日,即旧行为);前向检验应显式写死。"""
     cfg = load_config(Path(config_path))
     specs = load_instruments()
-    src = default_stitched(Path(data_root), official_settle=True)
-    panels = build_panels(src, cfg, specs)
+    src = default_stitched(
+        Path(data_root), cutover=pd.Timestamp(cutover) if cutover else None, official_settle=True
+    )
+    panels = build_panels(src, cfg, specs, end=pd.Timestamp(data_end) if data_end else None)
     sig = compute_signals(
         panels, cfg, receipts=_receipts_of(src), specs=specs, reg_events=_reg_events_of(src, cfg)
     )

@@ -22,7 +22,7 @@
 
 | 文件 | 内容 |
 |---|---|
-| [design_log.md](design_log.md) | 设计日志:每一轮的预注册要点、全部试验(计数 60)、事后改动与更正;以追加为主,更正一般另起小节;少数旧文字曾原地修改(如占位符、运行中的试验计数、2026-09-22 更正的笔误日期),可用 `git log -p -- docs/design_log.md` 查到 |
+| [design_log.md](design_log.md) | 设计日志:每一轮的预注册要点、全部试验(计数 61)、事后改动与更正;以追加为主,更正一般另起小节;少数旧文字曾原地修改(如占位符、运行中的试验计数、2026-09-22 更正的笔误日期),可用 `git log -p -- docs/design_log.md` 查到 |
 | [architecture.md](architecture.md) | 代码结构与关键约定 |
 | [deployment.md](deployment.md) | 纸面交易运行手册:每日流程、失败语义与恢复 |
 | [drills/](drills/) | 故障恢复演练证据的存放目录与格式说明(验收程序读取其中的 `*.json`;截至 2026-10-06 尚无演练记录,验收报告该项为 PENDING) |
@@ -47,6 +47,7 @@
 | 二十四 | 非量价因子说明书(仓单水平) | `non_pv_factor_card.md` |
 | 二十五 | 多源基本面合成因子 MSF 演示 | `msf_prereg.md`、`msf_demo.md` |
 | 二十七 | 数据路径校验:只用交易所公开数据复现正式基线;选合约规则的影响(不计试验) | `source_check.md` |
+| 二十八 | ewmac 基本盘(试验 61,前向检验) | `ewmac_base_prereg.md` |
 
 ## data/ — 数据源、合约参数核验、基线
 
