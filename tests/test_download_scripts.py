@@ -1,4 +1,4 @@
-"""download/ 的纯函数(不需要 rqdatac):合成连续合约排除、品种排序、分批、原子写 parquet、重试不吞配额错误。"""
+"""download/ 的纯函数(不需要 rqdatac):合成连续合约排除、品种排序、分批、原子写 parquet、压缩编码判定、重试不吞配额错误。"""
 
 from __future__ import annotations
 
@@ -67,3 +67,16 @@ def test_retry_retries_network_errors_but_not_quota() -> None:
         rc.retry(lambda: (_ for _ in ()).throw(rc.QuotaExhausted("q")), attempts=3, wait=0.0)
     with pytest.raises(RuntimeError, match="重试 2 次仍失败"):
         rc.retry(lambda: (_ for _ in ()).throw(ValueError("bad")), attempts=2, wait=0.0)
+
+
+def test_column_encodings_only_for_float_and_time_columns() -> None:
+    df = pd.DataFrame({"v": [1.0, 2.0], "ts": pd.to_datetime(["2026-01-02", "2026-01-05"])})
+    assert rc.column_encodings(df) == {"v": "BYTE_STREAM_SPLIT", "ts": "DELTA_BINARY_PACKED"}
+    assert rc.column_encodings(df.assign(s=["a", "b"])) is None  # 混入字符串列 -> 默认编码
+    assert rc.column_encodings(df.set_index(pd.Index(["c1", "c2"], name="contract"))) is None  # 字符串索引
+    di = df.set_index(pd.DatetimeIndex(["2026-01-02", "2026-01-05"], name="datetime"))
+    assert rc.column_encodings(di) == {
+        "datetime": "DELTA_BINARY_PACKED",
+        "v": "BYTE_STREAM_SPLIT",
+        "ts": "DELTA_BINARY_PACKED",
+    }

@@ -19,6 +19,7 @@ download/run_all.sh --no-5m         # 跳过 5 分钟线(轻量数据,几分钟�
 nohup download/continue_daily.sh >> download/run.log 2>&1 &   # 配额自动续跑(多日无人值守)
 .venv/bin/python download/download_5minute.py --check    # 查看 5 分钟线进度
 .venv/bin/python download/validate.py                    # 校验产物 schema / 不变量
+.venv/bin/python download/check_5m.py --fix              # 5 分钟线全量清洁性检查(仅修 OHLC 越界)
 ```
 
 逐表细节见各脚本 docstring;`--symbols CU,RB`、`--limit N`(冒烟)、`--force`(重下)通用。
@@ -60,6 +61,19 @@ nohup download/continue_daily.sh >> download/run.log 2>&1 &   # 配额自动续�
   **5 分钟线 ~1–1.5 GiB**(最大头,按品种顺序跑,生产 22 品种优先)。
 - 每次运行的进度与耗时追加到 `data/ricecta/download_log.jsonl`。
 
+## 压缩格式(2026-10-17 起)
+
+- 写盘统一走 `rq_common.write_parquet`:全表只有浮点/时间列时用
+  zstd-18 + 浮点列 `BYTE_STREAM_SPLIT` + 时间列 `DELTA_BINARY_PACKED`;
+  含字符串等其它类型的表保持默认字典编码(两套逐列编码不能混用)。
+- AB 测试(23 文件 / 39.8 万行):9.0 MiB → 3.1 MiB(2.9x),读取耗时与 snappy 持平。
+  收益大头是时间列:snappy 下 datetime 索引约 7.6 B/行(全表 23.8 B/行),delta 后约 0.3 B/行;
+  其次是把浮点字典编码让位给 BYTE_STREAM_SPLIT。
+- 存量重写实测:1,714 个文件 570 → 179 MiB(**3.19x**,0 失败,193s);其余文件下载时即按新编码写盘,
+  5 分钟线全量(7,430 文件)约 557 MiB。
+- 存量文件重写:`download/recompress.py --table futures_5minute`(幂等:已优化的跳过、
+  不可优化的表跳过;逐文件 `DataFrame.equals` 校验无损)。
+
 ## 口径与注意事项
 
 - 只下载**真实合约**:米筐的人工合成连续合约(命名含"连续",代码以 88/888/889/99/88A2 结尾,
@@ -67,7 +81,9 @@ nohup download/continue_daily.sh >> download/run.log 2>&1 &   # 配额自动续�
   需要连续价请用 `dominant_daily/` 或 `continuous/`。
 
 - 5 分钟线 index 为 bar 结束时间(夜盘归属下一交易日),列
-  `open/high/low/close/volume/total_turnover/open_interest/trading_date`,字段集与既有导出一致。
+  `open/high/low/close/volume/total_turnover/open_interest/trading_date`,字段集与既有导出一致;
+  约一半 bar 零成交、郑商所 `total_turnover` 不能反推价格等已知特性见 `docs/data/data_notes.md`「5 分钟线」,
+  清洁性检查/修复用 `download/check_5m.py --fix`。
 - `dominant_daily` 使用前复权(`adjust_type='pre'`, `prev_close_spread`),与既有导出口径一致;
   原始价请用 `contracts_daily` / `exchange_daily`。
 - `metadata.parquet` 的 `margin_rate` 是米筐的"临近交割抬高后"值,细节见 `docs/data/data_notes.md`。

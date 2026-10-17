@@ -105,13 +105,56 @@ def record(**fields: Any) -> None:
 
 
 def write_parquet(df: pd.DataFrame, path: Path, index: bool = True) -> None:
-    """原子写 parquet:先写 .tmp 再 rename,避免半截文件被当成已完成。"""
+    """原子写 parquet:先写 .tmp 再 rename,避免半截文件被当成已完成。
+
+    全表(含索引)只有浮点/时间列时用高压缩编码:zstd-18 + 浮点列 BYTE_STREAM_SPLIT +
+    时间列 DELTA_BINARY_PACKED(等差时间戳每行 <0.5 B)。实测 5 分钟线体积 ~2.9x、
+    读取耗时不变(AB 测试见 README「压缩格式」)。含字符串等其它类型的表保持默认字典编码。
+    """
     if df is None or len(df) == 0:
         return
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.name + ".tmp")
-    df.to_parquet(tmp, index=index)
+    enc = column_encodings(df)
+    if enc is None:
+        df.to_parquet(tmp, index=index)
+    else:
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+
+        pq.write_table(
+            pa.Table.from_pandas(df, preserve_index=index),
+            tmp,
+            compression="zstd",
+            compression_level=18,
+            use_dictionary=False,
+            column_encoding=enc,
+        )
     os.replace(tmp, path)
+
+
+def column_encodings(df: pd.DataFrame) -> dict[str, str] | None:
+    """全表只有浮点/时间列时给出逐列编码;出现其它类型(含字符串索引)返回 None 走默认。"""
+    enc: dict[str, str] = {}
+
+    def add(name: str, dtype: Any) -> bool:
+        if pd.api.types.is_float_dtype(dtype):
+            enc[name] = "BYTE_STREAM_SPLIT"
+        elif pd.api.types.is_datetime64_any_dtype(dtype):
+            enc[name] = "DELTA_BINARY_PACKED"
+        else:
+            return False
+        return True
+
+    if isinstance(df.index, pd.DatetimeIndex):
+        if not add(str(df.index.name or "__index_level_0__"), df.index.dtype):
+            return None
+    elif not isinstance(df.index, pd.RangeIndex):
+        return None
+    for name, dtype in df.dtypes.items():
+        if not add(str(name), dtype):
+            return None
+    return enc or None
 
 
 def retry[T](fn: Callable[[], T], attempts: int = 3, wait: float = 5.0) -> T:
