@@ -60,6 +60,19 @@ nohup download/continue_daily.sh >> download/run.log 2>&1 &   # 配额自动续�
   **5 分钟线 ~1–1.5 GiB**(最大头,按品种顺序跑,生产 22 品种优先)。
 - 每次运行的进度与耗时追加到 `data/ricecta/download_log.jsonl`。
 
+## 压缩格式(2026-10-17 起)
+
+- 写盘统一走 `rq_common.write_parquet`:全表只有浮点/时间列时用
+  zstd-18 + 浮点列 `BYTE_STREAM_SPLIT` + 时间列 `DELTA_BINARY_PACKED`;
+  含字符串等其它类型的表保持默认字典编码(两套逐列编码不能混用)。
+- AB 测试(23 文件 / 39.8 万行):9.0 MiB → 3.1 MiB(2.9x),读取耗时与 snappy 持平。
+  收益大头是时间列:snappy 下 datetime 索引约 7.6 B/行(全表 23.8 B/行),delta 后约 0.3 B/行;
+  其次是把浮点字典编码让位给 BYTE_STREAM_SPLIT。
+- 存量重写实测:1,714 个文件 570 → 179 MiB(**3.19x**,0 失败,193s);其余文件下载时即按新编码写盘,
+  5 分钟线全量(7,430 文件)约 557 MiB。
+- 存量文件重写:`download/recompress.py --table futures_5minute`(幂等:已优化的跳过、
+  不可优化的表跳过;逐文件 `DataFrame.equals` 校验无损)。
+
 ## 口径与注意事项
 
 - 只下载**真实合约**:米筐的人工合成连续合约(命名含"连续",代码以 88/888/889/99/88A2 结尾,
