@@ -1,0 +1,18 @@
+{
+ "date": "2026-10-20",
+ "ingest": {
+  "SHFE": "quotes:written,positions:written,receipts:written,params:written",
+  "INE": "quotes:written,positions:written,receipts:written,params:written",
+  "CZCE": "quotes:ok,positions:ok,receipts:ok,params:written",
+  "DCE": "error: TimeoutError: timed out,params:skipped_needs_browser"
+ },
+ "fills": {
+  "n": 1,
+  "filled": 0,
+  "blocked": 1
+ },
+ "failed": {
+  "stage": "settle",
+  "error": "LedgerIntegrityError: held contracts without a finite settlement price: ['M:M2701', 'P:P2701', 'V:V2701', 'Y:Y2701', 'I:I2701', 'JD:JD2612', 'C:C2701', 'J:J2701']"
+ }
+}
