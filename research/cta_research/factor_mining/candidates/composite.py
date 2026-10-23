@@ -30,14 +30,16 @@ from cta_research.factor_mining.signals import options_signals as osig
 Frame = pd.DataFrame
 
 ALT_DIR = Path("data/external/alt")
-MACRO_DIR = Path("data/ricecta/data/macro_factors")
+MACRO_FILE = Path(
+    "data/ricecta/data/econ/macro_factors.parquet"
+)  # 全量宏观长表(factor/info_date/start_date/end_date/value)
 EXCHANGE_DIR = Path("data/exchanges")
 COMPONENTS = ("R", "S", "W", "E", "N", "Q", "A", "B", "O1", "O2", "O3", "P")
 INDUSTRIAL_CLASSES = ("metal", "ferrous", "chem", "energy")
-PMI_NO, PMI_FG = "制造业采购经理指数PMI_新订单.parquet", "制造业采购经理指数PMI_产成品库存.parquet"
-PPI_FILE, PPIRM_FILE = (
-    "PPI_全部工业品(全国_当期同比增长率_月).parquet",
-    "PPIRM(全国_当期同比增长率_月).parquet",
+PMI_NO, PMI_FG = "制造业采购经理指数PMI_新订单", "制造业采购经理指数PMI_产成品库存"
+PPI_FACTOR, PPIRM_FACTOR = (
+    "PPI_全部工业品(全国:当期同比增长率:月)",
+    "PPIRM(全国:当期同比增长率:月)",
 )
 P_CHANGE_MONTHS = 3
 
@@ -136,9 +138,9 @@ def _signal_releases(
     ]
 
 
-def _b_releases(macro_dir: Path) -> list[fs.Release]:
+def _b_releases(macro_file: Path) -> list[fs.Release]:
     rel = fs.pmi_ratio_releases(
-        fs.load_macro(str(macro_dir / PMI_NO)), fs.load_macro(str(macro_dir / PMI_FG))
+        fs.load_macro(str(macro_file), PMI_NO), fs.load_macro(str(macro_file), PMI_FG)
     )
     ratio = pd.Series({r.info_date: r.value for r in rel}, dtype=float)
     pe = {r.info_date: r.period_end for r in rel}
@@ -146,17 +148,17 @@ def _b_releases(macro_dir: Path) -> list[fs.Release]:
 
 
 def component_b(
-    dates: pd.DatetimeIndex, basket: list[str], cols: list[str], macro_dir: Path = MACRO_DIR
+    dates: pd.DatetimeIndex, basket: list[str], cols: list[str], macro_file: Path = MACRO_FILE
 ) -> Frame:
     """PMI 新订单 / 产成品库存:按公布日 → 扩展 z → clip;工业品 + 能源篮子。"""
     return _broadcast(
-        fs.releases_to_daily(_b_releases(macro_dir), dates, target_rule=TARGET_RULE), basket, cols
+        fs.releases_to_daily(_b_releases(macro_file), dates, target_rule=TARGET_RULE), basket, cols
     )
 
 
-def _p_releases(macro_dir: Path) -> list[fs.Release]:
-    ppi = {r.period_end: r for r in fs.load_macro(str(macro_dir / PPI_FILE))}
-    ppirm = {r.period_end: r for r in fs.load_macro(str(macro_dir / PPIRM_FILE))}
+def _p_releases(macro_file: Path) -> list[fs.Release]:
+    ppi = {r.period_end: r for r in fs.load_macro(str(macro_file), PPI_FACTOR)}
+    ppirm = {r.period_end: r for r in fs.load_macro(str(macro_file), PPIRM_FACTOR)}
     rows = sorted(
         (pe, max(ppi[pe].info_date, ppirm[pe].info_date), ppi[pe].value - ppirm[pe].value)
         for pe in sorted(set(ppi) & set(ppirm))
@@ -173,11 +175,11 @@ def _p_releases(macro_dir: Path) -> list[fs.Release]:
 
 
 def component_p(
-    dates: pd.DatetimeIndex, basket: list[str], cols: list[str], macro_dir: Path = MACRO_DIR
+    dates: pd.DatetimeIndex, basket: list[str], cols: list[str], macro_file: Path = MACRO_FILE
 ) -> Frame:
     """工业品利润剪刀差:PPI 同比 − PPIRM 同比的 3 个月变化 → 扩展 z → clip(去极值);剪刀差扩大 → 多工业品。"""
     return _broadcast(
-        fs.releases_to_daily(_p_releases(macro_dir), dates, target_rule=TARGET_RULE), basket, cols
+        fs.releases_to_daily(_p_releases(macro_file), dates, target_rule=TARGET_RULE), basket, cols
     )
 
 
@@ -210,7 +212,7 @@ def build_component_candidates(
     specs: InstrumentTable,
     panels: dict[str, SymbolPanel],
     alt_dir: Path = ALT_DIR,
-    macro_dir: Path = MACRO_DIR,
+    macro_file: Path = MACRO_FILE,
     exchange_dir: Path = EXCHANGE_DIR,
 ) -> dict[str, Candidate]:
     """12 个成分(信号 date × symbol,[−1, 1],篮子外 NaN;附点时审计表),全部按各自预注册的点时规则。"""
@@ -260,7 +262,7 @@ def build_component_candidates(
         _broadcast(fs.releases_to_daily(rel_a, dates, target_rule=TARGET_RULE), cols, cols),
         release_audit(rel_a, dates),
     )
-    rel_b = _b_releases(macro_dir)
+    rel_b = _b_releases(macro_file)
     out["B"] = Candidate(
         "B",
         "PMI 新订单 / 产成品库存",
@@ -276,7 +278,7 @@ def build_component_candidates(
     }
     for tag in ("O1", "O2", "O3"):
         out[tag] = osig.build_candidate(tag, feats, dates, cols)
-    rel_p = _p_releases(macro_dir)
+    rel_p = _p_releases(macro_file)
     out["P"] = Candidate(
         "P",
         "工业品利润剪刀差(PPI − PPIRM 的 3 个月变化)",
@@ -296,11 +298,11 @@ def build_components(
     specs: InstrumentTable,
     panels: dict[str, SymbolPanel],
     alt_dir: Path = ALT_DIR,
-    macro_dir: Path = MACRO_DIR,
+    macro_file: Path = MACRO_FILE,
     exchange_dir: Path = EXCHANGE_DIR,
 ) -> dict[str, Frame]:
     """12 个成分信号(date × symbol)。"""
-    cands = build_component_candidates(src, cfg, specs, panels, alt_dir, macro_dir, exchange_dir)
+    cands = build_component_candidates(src, cfg, specs, panels, alt_dir, macro_file, exchange_dir)
     return {k: c.signal for k, c in cands.items()}
 
 

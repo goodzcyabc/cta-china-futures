@@ -14,9 +14,11 @@ pytestmark = pytest.mark.skipif(not DATA.exists(), reason="no market data")
 def test_real_source_shapes() -> None:
     src = RicequantParquetSource(DATA)
     syms = src.symbols()
-    assert len(syms) == 23 and "CU" in syms and "metadata" not in syms
+    assert len(syms) == 84 and "CU" in syms and "metadata" not in syms  # 全量导出口径(原 23 品种)
     c = src.contracts("CU")
-    assert list(c.index.names) == ["contract", "date"] and list(c.columns) == CONTRACT_COLS
+    # 全量导出的 contracts_daily 多一列 total_turnover(成交额,见 docs/data/data_notes.md)
+    assert list(c.index.names) == ["contract", "date"]
+    assert list(c.columns) == [*CONTRACT_COLS[:5], "total_turnover", *CONTRACT_COLS[5:]]
     assert c.index.get_level_values("date").min() == pd.Timestamp("2016-01-04")
     dm = src.dominant_map()
     assert list(dm.columns) == ["date", "symbol", "contract"] and dm["date"].dtype.kind == "M"

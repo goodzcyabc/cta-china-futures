@@ -268,8 +268,8 @@ def test_real_predictors_are_point_in_time() -> None:
         col = oi.contracts[sym]
         first = col.first_valid_index()
         assert first is not None and col.loc[first:].isna().sum() == 0 and (col.loc[first:] > 0).all()
-    no = fs.load_macro(str(DATA / "macro_factors/制造业采购经理指数PMI_新订单.parquet"))
-    fg = fs.load_macro(str(DATA / "macro_factors/制造业采购经理指数PMI_产成品库存.parquet"))
+    no = fs.load_macro(str(DATA / "econ/macro_factors.parquet"), "制造业采购经理指数PMI_新订单")
+    fg = fs.load_macro(str(DATA / "econ/macro_factors.parquet"), "制造业采购经理指数PMI_产成品库存")
     rel = fs.pmi_ratio_releases(no, fg)
     assert len(rel) >= 120
     for r in rel:

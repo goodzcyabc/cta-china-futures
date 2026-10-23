@@ -10,7 +10,8 @@ import pandas as pd
 import pytest
 
 DATA = Path("data/ricecta/data")
-pytestmark = pytest.mark.skipif(not DATA.exists(), reason="需要本地米筐/交易所数据")
+EXCHANGE = Path("data/exchanges")  # 交易所直连落盘(ExchangeSource 默认根);拼接源两类数据都要
+pytestmark = pytest.mark.skipif(not (DATA.exists() and EXCHANGE.exists()), reason="需要本地米筐/交易所数据")
 
 
 def _quotes_for(panels: dict, d: pd.Timestamp) -> dict:  # type: ignore[type-arg]

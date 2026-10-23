@@ -14,7 +14,8 @@ from cta_research.factor_mining.evaluation import adaptive_quarterly as aq
 from cta_research.factor_mining.evaluation import walkforward as wf
 
 DATA = Path("data/ricecta/data")
-needs_data = pytest.mark.skipif(not DATA.exists(), reason="需要本地米筐/交易所数据")
+EXCHANGE = Path("data/exchanges")  # 交易所直连落盘(ExchangeSource 默认根);拼接源两类数据都要
+needs_data = pytest.mark.skipif(not (DATA.exists() and EXCHANGE.exists()), reason="需要本地米筐/交易所数据")
 
 
 def _returns(

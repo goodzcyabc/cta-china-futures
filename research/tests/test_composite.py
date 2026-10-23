@@ -11,7 +11,8 @@ import pytest
 from cta_research.factor_mining.candidates import composite as cp
 
 DATA = Path("data/ricecta/data")
-needs_data = pytest.mark.skipif(not DATA.exists(), reason="需要本地米筐/交易所数据")
+EXCHANGE = Path("data/exchanges")  # 交易所直连落盘(ExchangeSource 默认根);拼接源两类数据都要
+needs_data = pytest.mark.skipif(not (DATA.exists() and EXCHANGE.exists()), reason="需要本地米筐/交易所数据")
 
 
 def _bday_next(d: pd.Timestamp) -> pd.Timestamp:
@@ -70,18 +71,24 @@ def test_combine_msf_equal_weight_sqrt_n() -> None:
     assert out["B"].isna().all()
 
 
-def _write_macro(tmp: Path, name: str, rows: list[tuple[str, str, float]]) -> None:
-    df = pd.DataFrame(
-        {
-            "factor": name,
-            "info_date": [pd.Timestamp(r[0]) for r in rows],
-            "start_date": [pd.Timestamp(r[1]) - pd.offsets.MonthBegin(1) for r in rows],
-            "end_date": [pd.Timestamp(r[1]) for r in rows],
-            "value": [r[2] for r in rows],
-            "rice_create_tm": pd.Timestamp("2026-01-01"),
-        }
-    ).set_index(["factor", "info_date"])
-    df.to_parquet(tmp / name)
+def _write_macro(path: Path, *series: tuple[str, list[tuple[str, str, float]]]) -> None:
+    df = pd.concat(
+        [
+            pd.DataFrame(
+                {
+                    "factor": name,
+                    "info_date": [pd.Timestamp(r[0]) for r in rows],
+                    "start_date": [pd.Timestamp(r[1]) - pd.offsets.MonthBegin(1) for r in rows],
+                    "end_date": [pd.Timestamp(r[1]) for r in rows],
+                    "value": [r[2] for r in rows],
+                    "rice_create_tm": pd.Timestamp("2026-01-01"),
+                }
+            )
+            for name, rows in series
+        ],
+        ignore_index=True,
+    )
+    df.to_parquet(path)
 
 
 def test_component_p_definition_and_point_in_time(tmp_path: Path) -> None:
@@ -90,18 +97,14 @@ def test_component_p_definition_and_point_in_time(tmp_path: Path) -> None:
     ppi = rng.normal(0, 3, 60)
     ppirm = rng.normal(0, 3, 60)
     info = [m + pd.Timedelta(days=10) for m in months]
+    macro_file = tmp_path / "macro_factors.parquet"
     _write_macro(
-        tmp_path,
-        cp.PPI_FILE,
-        [(str(i.date()), str(m.date()), float(v)) for i, m, v in zip(info, months, ppi)],
-    )
-    _write_macro(
-        tmp_path,
-        cp.PPIRM_FILE,
-        [(str(i.date()), str(m.date()), float(v)) for i, m, v in zip(info, months, ppirm)],
+        macro_file,
+        (cp.PPI_FACTOR, [(str(i.date()), str(m.date()), float(v)) for i, m, v in zip(info, months, ppi)]),
+        (cp.PPIRM_FACTOR, [(str(i.date()), str(m.date()), float(v)) for i, m, v in zip(info, months, ppirm)]),
     )
     dates = pd.bdate_range("2016-01-04", "2020-12-31")
-    sig = cp.component_p(dates, ["CU"], ["CU", "C"], macro_dir=tmp_path)
+    sig = cp.component_p(dates, ["CU"], ["CU", "C"], macro_file=macro_file)
     assert sig["C"].isna().all()
     s = sig["CU"]
     # 公布日之前看不到:第 k 次公布的值从公布日当天或之后第一个交易日起生效(周末公布 → 下周一)
@@ -110,21 +113,19 @@ def test_component_p_definition_and_point_in_time(tmp_path: Path) -> None:
     # 截断:只给 2018 年底之前公布的数据,2018 年底之前信号不变
     cut = pd.Timestamp("2018-12-31")
     keep = [k for k, i in enumerate(info) if i <= cut]
-    tmp2 = tmp_path / "trunc"
-    tmp2.mkdir()
+    trunc = tmp_path / "trunc.parquet"
     _write_macro(
-        tmp2, cp.PPI_FILE, [(str(info[k].date()), str(months[k].date()), float(ppi[k])) for k in keep]
+        trunc,
+        (cp.PPI_FACTOR, [(str(info[k].date()), str(months[k].date()), float(ppi[k])) for k in keep]),
+        (cp.PPIRM_FACTOR, [(str(info[k].date()), str(months[k].date()), float(ppirm[k])) for k in keep]),
     )
-    _write_macro(
-        tmp2, cp.PPIRM_FILE, [(str(info[k].date()), str(months[k].date()), float(ppirm[k])) for k in keep]
-    )
-    s2 = cp.component_p(dates, ["CU"], ["CU", "C"], macro_dir=tmp2)["CU"]
+    s2 = cp.component_p(dates, ["CU"], ["CU", "C"], macro_file=trunc)["CU"]
     m = s.index <= cut
     assert np.allclose(s[m].to_numpy(), s2[m].to_numpy(), equal_nan=True)
     # 周五截断、周末公布:截断日历下的信号与完整日历相同(公布前不可用)
     sat = next(i for i in info[30:] if i.weekday() == 5)
     fri = sat - pd.Timedelta(days=1)
-    s3 = cp.component_p(dates[dates <= fri], ["CU"], ["CU", "C"], macro_dir=tmp_path)["CU"]
+    s3 = cp.component_p(dates[dates <= fri], ["CU"], ["CU", "C"], macro_file=macro_file)["CU"]
     assert np.allclose(s3.to_numpy(), s.reindex(s3.index).to_numpy(), equal_nan=True)
     # 方向:剪刀差 3 个月变化为正且偏大 → 信号为正
     g = ppi - ppirm

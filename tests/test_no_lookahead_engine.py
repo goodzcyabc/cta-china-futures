@@ -10,7 +10,10 @@ import pandas as pd
 import pytest
 
 DATA = Path("data/ricecta/data")
-pytestmark = pytest.mark.skipif(not DATA.exists(), reason="需要米筐导出与交易所直连数据")
+EXCHANGE = Path("data/exchanges")  # 交易所直连落盘(ExchangeSource 默认根);拼接源两类数据都要
+pytestmark = pytest.mark.skipif(
+    not (DATA.exists() and EXCHANGE.exists()), reason="需要米筐导出与交易所直连数据"
+)
 
 
 def _run(cfg, specs, src, end):  # type: ignore[no-untyped-def]

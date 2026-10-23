@@ -171,9 +171,15 @@ class Release:
     value: float
 
 
-def load_macro(path: str) -> list[Release]:
-    """米筐宏观文件(index = (factor, info_date);列 start_date/end_date/value/rice_create_tm)→ 按公布日排序的发布记录。"""
-    m = pd.read_parquet(path).reset_index()
+def load_macro(path: str, factor: str | None = None) -> list[Release]:
+    """米筐宏观文件(列 factor/info_date/start_date/end_date/value/rice_create_tm)→ 按公布日排序的发布记录。
+
+    path 指向 `econ/macro_factors.parquet` 长表时用 factor 取单条序列;指向单因子文件(旧布局,索引 (factor, info_date))时 factor 留空。
+    """
+    m = pd.read_parquet(path)
+    if factor is not None:
+        m = m[m["factor"] == factor]
+    m = m.reset_index()
     out = [
         Release(pd.Timestamp(i), pd.Timestamp(e), float(v))
         for i, e, v in zip(m["info_date"].tolist(), m["end_date"].tolist(), m["value"].tolist())

@@ -54,7 +54,7 @@ from cta.pipeline import (
 from cta_research.factor_mining.signals import fundamental_signals as fs  # noqa: E402
 
 RQ = Path("data/ricecta/data")
-MACRO = RQ / "macro_factors"
+MACRO = RQ / "econ" / "macro_factors.parquet"
 HIST = pd.Timestamp("2016-01-04")
 END = pd.Timestamp("2026-06-05")  # 正式 OOS 末日 = 配置 backtest.end;宏观导出止于 2026-05-31 公布
 OOS_START = pd.Timestamp("2022-01-04")
@@ -62,7 +62,7 @@ IS_END = pd.Timestamp("2021-12-31")
 SEED, N_BOOT, BLOCK, LAGS = 20260926, 2000, 10, 5
 W_BLEND = 0.5
 OI_MEASURE = "notional"  # 预注册第 3 节:名义持仓(合约数 × 结算价 × 乘数)
-NO_FILE, FG_FILE = "制造业采购经理指数PMI_新订单.parquet", "制造业采购经理指数PMI_产成品库存.parquet"
+NO_FACTOR, FG_FACTOR = "制造业采购经理指数PMI_新订单", "制造业采购经理指数PMI_产成品库存"
 INDUSTRIAL_CLASSES = ("metal", "ferrous", "chem", "energy")  # 预注册第 4 节:工业品 + 能源;不含贵金属、农产品
 
 
@@ -322,8 +322,8 @@ def main() -> int:
     sec_tab.to_csv(out / "A_sector_growth.csv")
 
     # ---------- 候选 B:PMI 新订单 / 产成品库存 ----------
-    no = fs.load_macro(str(MACRO / NO_FILE))
-    fg = fs.load_macro(str(MACRO / FG_FILE))
+    no = fs.load_macro(str(MACRO), NO_FACTOR)
+    fg = fs.load_macro(str(MACRO), FG_FACTOR)
     rel_b_raw = fs.pmi_ratio_releases(no, fg)
     ratio = pd.Series({r.info_date: r.value for r in rel_b_raw}, dtype=float).sort_index()
     z_b = fs.expanding_z(ratio)

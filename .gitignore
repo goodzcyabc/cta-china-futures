@@ -13,3 +13,11 @@ results
 # 纸面账日步事务目录(失败时留作取证,不进 git)
 .txn/
 .venv
+INSTRUCTION.md
+*.tmp
+# 米筐导出入库(由 download/ 脚本生成);只排除 tick(未下载)、中间分片与日志
+!data/ricecta/
+!data/ricecta/data/
+data/ricecta/data/futures_tick/
+data/ricecta/data/dominant_contracts/_pieces/
+data/ricecta/download_log.jsonl
