@@ -1,0 +1,4 @@
+date,symbol,contract,lots,status,reason,leg,price,fee,slippage,realized_pnl
+2026-10-23,CU,CU2611,-1.0,filled,,roll_close,107840.0,26.96,50.0,-4950.0
+2026-10-23,CU,CU2612,1.0,filled,,roll_open,106890.0,26.7225,50.0,0.0
+2026-10-23,V,V2701,3.0,filled,,rebalance,5006.0,3.0,15.0,75.0
