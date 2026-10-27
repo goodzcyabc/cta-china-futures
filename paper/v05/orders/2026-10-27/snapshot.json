@@ -1,0 +1,17 @@
+{
+  "asof": "2026-10-27",
+  "equity": 3072463.2827499993,
+  "config_digest": "764ae2e20153",
+  "instruments_digest": "d023ab35",
+  "git_sha": "bc52b26",
+  "data_manifest": {
+    "primary": "{'root': 'data/ricecta/data', 'n_files': '2804', 'sha256': 'a9184ab336540a82'}",
+    "secondary": "{'root': '/Users/mac/code/cta-china-futures/data/exchanges', 'coverage': 'SHFE:2625:20261027;INE:2083:20261027;DCE:2625:20261027;CZCE:2625:20261027', 'sha256': '4f666c42268c587e'}",
+    "cutover": "2026-06-05",
+    "settle": "official",
+    "sha256": "80d31783c8bba7d5"
+  },
+  "stale_symbols": {},
+  "est_margin_usage": 0.11847025220565269,
+  "orders_sha256": "f85cd9d054198250"
+}
