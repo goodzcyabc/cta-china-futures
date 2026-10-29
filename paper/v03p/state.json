@@ -1,81 +1,86 @@
 {
- "equity": 2988811.8835000005,
+ "equity": 2984706.7075000005,
  "cash_start": 3000000.0,
- "last_settled": "2026-10-28",
- "pending_orders_date": "2026-10-28",
+ "last_settled": "2026-10-29",
+ "pending_orders_date": "2026-10-29",
  "positions": {
   "I": {
    "contract": "I2701",
    "lots": -5.0,
-   "ref_price": 666.0
+   "ref_price": 680.0
   },
   "J": {
    "contract": "J2701",
    "lots": 1.0,
-   "ref_price": 1929.5
+   "ref_price": 1932.0
   },
   "MA": {
    "contract": "MA2701",
    "lots": 10.0,
-   "ref_price": 3417.0
+   "ref_price": 3431.0
   },
   "P": {
    "contract": "P2701",
    "lots": -8.0,
-   "ref_price": 9312.0
+   "ref_price": 9188.0
   },
   "TA": {
    "contract": "TA2701",
    "lots": 10.0,
-   "ref_price": 6606.0
+   "ref_price": 6678.0
   },
   "V": {
    "contract": "V2701",
-   "lots": -4.0,
-   "ref_price": 5212.0
+   "lots": -1.0,
+   "ref_price": 5269.0
   },
   "JD": {
    "contract": "JD2612",
    "lots": 5.0,
-   "ref_price": 3304.0
+   "ref_price": 3353.0
   },
   "CF": {
    "contract": "CF2701",
    "lots": 2.0,
-   "ref_price": 15260.0
+   "ref_price": 15170.0
   },
   "Y": {
    "contract": "Y2701",
    "lots": 1.0,
-   "ref_price": 8965.0
+   "ref_price": 8964.0
   },
   "C": {
    "contract": "C2701",
    "lots": -43.0,
-   "ref_price": 2219.0
+   "ref_price": 2223.0
   },
   "NI": {
    "contract": "NI2612",
    "lots": -2.0,
-   "ref_price": 117870.0
+   "ref_price": 118150.0
   },
   "AL": {
    "contract": "AL2612",
    "lots": 6.0,
-   "ref_price": 23585.0
+   "ref_price": 23360.0
   },
   "CU": {
    "contract": "CU2612",
    "lots": 1.0,
-   "ref_price": 109200.0
+   "ref_price": 109030.0
   },
   "SN": {
    "contract": "SN2612",
    "lots": 1.0,
-   "ref_price": 386470.0
+   "ref_price": 383080.0
+  },
+  "RB": {
+   "contract": "RB2701",
+   "lots": 4.0,
+   "ref_price": 3060.0
   }
  },
- "realized_pnl": -21615.0,
- "fees_paid": 1233.1165,
- "slippage_paid": 5490.0
+ "realized_pnl": -22500.0,
+ "fees_paid": 1248.2925,
+ "slippage_paid": 5545.0
 }
