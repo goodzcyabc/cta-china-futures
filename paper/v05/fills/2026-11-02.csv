@@ -1,0 +1,2 @@
+date,symbol,contract,lots,status,reason,leg,price,fee,slippage,realized_pnl
+2026-11-02,SN,SN2612,-1.0,filled,,rebalance,359990.0,3.0,10.0,-10170.0

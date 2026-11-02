@@ -1,56 +1,51 @@
 {
- "equity": 3066491.2827499993,
+ "equity": 3078818.2827499993,
  "cash_start": 3000000.0,
- "last_settled": "2026-10-30",
- "pending_orders_date": "2026-10-30",
+ "last_settled": "2026-11-02",
+ "pending_orders_date": "2026-11-02",
  "positions": {
   "MA": {
    "contract": "MA2701",
    "lots": 10.0,
-   "ref_price": 3463.0
+   "ref_price": 3553.0
   },
   "SA": {
    "contract": "SA2701",
    "lots": -14.0,
-   "ref_price": 976.0
+   "ref_price": 966.0
   },
   "TA": {
    "contract": "TA2701",
    "lots": 10.0,
-   "ref_price": 6620.0
+   "ref_price": 6678.0
   },
   "V": {
    "contract": "V2701",
    "lots": -1.0,
-   "ref_price": 5295.0
+   "ref_price": 5269.0
   },
   "AG": {
    "contract": "AG2612",
    "lots": -1.0,
-   "ref_price": 12374.0
+   "ref_price": 11754.0
   },
   "NI": {
    "contract": "NI2612",
    "lots": -4.0,
-   "ref_price": 117390.0
+   "ref_price": 115910.0
   },
   "AL": {
    "contract": "AL2612",
    "lots": 6.0,
-   "ref_price": 23365.0
+   "ref_price": 23215.0
   },
   "CU": {
    "contract": "CU2612",
    "lots": 1.0,
-   "ref_price": 108190.0
-  },
-  "SN": {
-   "contract": "SN2612",
-   "lots": 1.0,
-   "ref_price": 370160.0
+   "ref_price": 107580.0
   }
  },
- "realized_pnl": -11890.0,
- "fees_paid": 393.71725000000004,
- "slippage_paid": 1640.0
+ "realized_pnl": -22060.0,
+ "fees_paid": 396.71725000000004,
+ "slippage_paid": 1650.0
 }
