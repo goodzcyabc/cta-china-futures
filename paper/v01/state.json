@@ -1,86 +1,81 @@
 {
- "equity": 2978722.0104999985,
+ "equity": 2946035.1904999986,
  "cash_start": 3000000.0,
- "last_settled": "2026-11-02",
- "pending_orders_date": "2026-11-02",
+ "last_settled": "2026-11-03",
+ "pending_orders_date": "2026-11-03",
  "positions": {
   "M": {
    "contract": "M2701",
    "lots": 12.0,
-   "ref_price": 3187.0
+   "ref_price": 3166.0
   },
   "MA": {
    "contract": "MA2701",
    "lots": 10.0,
-   "ref_price": 3553.0
+   "ref_price": 3447.0
   },
   "P": {
    "contract": "P2701",
    "lots": -4.0,
-   "ref_price": 9308.0
+   "ref_price": 9244.0
   },
   "RB": {
    "contract": "RB2701",
-   "lots": -4.0,
-   "ref_price": 3019.0
+   "lots": -9.0,
+   "ref_price": 3002.0
   },
   "SA": {
    "contract": "SA2701",
    "lots": -19.0,
-   "ref_price": 966.0
+   "ref_price": 973.0
   },
   "SR": {
    "contract": "SR2701",
    "lots": -4.0,
-   "ref_price": 5243.0
+   "ref_price": 5220.0
   },
   "TA": {
    "contract": "TA2701",
    "lots": 9.0,
-   "ref_price": 6678.0
-  },
-  "V": {
-   "contract": "V2701",
-   "lots": -1.0,
-   "ref_price": 5269.0
+   "ref_price": 6422.0
   },
   "Y": {
    "contract": "Y2701",
    "lots": 4.0,
-   "ref_price": 9063.0
+   "ref_price": 8947.0
   },
   "I": {
    "contract": "I2701",
    "lots": -1.0,
-   "ref_price": 676.0
+   "ref_price": 671.5
   },
   "JD": {
    "contract": "JD2612",
    "lots": 4.0,
-   "ref_price": 3535.0
+   "ref_price": 3550.0
   },
   "C": {
    "contract": "C2701",
-   "lots": -13.0,
-   "ref_price": 2228.0
+   "lots": -9.0,
+   "ref_price": 2229.0
   },
   "NI": {
    "contract": "NI2612",
    "lots": -2.0,
-   "ref_price": 115910.0
+   "ref_price": 117010.0
   },
   "AL": {
    "contract": "AL2612",
-   "lots": 4.0,
-   "ref_price": 23215.0
+   "lots": 2.0,
+   "ref_price": 23115.0
   },
   "CU": {
    "contract": "CU2612",
    "lots": 1.0,
-   "ref_price": 107580.0
+   "ref_price": 107230.0
   }
  },
- "realized_pnl": -34950.0,
- "fees_paid": 1032.9895,
- "slippage_paid": 4755.0
+ "realized_pnl": -35940.0,
+ "fees_paid": 1059.8094999999998,
+ "slippage_paid": 4900.0
 }
