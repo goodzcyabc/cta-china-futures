@@ -2,11 +2,81 @@
  "date": "2026-11-06",
  "fills": {
   "n": 6,
-  "filled": 4,
-  "blocked": 2
+  "filled": 6,
+  "blocked": 0
  },
- "failed": {
-  "stage": "settle",
-  "error": "LedgerIntegrityError: held contracts without a finite settlement price: ['M:M2701', 'P:P2701', 'Y:Y2701', 'JD:JD2612', 'C:C2701', 'V:V2701']"
+ "orders": {
+  "n_symbols": 22,
+  "n_trades": 5,
+  "n_rolls": 0,
+  "est_margin_usage": 0.1291348953440006,
+  "stale_symbols": {}
+ },
+ "equity": 2874843.000499999,
+ "positions": {
+  "M": [
+   "M2701",
+   12.0
+  ],
+  "MA": [
+   "MA2701",
+   10.0
+  ],
+  "P": [
+   "P2701",
+   -4.0
+  ],
+  "RB": [
+   "RB2701",
+   -6.0
+  ],
+  "SA": [
+   "SA2701",
+   -19.0
+  ],
+  "SR": [
+   "SR2701",
+   -4.0
+  ],
+  "TA": [
+   "TA2701",
+   9.0
+  ],
+  "Y": [
+   "Y2701",
+   4.0
+  ],
+  "JD": [
+   "JD2612",
+   7.0
+  ],
+  "C": [
+   "C2701",
+   -13.0
+  ],
+  "NI": [
+   "NI2612",
+   -1.0
+  ],
+  "AL": [
+   "AL2612",
+   3.0
+  ],
+  "CU": [
+   "CU2612",
+   1.0
+  ],
+  "V": [
+   "V2701",
+   -7.0
+  ],
+  "CF": [
+   "CF2701",
+   1.0
+  ],
+  "J": [
+   "J2701",
+   1.0
+  ]
  }
 }

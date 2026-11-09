@@ -1,0 +1,2 @@
+date,symbol,contract,lots,status,reason,leg,price,fee,slippage,realized_pnl
+2026-11-09,TA,TA2701,-3.0,filled,,rebalance,6092.0,9.0,30.0,570.0
