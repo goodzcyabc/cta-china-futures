@@ -1,0 +1,12 @@
+{
+ "date": "2026-11-11",
+ "fills": {
+  "n": 2,
+  "filled": 0,
+  "blocked": 2
+ },
+ "failed": {
+  "stage": "settle",
+  "error": "LedgerIntegrityError: held contracts without a finite settlement price: ['J:J2701', 'M:M2701', 'P:P2701', 'JD:JD2612', 'C:C2701', 'Y:Y2701', 'V:V2701']"
+ }
+}
