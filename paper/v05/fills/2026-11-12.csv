@@ -1,0 +1,5 @@
+date,symbol,contract,lots,status,reason,leg,price,fee,slippage,realized_pnl
+2026-11-12,NI,NI2612,1.0,filled,,roll_close,122310.0,3.0,10.0,-520.0
+2026-11-12,NI,NI2701,-1.0,filled,,roll_open,122150.0,3.0,10.0,0.0
+2026-11-12,RU,RU2701,1.0,filled,,rebalance,19500.0,3.0,50.0,-3050.0
+2026-11-12,SA,SA2701,10.0,filled,,rebalance,977.0,19.54,200.0,-1800.0

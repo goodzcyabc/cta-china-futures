@@ -2,11 +2,61 @@
  "date": "2026-11-11",
  "fills": {
   "n": 2,
-  "filled": 1,
-  "blocked": 1
+  "filled": 2,
+  "blocked": 0
  },
- "failed": {
-  "stage": "settle",
-  "error": "LedgerIntegrityError: held contracts without a finite settlement price: ['V:V2701']"
+ "orders": {
+  "n_symbols": 12,
+  "n_trades": 3,
+  "n_rolls": 1,
+  "est_margin_usage": 0.15475016370320926,
+  "stale_symbols": {}
+ },
+ "equity": 2893812.770749999,
+ "positions": {
+  "MA": [
+   "MA2701",
+   10.0
+  ],
+  "SA": [
+   "SA2701",
+   -22.0
+  ],
+  "TA": [
+   "TA2701",
+   7.0
+  ],
+  "V": [
+   "V2701",
+   -8.0
+  ],
+  "NI": [
+   "NI2612",
+   -1.0
+  ],
+  "AL": [
+   "AL2612",
+   6.0
+  ],
+  "CU": [
+   "CU2612",
+   1.0
+  ],
+  "AU": [
+   "AU2612",
+   -1.0
+  ],
+  "SN": [
+   "SN2612",
+   1.0
+  ],
+  "AG": [
+   "AG2702",
+   -1.0
+  ],
+  "RU": [
+   "RU2701",
+   -1.0
+  ]
  }
 }
