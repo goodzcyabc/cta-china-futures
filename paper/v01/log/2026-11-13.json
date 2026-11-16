@@ -1,9 +1,9 @@
 {
  "date": "2026-11-13",
  "ingest": {
-  "SHFE": "quotes:written,positions:written,receipts:written,params:written",
-  "INE": "quotes:written,positions:written,receipts:written,params:written",
-  "CZCE": "quotes:ok,positions:ok,receipts:ok,params:written",
+  "SHFE": "quotes:exists,positions:exists,receipts:exists,params:exists",
+  "INE": "quotes:exists,positions:exists,receipts:exists,params:exists",
+  "CZCE": "quotes:exists,positions:exists,receipts:exists,params:exists",
   "DCE": "error: TimeoutError: timed out,params:skipped_needs_browser"
  },
  "fills": {
