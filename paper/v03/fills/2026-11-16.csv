@@ -1,0 +1,9 @@
+date,symbol,contract,lots,status,reason,leg,price,fee,slippage,realized_pnl
+2026-11-16,AL,AL2612,-7.0,filled,,roll_close,22585.0,21.0,175.0,-2625.0
+2026-11-16,AL,AL2701,7.0,filled,,roll_open,22205.0,21.0,175.0,0.0
+2026-11-16,JD,JD2612,-8.0,filled,,roll_close,3609.0,43.308,80.0,-2160.0
+2026-11-16,JD,JD2701,8.0,filled,,roll_open,3261.0,39.132,80.0,0.0
+2026-11-16,M,M2701,1.0,filled,,rebalance,3161.0,1.5,10.0,0.0
+2026-11-16,RB,RB2701,2.0,filled,,rebalance,3036.0,6.072,20.0,0.0
+2026-11-16,SA,SA2701,4.0,filled,,rebalance,995.0,7.96,80.0,-160.0
+2026-11-16,V,V2701,4.0,filled,,rebalance,5070.0,4.0,20.0,-1680.0

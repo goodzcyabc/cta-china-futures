@@ -1,86 +1,91 @@
 {
- "equity": 2863900.2424999997,
+ "equity": 2865282.9015,
  "cash_start": 3000000.0,
- "last_settled": "2026-11-12",
- "pending_orders_date": "2026-11-12",
+ "last_settled": "2026-11-17",
+ "pending_orders_date": "2026-11-17",
  "positions": {
   "M": {
    "contract": "M2701",
    "lots": 12.0,
-   "ref_price": 3139.0
+   "ref_price": 3089.0
   },
   "MA": {
    "contract": "MA2701",
    "lots": 10.0,
-   "ref_price": 3163.0
+   "ref_price": 3140.0
   },
   "P": {
    "contract": "P2701",
-   "lots": -6.0,
-   "ref_price": 8922.0
+   "lots": -4.0,
+   "ref_price": 8874.0
   },
   "RB": {
    "contract": "RB2701",
-   "lots": -8.0,
-   "ref_price": 3031.0
+   "lots": -12.0,
+   "ref_price": 2978.0
   },
   "SA": {
    "contract": "SA2701",
-   "lots": -19.0,
-   "ref_price": 976.0
+   "lots": -11.0,
+   "ref_price": 969.0
   },
   "SR": {
    "contract": "SR2701",
    "lots": -10.0,
-   "ref_price": 5194.0
+   "ref_price": 5060.0
   },
   "TA": {
    "contract": "TA2701",
    "lots": 5.0,
-   "ref_price": 6006.0
+   "ref_price": 5962.0
   },
   "Y": {
    "contract": "Y2701",
    "lots": 4.0,
-   "ref_price": 8775.0
-  },
-  "JD": {
-   "contract": "JD2612",
-   "lots": 7.0,
-   "ref_price": 3606.0
+   "ref_price": 8663.0
   },
   "C": {
    "contract": "C2701",
    "lots": -15.0,
-   "ref_price": 2188.0
-  },
-  "AL": {
-   "contract": "AL2612",
-   "lots": 2.0,
-   "ref_price": 22650.0
+   "ref_price": 2178.0
   },
   "CU": {
    "contract": "CU2612",
    "lots": 1.0,
-   "ref_price": 105140.0
+   "ref_price": 104160.0
   },
   "V": {
    "contract": "V2701",
-   "lots": -7.0,
-   "ref_price": 4930.0
+   "lots": -4.0,
+   "ref_price": 4938.0
   },
   "J": {
    "contract": "J2701",
    "lots": 1.0,
-   "ref_price": 1934.0
+   "ref_price": 1929.5
   },
   "NI": {
    "contract": "NI2701",
    "lots": -1.0,
-   "ref_price": 122490.0
+   "ref_price": 120320.0
+  },
+  "I": {
+   "contract": "I2701",
+   "lots": -2.0,
+   "ref_price": 645.5
+  },
+  "AL": {
+   "contract": "AL2701",
+   "lots": 3.0,
+   "ref_price": 22130.0
+  },
+  "JD": {
+   "contract": "JD2701",
+   "lots": 7.0,
+   "ref_price": 3257.0
   }
  },
- "realized_pnl": -44685.0,
- "fees_paid": 1254.7574999999997,
- "slippage_paid": 5875.0
+ "realized_pnl": -50540.0,
+ "fees_paid": 1397.0984999999996,
+ "slippage_paid": 6525.0
 }

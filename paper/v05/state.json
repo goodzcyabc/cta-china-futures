@@ -1,61 +1,61 @@
 {
- "equity": 2913024.230749999,
+ "equity": 2945511.270749999,
  "cash_start": 3000000.0,
- "last_settled": "2026-11-12",
- "pending_orders_date": "2026-11-12",
+ "last_settled": "2026-11-17",
+ "pending_orders_date": "2026-11-17",
  "positions": {
   "MA": {
    "contract": "MA2701",
    "lots": 10.0,
-   "ref_price": 3163.0
+   "ref_price": 3140.0
   },
   "SA": {
    "contract": "SA2701",
-   "lots": -12.0,
-   "ref_price": 976.0
+   "lots": -8.0,
+   "ref_price": 969.0
   },
   "TA": {
    "contract": "TA2701",
    "lots": 7.0,
-   "ref_price": 6006.0
+   "ref_price": 5962.0
   },
   "V": {
    "contract": "V2701",
-   "lots": -8.0,
-   "ref_price": 4930.0
-  },
-  "AL": {
-   "contract": "AL2612",
-   "lots": 6.0,
-   "ref_price": 22650.0
+   "lots": -4.0,
+   "ref_price": 4938.0
   },
   "CU": {
    "contract": "CU2612",
    "lots": 1.0,
-   "ref_price": 105140.0
+   "ref_price": 104160.0
   },
   "AU": {
    "contract": "AU2612",
    "lots": -1.0,
-   "ref_price": 860.46
+   "ref_price": 831.5
   },
   "SN": {
    "contract": "SN2612",
    "lots": 1.0,
-   "ref_price": 349840.0
+   "ref_price": 349050.0
   },
   "AG": {
    "contract": "AG2702",
    "lots": -1.0,
-   "ref_price": 12495.0
+   "ref_price": 11262.0
   },
   "NI": {
    "contract": "NI2701",
    "lots": -1.0,
-   "ref_price": 122490.0
+   "ref_price": 120320.0
+  },
+  "AL": {
+   "contract": "AL2701",
+   "lots": 6.0,
+   "ref_price": 22130.0
   }
  },
- "realized_pnl": -35695.0,
- "fees_paid": 510.7692500000001,
- "slippage_paid": 2285.0
+ "realized_pnl": -39785.0,
+ "fees_paid": 558.7292500000001,
+ "slippage_paid": 2685.0
 }
