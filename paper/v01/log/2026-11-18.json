@@ -1,0 +1,18 @@
+{
+ "date": "2026-11-18",
+ "ingest": {
+  "SHFE": "quotes:written,positions:written,receipts:written,params:written",
+  "INE": "quotes:written,positions:written,receipts:written,params:written",
+  "CZCE": "quotes:ok,positions:error:IncompleteRead:IncompleteRead(278235 bytes read, 187185 more expected),receipts:ok,params:written",
+  "DCE": "error: URLError: <urlopen error [Errno 61] Connection refused>,params:skipped_needs_browser"
+ },
+ "fills": {
+  "n": 5,
+  "filled": 3,
+  "blocked": 2
+ },
+ "failed": {
+  "stage": "settle",
+  "error": "LedgerIntegrityError: held contracts without a finite settlement price: ['M:M2701', 'P:P2701', 'Y:Y2701', 'C:C2701', 'V:V2701', 'J:J2701', 'I:I2701', 'JD:JD2701']"
+ }
+}
