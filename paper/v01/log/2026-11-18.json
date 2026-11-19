@@ -1,9 +1,9 @@
 {
  "date": "2026-11-18",
  "ingest": {
-  "SHFE": "quotes:written,positions:written,receipts:written,params:written",
-  "INE": "quotes:written,positions:written,receipts:written,params:written",
-  "CZCE": "quotes:ok,positions:error:IncompleteRead:IncompleteRead(278235 bytes read, 187185 more expected),receipts:ok,params:written",
+  "SHFE": "quotes:exists,positions:exists,receipts:exists,params:exists",
+  "INE": "quotes:exists,positions:exists,receipts:exists,params:exists",
+  "CZCE": "quotes:exists,positions:ok,receipts:exists,params:exists",
   "DCE": "error: URLError: <urlopen error [Errno 61] Connection refused>,params:skipped_needs_browser"
  },
  "fills": {
