@@ -3,7 +3,7 @@
  "ingest": {
   "SHFE": "quotes:exists,positions:exists,receipts:exists,params:exists",
   "INE": "quotes:exists,positions:exists,receipts:exists,params:exists",
-  "CZCE": "quotes:exists,positions:ok,receipts:exists,params:exists",
+  "CZCE": "quotes:exists,positions:exists,receipts:exists,params:exists",
   "DCE": "error: URLError: <urlopen error [Errno 61] Connection refused>,params:skipped_needs_browser"
  },
  "fills": {
